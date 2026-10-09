@@ -1,0 +1,47 @@
+<div class="label">Try it</div>
+      <div class="lab">
+        <p class="note">Example business: Juniper Row Bakery sends a newsletter every Friday. Done by hand it takes the owner about 86 minutes (example numbers).</p>
+        <p class="ask" id="l4m1-ask">Step 1 of 3. Tap the steps in the order you would do them.</p>
+        <div class="split">
+          <div>
+            <p class="mini">Steps (tap to add)</p>
+            <div class="chips" id="l4m1-pile"></div>
+          </div>
+          <div>
+            <p class="mini">Your process</p>
+            <ol class="seq" id="l4m1-seq"></ol>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" id="l4m1-check" disabled>Check my order</button>
+          <button type="button" class="btn ghost" id="l4m1-fix">Show me a sensible order</button>
+          <button type="button" class="btn ghost" id="l4m1-undo" data-smoke="skip">Undo last</button>
+          <button type="button" class="btn ghost" id="l4m1-reset" data-smoke="skip">Start over</button>
+        </div>
+        <p class="msg" id="l4m1-msg" aria-live="polite">Tap a step to start. Several orders work. Each step just needs what it depends on to come first.</p>
+        <div id="l4m1-sumwrap" hidden>
+          <div class="actions"><button type="button" class="btn" id="l4m1-sumbtn" disabled>Show where the time goes</button><span class="note" id="l4m1-tagcount">0 of 7 tagged</span></div>
+        </div>
+        <div id="l4m1-sum" hidden style="display:grid;gap:14px"></div>
+      </div>
+
+      <div class="label">Why it works</div>
+      <p>A prompt gets you one answer. A process gets you the same good answer every week, because the steps around the AI are written down: what goes in, what the AI does, and who checks what comes out.</p>
+      <p>Tag every step honestly. AI is strong at drafts and options. A person stays wherever a wrong detail costs money or trust.</p>
+      <ul class="tells">
+        <li><b>Human</b><span>Choosing, fact-checking, sending.</span></li>
+        <li><b>AI</b><span>First drafts, options, rewrites.</span></li>
+        <li><b>Both</b><span>The AI proposes, you decide.</span></li>
+      </ul>
+
+      <div class="label">Check</div>
+      <div id="quiz1"></div>
+
+      <div class="label">Go deeper</div>
+      <details class="deeper">
+        <summary>Write it down before you build anything</summary>
+        <div class="body">
+          <p>Run the task by hand three times and write the steps in a note. Save one example of a result you were proud of. If you cannot describe a step in a sentence, it is not ready to hand off.</p>
+          <p>Start with the task you repeat most and dislike least to explain. A weekly newsletter, a lead follow-up, and a monthly report are all good first picks.</p>
+        </div>
+      </details>

@@ -1,0 +1,40 @@
+{
+ "level": 4,
+ "pageTitle": "AI Build Mode",
+ "name": "Build Mode",
+ "lede": "Four missions, about ten minutes each. You move from one-off prompts to workflows, agents, and automations you can run every week, and you learn when to trust what comes back. Jump to any mission in any order.",
+ "description": "Level 4 of an interactive AI course for marketers: four short missions on repeatable workflows, agents, automations, and checking AI output.",
+ "missions": [
+  {
+   "name": "From Prompt to Process",
+   "min": 10,
+   "hook": "A good prompt gets you one good answer. A process gets you the same good answer every Friday. Build one for a small bakery and decide who does each step.",
+   "objective": "Turn a weekly task into a clear process and decide where a person stays involved."
+  },
+  {
+   "name": "Meet the Agent",
+   "min": 10,
+   "hook": "An agent is an AI that plans steps and uses tools, while you set the goal and the limits. Watch one work, and decide when to let it keep going.",
+   "objective": "Follow an AI agent through a task and decide when to approve, edit, or stop it."
+  },
+  {
+   "name": "Wire It Up",
+   "min": 10,
+   "hook": "An automation is a trigger plus some steps. The trick is not building it, it is building it so a bad day cannot hurt you. Watch the risk meter as you go.",
+   "objective": "Build a simple automation and see how each choice changes the risk."
+  },
+  {
+   "name": "Trust Test",
+   "min": 10,
+   "hook": "Output that looks fine is not the same as output that is right. Score five drafts two ways, then write the approval rules you will actually use.",
+   "objective": "Score AI output two ways and set approval rules you will actually use."
+  }
+ ],
+ "recap": [
+  "A process is steps plus owners. Tag each one Human, AI, or Both.",
+  "An agent plans, acts with tools, checks, and reports. You hold the goal, the limits, and the approvals.",
+  "An automation is a trigger plus steps. Filters, repeat checks, and drafts keep a bad day small.",
+  "Quick looks catch tone, not facts. Set approval rules by risk: always check, spot-check, or run alone."
+ ],
+ "next": "Next up: Level 5, Boss Level. Set strategy and rules, prove the return, and ship a real workflow."
+}

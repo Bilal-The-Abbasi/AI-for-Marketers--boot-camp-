@@ -1,0 +1,40 @@
+{
+ "level": 5,
+ "pageTitle": "AI Boss Level",
+ "name": "Boss Level",
+ "lede": "Four missions, about ten minutes each. This time you are the one who decides how a team uses AI: where to start, what the rules are, what it returned, and what ships. Jump to any mission in any order.",
+ "description": "Level 5 of an interactive AI course for marketers: strategy, rules, proof of return, and a one-page AI workflow plan you can copy and use.",
+ "missions": [
+  {
+   "name": "Strategy Map",
+   "min": 10,
+   "hook": "A team can try AI on a hundred things. The smart ones start with a few. Place six ideas on the map, then pick your first three.",
+   "objective": "Rank AI use cases by impact and risk, then choose the first three to try."
+  },
+  {
+   "name": "Rules of the Road",
+   "min": 10,
+   "hook": "Ten quick scenarios. Sort each one: fine, needs a human sign-off, or don't. Build a streak and read the reason after every card.",
+   "objective": "Sort real-world scenarios into fine, needs sign-off, or don't."
+  },
+  {
+   "name": "Prove It",
+   "min": 10,
+   "hook": "Someone will ask whether the AI is worth it. Build an honest number with a calculator, then try to break it.",
+   "objective": "Build an honest estimate of what an AI workflow is worth, and test where it could be wrong."
+  },
+  {
+   "name": "Ship It",
+   "min": 10,
+   "hook": "The capstone. Pick a campaign, fill in six boxes, and walk away with a clean one-page AI workflow plan you can hand to your team.",
+   "objective": "Write a one-page plan for a real AI workflow that your team can follow."
+  }
+ ],
+ "recap": [
+  "Start where the impact is high and the risk is low. Earn the bigger bets.",
+  "Sort every use into fine, needs a human sign-off, or don't, and check your own policies.",
+  "Net value is time kept, minus review, rework, and tool cost. Count it honestly.",
+  "You wrote a one-page AI workflow plan with human checkpoints. Now run it."
+ ],
+ "next": "That is the whole course. You have the prompts, the kit, the systems, and now the plan. Pick one real campaign this week and go ship something real."
+}

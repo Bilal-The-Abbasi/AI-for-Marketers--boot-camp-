@@ -1,0 +1,40 @@
+{
+ "level": 3,
+ "pageTitle": "AI Marketing Machine",
+ "name": "Marketing Machine",
+ "lede": "Four missions, about ten minutes each. Each one is a small project from a normal marketing week: research, content, ad testing, and reporting. You do the work first, then find out why it held up.",
+ "description": "Level 3 of an interactive AI course for marketers: research, content, ad testing, and reporting, each as a short hands-on project.",
+ "missions": [
+  {
+   "name": "Research Sprint",
+   "min": 10,
+   "hook": "An AI research summary reads well and sounds sure. Your job is sorting what you can use today from what needs a check and what gets cut.",
+   "objective": "Sort an AI research summary into what to use, what to check first, and what to cut."
+  },
+  {
+   "name": "Content Engine",
+   "min": 10,
+   "hook": "From search intent to a published post, six steps. Decide who does each one, you, the AI, or both, and see how your pipeline scores.",
+   "objective": "Decide which steps of a content workflow belong to you, to the AI, or to both."
+  },
+  {
+   "name": "Ad Copy Lab",
+   "min": 10,
+   "hook": "AI will write you twenty ad variants before lunch. Testing them honestly is the hard part. Start by running two identical ads and watching one win.",
+   "objective": "Tell a real winner from luck, and design an ad test you can trust."
+  },
+  {
+   "name": "Read the Numbers",
+   "min": 10,
+   "hook": "Ask better questions of a weekly table, catch the shaky claims in an AI summary, then build the report prompt you can reuse every Monday.",
+   "objective": "Ask better questions of your data and spot the weak claims in an AI summary."
+  }
+ ],
+ "recap": [
+  "Sort AI research into use, check, and cut. Ask it what it is unsure of.",
+  "Give AI the drafting. Keep intent, facts, voice, and the publish button.",
+  "Small numbers are noisy. Change one thing, wait, then decide.",
+  "Ask what moved, flag the claims the data cannot back, and reuse your report prompt."
+ ],
+ "next": "Next up: Level 4, Build Mode. Turn your best prompts into repeatable workflows."
+}

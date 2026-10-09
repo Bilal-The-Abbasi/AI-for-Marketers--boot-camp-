@@ -1,0 +1,65 @@
+<div class="label">Try it</div>
+      <div class="lab">
+        <p class="note">Prefilled with examples from a made-up shop. Swap in your own, then copy. Build at least two of the three types.</p>
+        <fieldset class="seg" id="l2m4-types">
+          <legend class="mini">Template type</legend>
+        </fieldset>
+        <div class="form">
+          <label class="fld wide" for="l2m4-role"><span>Role for the AI</span>
+            <input id="l2m4-role" type="text" autocomplete="off"></label>
+          <label class="fld wide" for="l2m4-voice"><span>Voice card (from Mission 1)</span>
+            <textarea id="l2m4-voice" rows="5"></textarea></label>
+          <div class="fld">
+            <label for="l2m4-aud"><span>Audience</span></label>
+            <input id="l2m4-aud" type="text" autocomplete="off">
+            <label class="mk"><input type="checkbox" id="l2m4-audph"> Make it a {audience} placeholder</label>
+          </div>
+          <div class="fld">
+            <label for="l2m4-goal"><span>Goal</span></label>
+            <input id="l2m4-goal" type="text" autocomplete="off">
+            <label class="mk"><input type="checkbox" id="l2m4-goalph"> Make it a {goal} placeholder</label>
+          </div>
+          <label class="fld wide" for="l2m4-cons"><span>Constraints</span>
+            <textarea id="l2m4-cons" rows="3"></textarea></label>
+          <label class="fld wide" for="l2m4-ex"><span>One example of the style you want</span>
+            <input id="l2m4-ex" type="text" autocomplete="off"></label>
+          <label class="fld wide" for="l2m4-fmt"><span>Format</span>
+            <input id="l2m4-fmt" type="text" autocomplete="off"></label>
+        </div>
+        <div>
+          <p class="mini">Your template</p>
+          <pre class="prompt" id="l2m4-pre" tabindex="0"></pre>
+        </div>
+        <p class="note" id="l2m4-ph"></p>
+        <div class="actions">
+          <button type="button" class="btn" id="l2m4-copy">Copy template</button>
+          <button type="button" class="btn ghost" id="l2m4-next" data-smoke="">Build another type</button>
+          <span class="note" id="l2m4-cn" aria-live="polite"></span>
+        </div>
+        <p class="tracker" id="l2m4-trk"></p>
+      </div>
+
+      <div class="label">Why it works</div>
+      <p>The template splits your prompt into two kinds of lines. Fixed lines (role, voice, constraints, example, format, the no-invented-facts rule) stay the same every time. Placeholders in curly braces are the only parts you change.</p>
+      <p>That is the whole kit. Next time you need a campaign email, you paste the template, swap {offer} and {facts}, and run it. Ten seconds, same quality, same voice.</p>
+
+      <div class="label">Check</div>
+      <div class="lab">
+        <p class="ask">Paste one template into your AI tool, replace the placeholders with real details, run it, then tick whatever is true.</p>
+        <ul class="checklist" id="l2m4-checklist">
+          <li><label><input type="checkbox"> I replaced every {placeholder} with real details before running it.</label></li>
+          <li><label><input type="checkbox"> The output followed my format and my limits.</label></li>
+          <li><label><input type="checkbox"> It sounded like us, or I know which voice-card line to tighten.</label></li>
+          <li><label><input type="checkbox"> I saved the template where I will find it next week.</label></li>
+        </ul>
+        <p class="msg" id="l2m4-ckmsg" aria-live="polite"></p>
+      </div>
+
+      <div class="label">Go deeper</div>
+      <details class="deeper">
+        <summary>Keeping the kit alive</summary>
+        <div class="body">
+          <p>Save the three templates in one note, one heading each. When a result disappoints, fix the template, not just the output. A new line in the template helps every future run.</p>
+          <p>Add a version date to each. When a template stops working, you will know which edit broke it.</p>
+        </div>
+      </details>

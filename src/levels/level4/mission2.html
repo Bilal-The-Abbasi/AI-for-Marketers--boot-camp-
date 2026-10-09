@@ -1,0 +1,33 @@
+<div class="label">Try it</div>
+      <div class="lab">
+        <p class="note">A scripted example. No real AI is running and nothing is actually sent. Fictional business: Tidewater Tea Co., a small iced tea maker.</p>
+        <div class="brief">
+          <b>Goal you set:</b> Find 3 independent cafes within 10 miles that could stock Tidewater Tea, and draft a short intro email to each.<br>
+          <b>Facts you gave it:</b> small-batch, three flavors, free tasting case. Nothing else.<br>
+          <b>Limits you set:</b> it may search the web and draft emails. It may not send anything without your OK, and it may not offer discounts.
+        </div>
+        <ol class="stages" id="l4m2-stages" aria-label="Agent loop">
+          <li class="on">Goal</li><li>Plan</li><li>Act</li><li>Check</li><li>Report</li>
+        </ol>
+        <div class="actions">
+          <button type="button" class="btn" id="l4m2-start">Run the agent</button>
+          <button type="button" class="btn ghost" id="l4m2-replay" data-smoke="skip" hidden>Replay with different choices</button>
+        </div>
+        <div id="l4m2-log" class="log" aria-live="polite"></div>
+      </div>
+
+      <div class="label">Why it works</div>
+      <p>An agent runs a loop: take the goal, make a plan, act with tools (search, read, draft, send), check its own work, and report. A chat answers once. An agent keeps going until it thinks it is done.</p>
+      <p>That is why the limits matter. Reading and drafting are easy to undo. Sending, spending, and publishing are not. Approve the quiet steps fast and slow down at the ones that touch the outside world.</p>
+
+      <div class="label">Check</div>
+      <div id="quiz2"></div>
+
+      <div class="label">Go deeper</div>
+      <details class="deeper">
+        <summary>How agents fail in boring ways</summary>
+        <div class="body">
+          <p>Most agent mistakes are not dramatic. It uses a claim you never gave it, repeats a step, or quietly widens the job. A short written goal, a list of facts it may use, and a list of things it may not do prevent most of it.</p>
+          <p>Give a new agent the smallest permissions that do the job. Let it read and draft for a few weeks before it can send anything. Keep its log so you can see what it did and why.</p>
+        </div>
+      </details>

@@ -1,0 +1,38 @@
+/* Level 5 extras. Tokens only. */
+.ucards{display:grid;gap:12px}
+.ucard{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:14px;display:grid;gap:10px}
+.ucard>*{margin:0;min-width:0}
+.ucard .ut{font-family:var(--f-display);font-weight:600;font-size:1.15rem;line-height:1.3;max-width:none}
+.ucard .fb{font-size:0.9375rem}
+.qpick{display:grid;gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:420px){.qpick{grid-template-columns:minmax(0,1fr)}}
+.qb b{display:block}
+.qb .qs{display:block;font-size:0.8125rem;color:var(--muted)}
+.qgrid{display:grid;gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.qcell{border:1px solid var(--line);border-radius:6px;padding:10px;background:var(--surface);min-height:7.5rem;display:grid;align-content:start;gap:6px}
+.qcell.quick{background:var(--ok-tint)}
+.qcell.big{background:var(--yellow-tint)}
+.qcell.skip{background:var(--no-tint)}
+.qcell.nice{background:var(--key-tint)}
+.qh{font-family:var(--f-display);font-weight:700;line-height:1.2}
+.qh span{display:block;font-family:var(--f-mono);font-weight:400;font-size:0.6875rem;letter-spacing:.04em;color:var(--muted)}
+.qitem{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:6px 8px;font-size:0.875rem;line-height:1.3;overflow-wrap:anywhere}
+.qitem i{display:block;font-style:normal;font-size:0.75rem;color:var(--muted)}
+.sub{border-top:1px solid var(--line);padding-top:14px}
+.scn{font-family:var(--f-display);font-weight:600;font-size:clamp(1.15rem,3.8vw,1.45rem);line-height:1.3;max-width:none}
+.pair{display:grid;grid-template-columns:7rem minmax(0,1fr);gap:10px;align-items:center}
+.pair input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--m);min-height:44px}
+.pair input[type=number]{padding:9px 8px}
+@media (max-width:420px){.pair{grid-template-columns:5.5rem minmax(0,1fr)}}
+.bignum{font-family:var(--f-display);font-weight:800;font-size:clamp(2.2rem,9vw,3.4rem);line-height:1;margin:0}
+.bignum.pos{color:var(--ok)}
+.bignum.neg{color:var(--no)}
+.formula{margin:0;padding-left:1.3em;display:grid;gap:8px;font-size:0.9375rem}
+.formula li{min-width:0;overflow-wrap:anywhere}
+.fm{display:block;font-family:var(--f-mono);font-size:0.8125rem;color:var(--muted)}
+.mrow{display:grid;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:12px}
+.mrow>*{margin:0;min-width:0}
+.mrow .mt{font-weight:500}
+.mrow .fb{font-size:0.9375rem;min-height:0}
+.plan{max-height:none}
+.streakline{display:flex;flex-wrap:wrap;gap:6px 18px}

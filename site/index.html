@@ -1,0 +1,1656 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Marketing Boot Camp</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* AI for Marketers: shared theme (v2, calm redesign).
+   Dark-first. One action colour (--accent). Success (--ok) and attention (--warn) appear only for meaningful states.
+   Layout idea: one dominant task panel, quiet navigation. Sizes are rem so the "Larger text" preference scales everything.
+   Legacy token names (--m, --m-tint, --m-on, --no, --no-tint, --key-tint, --yellow-tint, --cyan, --magenta, --yellow)
+   are kept as aliases so level.css files written against v1 keep working. */
+:root{
+  /* surfaces */
+  --bg:#171C26; --surface:#1E2532; --raised:#252D3A; --raised-2:#2D3646;
+  --line:#364152; --line-strong:#7B879B;
+  /* text */
+  --ink:#F1F4F9; --muted:#A9B4C5;
+  /* the one action colour */
+  --accent:#56B8D8; --accent-hover:#7DCAE3; --on-accent:#0D1B24; --accent-tint:#1B3441; --focus:#8FD6EE;
+  /* meaning only */
+  --ok:#46BF95; --ok-tint:#163A31; --on-ok:#0B2A20;
+  --warn:#E6B85C; --warn-tint:#382F1C;
+  /* scales */
+  --s-1:.25rem; --s-2:.5rem; --s-3:.75rem; --s-4:1rem; --s-5:1.5rem; --s-6:2rem; --s-7:3rem;
+  --r-s:6px; --r-m:10px; --r-l:14px;
+  --t-xs:.8125rem; --t-s:.9375rem; --t-m:1.0625rem; --t-l:1.25rem; --t-xl:1.625rem; --t-2xl:2.25rem;
+  --f-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --f-body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    --bg:#F3F5F8; --surface:#FFFFFF; --raised:#EAEEF4; --raised-2:#E1E7F0;
+    --line:#D5DCE6; --line-strong:#6E7B90;
+    --ink:#131923; --muted:#475266;
+    --accent:#0A6B8C; --accent-hover:#08556F; --on-accent:#FFFFFF; --accent-tint:#D9EEF5; --focus:#0A5C78;
+    --ok:#0D7650; --ok-tint:#D7F0E5; --on-ok:#FFFFFF;
+    --warn:#8A5300; --warn-tint:#FAEBCB;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#F3F5F8; --surface:#FFFFFF; --raised:#EAEEF4; --raised-2:#E1E7F0;
+  --line:#D5DCE6; --line-strong:#6E7B90;
+  --ink:#131923; --muted:#475266;
+  --accent:#0A6B8C; --accent-hover:#08556F; --on-accent:#FFFFFF; --accent-tint:#D9EEF5; --focus:#0A5C78;
+  --ok:#0D7650; --ok-tint:#D7F0E5; --on-ok:#FFFFFF;
+  --warn:#8A5300; --warn-tint:#FAEBCB;
+  color-scheme:light;
+}
+:root{
+  /* v1 aliases */
+  --m:var(--accent); --m-on:var(--on-accent); --m-tint:var(--accent-tint);
+  --no:var(--warn); --no-tint:var(--warn-tint); --yellow-tint:var(--warn-tint); --key-tint:var(--raised);
+  --cyan:var(--accent); --magenta:var(--warn); --yellow:var(--warn); --key:var(--ink); --key-on:var(--bg);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{font-size:100%;scroll-padding-top:5.5rem}
+html[data-text="large"]{font-size:125%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:var(--t-m);line-height:1.6}
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:var(--r-s)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:70rem;margin-inline:auto;padding-inline:16px}
+svg.ic{width:1.1em;height:1.1em;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- skip link ---------- */
+.skiplink{position:absolute;left:16px;top:-4rem;z-index:50;background:var(--accent);color:var(--on-accent);padding:.6rem 1rem;border-radius:var(--r-s);font-weight:700;text-decoration:none}
+.skiplink:focus{top:calc(.5rem + env(safe-area-inset-top,0px))}
+
+/* ---------- header ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:0 var(--s-3);min-height:3.5rem}
+.brand{display:flex;align-items:center;gap:var(--s-2);font-family:var(--f-display);font-weight:700;font-size:1.0625rem;white-space:nowrap}
+.hud{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:var(--s-3);min-width:0}
+.xp{font-size:var(--t-s);color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.xp b{color:var(--ink);font-weight:700}
+.pbtn,.exitfocus{display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);min-height:2.75rem;min-width:2.75rem;padding:0 var(--s-3);color:var(--ink);background:transparent;border:1px solid var(--line-strong);border-radius:var(--r-m);cursor:pointer;font-weight:600;font-size:var(--t-s)}
+.pbtn:hover,.exitfocus:hover{background:var(--raised)}
+.pbtn[aria-expanded="true"]{background:var(--raised);border-color:var(--accent)}
+.exitfocus{display:none}
+html[data-focus="on"] .exitfocus{display:inline-flex}
+.ctxbar{display:none;padding-block:0 var(--s-2);font-size:var(--t-s);color:var(--muted);line-height:1.4}
+.ctxbar b{color:var(--ink)}
+@media (max-width:899px){
+  html[data-focus="on"] .bname{display:none}
+  .ctxbar{display:block}
+  .pbtn .ptxt{display:none}
+  .pbtn{padding:0}
+}
+
+/* ---------- preferences panel ---------- */
+.prefs{position:absolute;right:0;top:100%;z-index:40;width:min(24rem,100%);max-height:calc(100dvh - 4rem);overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line-strong);border-radius:0 0 var(--r-m) var(--r-m);padding:var(--s-4) var(--s-5) var(--s-5);box-shadow:0 12px 32px rgba(0,0,0,.28)}
+.prefs[hidden]{display:none}
+.prefs h2{font-family:var(--f-display);font-size:var(--t-l);margin:0 0 var(--s-1)}
+.prefs .sub{margin:0 0 var(--s-4);font-size:var(--t-s);color:var(--muted)}
+.prefs fieldset{border:0;margin:0 0 var(--s-4);padding:0;min-width:0}
+.prefs legend{padding:0;margin-bottom:var(--s-2);font-size:var(--t-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pseg{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.pseg label{position:relative;display:inline-flex;min-width:0}
+.pseg input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.pseg span{display:inline-flex;align-items:center;gap:var(--s-2);min-height:2.75rem;padding:.5rem .9rem;border:1px solid var(--line-strong);border-radius:var(--r-m);background:var(--bg);font-weight:600;font-size:var(--t-s)}
+.pseg input:checked+span{border-color:var(--accent);background:var(--accent-tint);box-shadow:inset 0 0 0 1px var(--accent)}
+.pseg input:checked+span::before{content:"\2713";font-weight:800}
+.pseg input:focus-visible+span{outline:3px solid var(--focus);outline-offset:3px}
+.sw-row{display:flex;gap:var(--s-3);align-items:flex-start;padding:var(--s-2) 0;min-height:2.75rem;cursor:pointer}
+.sw-row input{width:1.375rem;height:1.375rem;flex:none;margin-top:.15rem;accent-color:var(--accent)}
+.sw-row b{display:block;font-weight:600;font-size:var(--t-s)}
+.sw-row small{display:block;font-size:var(--t-xs);color:var(--muted);line-height:1.4}
+.prefs .done{margin-top:var(--s-2)}
+.prefs .persist{margin:var(--s-3) 0 0;font-size:var(--t-xs);color:var(--muted)}
+@media (max-width:899px){.prefs{width:100%;border-radius:0 0 var(--r-m) var(--r-m)}}
+
+/* ---------- intro, resume ---------- */
+.intro{padding-block:var(--s-6) var(--s-4);display:grid;gap:var(--s-3)}
+.intro>*{margin:0;min-width:0}
+.kicker{font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.intro h1{font-family:var(--f-display);font-weight:700;font-size:clamp(2.1rem,6vw,3rem);line-height:1.05;letter-spacing:-.02em}
+.lede{max-width:56ch;color:var(--muted)}
+.resume{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s-3) var(--s-5);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s-4) var(--s-5)}
+.resume p{margin:0;min-width:0;flex:1 1 18rem}
+.resume b{font-weight:700}
+.resume .sub{display:block;color:var(--muted);font-size:var(--t-s)}
+.levelnav{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.lv{display:inline-flex;align-items:center;gap:var(--s-2);font-size:var(--t-s);color:var(--ink);background:transparent;border:1px solid var(--line-strong);border-radius:var(--r-m);padding:.4rem .8rem;min-height:2.75rem;text-decoration:none;font-weight:500}
+.lv b{font-weight:700;color:var(--muted)}
+a.lv:hover{background:var(--raised)}
+.lv.cur{background:var(--raised-2);border-color:var(--ink);font-weight:700}
+.lv.cur b{color:var(--ink)}
+.lv.off{border-style:dashed;color:var(--muted)}
+
+/* ---------- layout ---------- */
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s-5);padding-block:var(--s-4) var(--s-7)}
+.stage{min-width:0}
+@media (min-width:900px){
+  .layout{grid-template-columns:16rem minmax(0,1fr);gap:var(--s-6)}
+  .map{position:sticky;top:5.5rem;align-self:start}
+}
+
+/* ---------- mission map ---------- */
+.map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s-2)}
+.node{display:grid;justify-items:center;align-content:start;gap:var(--s-1);text-align:center;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-2) var(--s-1);min-height:2.75rem;cursor:pointer}
+.node:hover{border-color:var(--line-strong)}
+.node[aria-current="true"]{border-color:var(--accent);background:var(--accent-tint)}
+.ni{display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;border:2px solid var(--line-strong);font-weight:700;font-size:var(--t-s);font-variant-numeric:tabular-nums}
+.node[aria-current="true"] .ni{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.node.done .ni{background:var(--ok);border-color:var(--ok);color:var(--on-ok)}
+.nt,.ns{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.nshort{font-size:var(--t-xs);color:var(--muted);font-variant-numeric:tabular-nums}
+.node.done .nshort{color:var(--ok);font-weight:700}
+@media (min-width:900px){
+  .map{grid-template-columns:minmax(0,1fr)}
+  .node{grid-template-columns:auto minmax(0,1fr);justify-items:start;align-items:center;text-align:left;gap:0 var(--s-3);padding:var(--s-3)}
+  .ni{grid-row:span 2}
+  .nt,.ns{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal}
+  .nt{display:block;font-weight:700;line-height:1.25}
+  .ns{display:block;font-size:var(--t-xs);color:var(--muted)}
+  .node.done .ns{color:var(--ok);font-weight:600}
+  .nshort{display:none}
+}
+
+/* ---------- mission header ---------- */
+.mission{min-width:0}
+.mhead{display:grid;gap:var(--s-3);margin-bottom:var(--s-4)}
+.mhead>*{margin:0;min-width:0}
+.mmeta{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2) var(--s-3);font-size:var(--t-s);color:var(--muted)}
+.mmeta .mnum{font-weight:700;color:var(--ink)}
+.mstate{display:inline-flex;align-items:center;gap:var(--s-1);font-weight:600}
+.mstate.is-done{color:var(--ok)}
+.mission h2{font-family:var(--f-display);font-weight:700;font-size:clamp(1.75rem,4.6vw,2.25rem);line-height:1.1;letter-spacing:-.015em;text-wrap:balance}
+.hook{max-width:60ch;color:var(--muted);font-size:var(--t-m)}
+.objective{display:grid;gap:var(--s-1);max-width:60ch;padding:var(--s-3) var(--s-4);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m)}
+.objective>span{font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.objective>b{font-weight:600;font-size:var(--t-m);line-height:1.45}
+.mprog{display:flex;align-items:center;gap:var(--s-3)}
+.bar-track{flex:1;height:.625rem;border-radius:999px;background:var(--raised-2);overflow:hidden;min-width:0}
+.bar-track i{display:block;height:100%;width:0;background:var(--accent);border-radius:999px;transition:width .4s ease}
+.mprog.is-done .bar-track i{background:var(--ok)}
+.mprogtxt{font-size:var(--t-s);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* ---------- step tabs ---------- */
+.mtabs{margin:0 0 var(--s-5)}
+.mtabs ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s-2)}
+.stepbtn{display:flex;align-items:center;gap:var(--s-2);width:100%;min-height:2.75rem;padding:.4rem var(--s-3);text-align:left;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);cursor:pointer;font-weight:500;font-size:var(--t-s);line-height:1.25}
+.stepbtn:hover{border-color:var(--line-strong)}
+.stepbtn .sn{display:grid;place-items:center;flex:none;width:1.5rem;height:1.5rem;border-radius:50%;border:2px solid var(--line-strong);font-size:var(--t-xs);font-weight:700}
+.stepbtn[aria-current="step"]{background:var(--accent-tint);border-color:var(--accent);font-weight:700}
+.stepbtn[aria-current="step"] .sn{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.stepbtn.seen:not([aria-current="step"]) .sn{border-color:var(--muted);color:var(--muted)}
+.stepbtn small{display:block;font-weight:400;color:var(--muted);font-size:var(--t-xs)}
+@media (max-width:640px){.mtabs ol{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---------- step sections ---------- */
+.mstep{min-width:0}
+.mstep+.mstep{margin-top:var(--s-6);padding-top:var(--s-5);border-top:1px solid var(--line)}
+html[data-steps="one"] .mstep{margin-top:0;padding-top:0;border-top:0}
+h3.label{font-family:var(--f-display);font-weight:700;font-size:var(--t-xl);line-height:1.15;margin:0 0 var(--s-4);letter-spacing:-.01em}
+h3.label:focus{outline:none}
+h3.label:focus-visible{outline:3px solid var(--focus);outline-offset:4px}
+.mission p{max-width:62ch}
+.stepnav{display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center;justify-content:space-between;margin-top:var(--s-6);padding-top:var(--s-4);border-top:1px solid var(--line)}
+.stepnav .nextline{flex:1 1 12rem;margin:0;font-size:var(--t-s);color:var(--muted)}
+.stepnav .acts{display:flex;flex-wrap:wrap;gap:var(--s-3);margin-left:auto}
+html[data-steps="all"] .stepnav{display:none}
+html[data-steps="one"] .pager{display:none}
+.pager{display:flex;flex-wrap:wrap;gap:var(--s-3);justify-content:space-between;margin-top:var(--s-6)}
+.pager .btn:only-child{margin-left:auto}
+
+/* ---------- task panel ---------- */
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s-5);display:grid;gap:var(--s-4)}
+.lab>*{margin:0;min-width:0}
+.note{font-size:var(--t-s);color:var(--muted)}
+.ask{font-weight:600;line-height:1.45}
+.lab>.ask:first-of-type::before{content:"Your move";display:block;font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:var(--s-1)}
+.msg{min-height:1.5em;font-size:var(--t-s)}
+.stem{font-family:var(--f-display);font-weight:600;font-size:clamp(1.3rem,4.4vw,1.75rem);line-height:1.3;max-width:none}
+.blank{display:inline-block;min-width:3.5em;border-bottom:3px solid var(--accent);padding-inline:6px;text-align:center}
+.ctxline{font-size:var(--t-s);color:var(--muted)}
+.ctxline b{color:var(--ink)}
+.eyebrow{display:inline-block;font-size:var(--t-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+
+.chips{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.chip{display:inline-flex;align-items:center;gap:var(--s-2);color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r-m);padding:.5rem .95rem;min-height:2.75rem;cursor:pointer;font-weight:500}
+.chip:hover:not(:disabled){background:var(--raised)}
+.chip:disabled{cursor:default;opacity:.8}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-tint);box-shadow:inset 0 0 0 1px var(--accent);opacity:1;font-weight:700}
+.chip[aria-pressed="true"]::before{content:"\2713";font-weight:800}
+.chip.seen::after{content:"\2713";color:var(--ok);font-weight:700}
+
+.bars{display:grid;gap:var(--s-1)}
+.row{display:grid;grid-template-columns:7.5rem minmax(0,1fr) 3rem;gap:var(--s-3);align-items:center;padding:var(--s-1) 0}
+.row .w{overflow-wrap:anywhere}
+.row.mine .w{font-weight:700;text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:3px;text-underline-offset:4px}
+.track{height:1.125rem;background:var(--raised-2);border-radius:var(--r-s);overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--accent);transition:width .45s ease}
+.pc{font-family:var(--f-mono);font-size:var(--t-xs);text-align:right;font-variant-numeric:tabular-nums}
+.verdict{font-weight:600}
+.tracker{font-family:var(--f-mono);font-size:var(--t-xs);color:var(--muted)}
+
+.split{display:grid;gap:var(--s-4);grid-template-columns:minmax(0,1fr)}
+@media (min-width:760px){.split{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.mini{font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 var(--s-2)}
+.prompt{font-family:var(--f-mono);font-size:.875rem;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-4);margin:0;color:var(--ink)}
+.ln{padding:2px 6px;margin:0 -6px;border-radius:var(--r-s)}
+.ln.new{background:var(--accent-tint);box-shadow:inset 0 0 0 1px var(--accent)}
+.ln+.ln{margin-top:var(--s-2)}
+.out{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-2)}
+.out li{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s-3);background:var(--bg);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-3)}
+.out .t{min-width:0;overflow-wrap:anywhere}
+.out .n{font-family:var(--f-mono);font-size:var(--t-xs);color:var(--muted);white-space:nowrap}
+.out .n.fit{color:var(--ok)}
+.meter{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-top:var(--s-1)}
+.meter i{height:.5rem;background:var(--raised-2);border-radius:3px;transition:background .3s}
+.meter i.on{background:var(--accent)}
+.mlabel{font-size:var(--t-s);font-weight:600;margin:var(--s-2) 0 0}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-3)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);font-weight:700;color:var(--on-accent);background:var(--accent);border:1px solid var(--accent);border-radius:var(--r-m);padding:.6rem 1.15rem;min-height:2.75rem;cursor:pointer;text-decoration:none;line-height:1.25}
+.btn:hover:not(:disabled){background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line-strong);font-weight:600}
+.btn.ghost:hover:not(:disabled){background:var(--raised);border-color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.quiet{background:transparent;border-color:transparent;color:var(--muted);font-weight:600;text-decoration:underline;text-underline-offset:3px;padding-inline:var(--s-2)}
+.btn.quiet:hover:not(:disabled){background:var(--raised);color:var(--ink)}
+.btn.warnbtn{background:var(--warn-tint);color:var(--ink);border-color:var(--warn)}
+
+/* ---------- answers, quiz, rounds ---------- */
+.choice{display:block;width:100%;text-align:left;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r-m);padding:var(--s-3) var(--s-4);min-height:2.75rem;cursor:pointer;transition:border-color .15s,background .15s}
+.choice:hover:not(:disabled){background:var(--raised)}
+.choice:disabled{color:var(--ink);cursor:default}
+.choice.ok{border-color:var(--ok);background:var(--ok-tint)}
+.choice.ok::before{content:"\2713\00a0Correct:\00a0";font-weight:700;color:var(--ok)}
+.choice.no{border-color:var(--warn);background:var(--warn-tint)}
+.choice.no::before{content:"Not this one:\00a0";font-weight:700;color:var(--warn)}
+.choice.dim{opacity:.7}
+fieldset.q{border:0;padding:0;margin:0 0 var(--s-5);min-width:0}
+.q legend{font-weight:700;font-size:var(--t-m);padding:0;margin-bottom:var(--s-3);line-height:1.4}
+.qopts,.sent{display:grid;gap:var(--s-2);list-style:none;margin:0;padding:0}
+.why{margin:var(--s-3) 0 0;font-size:var(--t-s);min-height:1.5em}
+.why.good{color:var(--ok);font-weight:600}
+.why.bad{color:var(--warn);font-weight:600}
+.hintbtn{margin-top:var(--s-2)}
+.roundline{font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.brief{background:var(--raised);border-radius:var(--r-m);padding:var(--s-3) var(--s-4);font-size:var(--t-s)}
+.brief b{font-weight:700}
+.reveal{display:grid;gap:var(--s-3);background:var(--bg);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-4)}
+.reveal>*{margin:0}
+.tagchip{justify-self:start;font-size:var(--t-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--warn-tint);color:var(--ink);border:1px solid var(--warn);border-radius:var(--r-s);padding:.2rem .55rem}
+.tells{display:grid;gap:var(--s-2);grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));margin:var(--s-4) 0 0;padding:0;list-style:none}
+.tells li{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-3) var(--s-4)}
+.tells b{display:block;font-family:var(--f-display);font-size:var(--t-m)}
+.tells span{font-size:var(--t-s);color:var(--muted)}
+
+/* ---------- forms ---------- */
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-3)}
+.fld{display:grid;gap:var(--s-1);min-width:0}
+.fld.wide{grid-column:1/-1}
+.fld span{font-size:var(--t-s);font-weight:700}
+.fld input,.fld select,.fld textarea{width:100%;min-height:2.75rem;font-size:1rem;padding:.55rem .75rem;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r-m)}
+@media (max-width:560px){.form{grid-template-columns:minmax(0,1fr)}}
+.checklist{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.checklist label{display:flex;gap:var(--s-3);align-items:flex-start;padding:var(--s-3) 0;cursor:pointer;min-height:2.75rem}
+.checklist input{width:1.375rem;height:1.375rem;flex:none;margin-top:.15rem;accent-color:var(--accent)}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--accent)}
+
+/* ---------- details ---------- */
+details.deeper{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m)}
+details.deeper summary{cursor:pointer;padding:var(--s-3) var(--s-4);font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:var(--s-3);min-height:2.75rem}
+details.deeper summary::-webkit-details-marker{display:none}
+details.deeper summary::after{content:"+";font-family:var(--f-mono);font-size:1.25rem;transition:transform .2s}
+details.deeper[open] summary::after{transform:rotate(45deg)}
+details.deeper .body{padding:0 var(--s-4) var(--s-4)}
+details.deeper .body p{margin:0 0 var(--s-3)}
+
+/* ---------- completion ---------- */
+.level{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s-5);display:grid;gap:var(--s-4);margin-top:var(--s-6)}
+.level>*{margin:0;min-width:0}
+.stamp{justify-self:start;display:inline-flex;align-items:center;gap:var(--s-2);font-family:var(--f-display);font-weight:700;font-size:var(--t-l);color:var(--ok);border:2px solid var(--ok);border-radius:var(--r-m);padding:.3rem .9rem;animation:pop .35s ease-out both}
+.stamp.pending{color:var(--muted);border-color:var(--line-strong)}
+@keyframes pop{from{transform:scale(.94)}to{transform:scale(1)}}
+.recap{margin:0;padding-left:1.2em;display:grid;gap:var(--s-2)}
+.next{font-weight:700}
+.mdone{display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center;justify-content:space-between;background:var(--ok-tint);border:1px solid var(--ok);border-radius:var(--r-m);padding:var(--s-3) var(--s-4);margin-top:var(--s-5)}
+.mdone[hidden]{display:none}
+.mdone p{margin:0;font-weight:600}
+.mdone p::before{content:"\2713\00a0";color:var(--ok);font-weight:800}
+
+/* ---------- footer, toast ---------- */
+.foot{display:grid;gap:var(--s-3);padding-block:var(--s-5) var(--s-7);border-top:1px solid var(--line)}
+.foot h2{margin:0;font-size:var(--t-s);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.foot .row2{display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center}
+.foot p{margin:0;font-size:var(--t-s);color:var(--muted);max-width:60ch}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);visibility:hidden;background:var(--ink);color:var(--bg);font-weight:700;font-size:var(--t-s);padding:.5rem 1rem;border-radius:var(--r-m);pointer-events:none;z-index:60}
+.toast.show{visibility:visible}
+
+/* ---------- modes ---------- */
+/* Focus mode: only the current step. Navigation, intro, level links, and footer are hidden. */
+html[data-focus="on"] .intro>:not(h1),
+html[data-focus="on"] .map,
+html[data-focus="on"] .foot,
+html[data-focus="on"] .hook,
+html[data-focus="on"] .ctxbar{display:none}
+html[data-focus="on"] .intro{padding:0;gap:0}
+html[data-focus="on"] .intro h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+html[data-focus="on"] .layout{grid-template-columns:minmax(0,46rem);justify-content:center;padding-top:var(--s-5)}
+html[data-focus="on"] .wrap.layout{max-width:50rem}
+/* Calm mode: no popups, no celebration animation, fewer extras. */
+html[data-calm="on"] .toast{display:none}
+html[data-calm="on"] .stamp{animation:none}
+html[data-calm="on"] .objective{background:transparent}
+/* Motion */
+html[data-motion="reduce"] *,html[data-motion="reduce"] *::before,html[data-motion="reduce"] *::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+@media (prefers-reduced-motion:reduce){
+  html:not([data-motion="allow"]) *,html:not([data-motion="allow"]) *::before,html:not([data-motion="allow"]) *::after{transition:none!important;animation:none!important}
+}
+@media (max-width:460px){
+  .row{grid-template-columns:5.5rem minmax(0,1fr) 2.75rem}
+  .lab{padding:var(--s-4)}
+  .brand .bname{font-size:1rem}
+}
+
+/* v3: course-wide progress, view-all toggle, transfer */
+.lvp{font-size:var(--t-xs);font-weight:600;color:var(--muted)}
+.lv.cur .lvp{color:var(--ink)}
+.coursebar{margin:var(--s-2) 0 0;font-size:var(--t-s);color:var(--muted)}
+.resume .other{flex-basis:100%;font-size:var(--t-s);color:var(--muted)}
+.resume .other a{color:var(--accent);font-weight:600}
+.viewall{margin-top:var(--s-3)}
+html[data-steps="all"] .viewall,html[data-focus="on"] .viewall{display:none}
+.viewing-all .stepnav{display:none}
+.xfer{margin:var(--s-4) 0 0;display:grid;gap:var(--s-2);font-size:var(--t-s)}
+.xfer summary{cursor:pointer;color:var(--ink);font-weight:600;min-height:2.75rem;display:flex;align-items:center}
+.xfer input{width:100%;font:inherit;padding:.6rem .75rem;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r-m)}
+.foot .row2 .btn{flex:0 1 auto}
+
+/* small phones: one compact header row */
+@media (max-width:480px){
+  .bname{display:none}
+  .ctxbar .cn{display:none}
+  .ctxbar{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+
+</style>
+
+<a class="skiplink" href="#stage" id="skip">Skip to the mission</a>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand">
+        <svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><path d="M12 2v20M2 12h20"/></svg>
+        <span class="bname">AI for Marketers</span>
+      </div>
+      <div class="hud">
+        <span class="xp" id="xp" aria-label="Level progress"><b>0</b> / 200 XP</span>
+        <button type="button" class="exitfocus" id="exitFocus">Exit focus</button>
+        <button type="button" class="pbtn" id="prefsBtn" aria-expanded="false" aria-controls="prefs" aria-label="Preferences">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+          <span class="ptxt">Preferences</span>
+        </button>
+      </div>
+    </div>
+    <p class="ctxbar" id="ctxbar"></p>
+  </div>
+  <section class="prefs" id="prefs" aria-labelledby="prefsTitle" hidden>
+    <h2 id="prefsTitle">Preferences</h2>
+    <p class="sub">Change how this course looks and behaves. Saved in this browser.</p>
+    <fieldset>
+      <legend>Theme</legend>
+      <div class="pseg">
+        <label><input type="radio" name="pf-theme" value="system"><span>System</span></label>
+        <label><input type="radio" name="pf-theme" value="light"><span>Light</span></label>
+        <label><input type="radio" name="pf-theme" value="dark"><span>Dark</span></label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Text size</legend>
+      <div class="pseg">
+        <label><input type="radio" name="pf-text" value="normal"><span>Standard</span></label>
+        <label><input type="radio" name="pf-text" value="large"><span>Larger</span></label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Focus</legend>
+      <label class="sw-row" for="pf-focus"><input type="checkbox" id="pf-focus"><span><b>Focus mode</b><small>One step at a time. Hides menus and extras.</small></span></label>
+      <label class="sw-row" for="pf-steps"><input type="checkbox" id="pf-steps"><span><b>One step at a time</b><small>Turn off to see a whole mission on one page.</small></span></label>
+      <label class="sw-row" for="pf-hints"><input type="checkbox" id="pf-hints"><span><b>Show hints after a wrong answer</b><small>Off keeps hints behind a button.</small></span></label>
+    </fieldset>
+    <fieldset>
+      <legend>Comfort</legend>
+      <label class="sw-row" for="pf-motion"><input type="checkbox" id="pf-motion"><span><b>Reduce motion</b><small>Follows your device setting until you change it.</small></span></label>
+      <label class="sw-row" for="pf-calm"><input type="checkbox" id="pf-calm"><span><b>Calmer screen</b><small>No pop-up messages or celebration effects.</small></span></label>
+      <label class="sw-row" for="pf-sound"><input type="checkbox" id="pf-sound"><span><b>Sound effects</b><small>Soft tones for progress. Off by default.</small></span></label>
+    </fieldset>
+    <details class="xfer">
+      <summary>Bring over progress from an older link</summary>
+      <label for="xferIn">Transfer code</label>
+      <input type="text" id="xferIn" autocomplete="off" spellcheck="false">
+      <button type="button" class="btn ghost" id="xferBtn">Import</button>
+      <p class="persist" id="xferMsg" aria-live="polite"></p>
+    </details>
+    <button type="button" class="btn done" id="prefsClose">Done</button>
+    <p class="persist" id="persistNote"></p>
+  </section>
+</header>
+
+<main id="main">
+<section class="wrap intro" id="intro">
+  <p class="kicker">AI for Marketers · Level 1 of 5</p>
+  <h1>Boot Camp</h1>
+  <p class="lede">Four missions, about ten minutes each. You try something first, then find out why it worked. Jump to any mission in any order.</p>
+  <div class="resume" id="resume">
+    <p id="resumeText"></p>
+    <button type="button" class="btn" id="resumeBtn">Continue</button>
+    <p class="other" id="resumeOther" hidden></p>
+  </div>
+  <nav class="levelnav" aria-label="Course levels"><span class="lv cur" aria-current="page"><b>1</b> Boot Camp<span class="lvp" data-n="1"></span></span><a class="lv" href="level2.html"><b>2</b> Prompt Craft<span class="lvp" data-n="2"></span></a><a class="lv" href="level3.html"><b>3</b> Marketing Machine<span class="lvp" data-n="3"></span></a><a class="lv" href="level4.html"><b>4</b> Build Mode<span class="lvp" data-n="4"></span></a><a class="lv" href="level5.html"><b>5</b> Boss Level<span class="lvp" data-n="5"></span></a></nav>
+  <p class="coursebar" id="coursebar"></p>
+</section>
+
+<div class="wrap layout">
+  <nav class="map" id="map" aria-label="Missions in this level">
+    <button type="button" class="node" data-m="1"><span class="ni" aria-hidden="true">1</span><span class="nt"><span class="sr">Mission 1: </span>Guess the Next Word</span><span class="ns">Not started</span><span class="nshort" aria-hidden="true">0/50</span></button>
+    <button type="button" class="node" data-m="2"><span class="ni" aria-hidden="true">2</span><span class="nt"><span class="sr">Mission 2: </span>Brief the Machine</span><span class="ns">Not started</span><span class="nshort" aria-hidden="true">0/50</span></button>
+    <button type="button" class="node" data-m="3"><span class="ni" aria-hidden="true">3</span><span class="nt"><span class="sr">Mission 3: </span>Spot the Fake</span><span class="ns">Not started</span><span class="nshort" aria-hidden="true">0/50</span></button>
+    <button type="button" class="node" data-m="4"><span class="ni" aria-hidden="true">4</span><span class="nt"><span class="sr">Mission 4: </span>Your First Win</span><span class="ns">Not started</span><span class="nshort" aria-hidden="true">0/50</span></button>
+  </nav>
+
+  <div class="stage" id="stage">
+<article class="mission" data-m="1" id="mission1">
+<header class="mhead">
+<p class="mmeta"><span class="mnum">Mission 1 of 4</span><span>About 10 min</span><span class="mstate">Not started</span></p>
+<h2 tabindex="-1">Guess the Next Word</h2>
+<p class="hook">Every AI writing tool is, at heart, a very good guesser. You are about to guess alongside it.</p>
+<p class="objective"><span>Objective</span><b>See how an AI picks its next word, and how your context changes the odds.</b></p>
+<div class="mprog"><div class="bar-track" role="progressbar" aria-label="Mission 1 progress" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><i></i></div><span class="mprogtxt">0 / 50 XP</span></div>
+</header>
+<div class="mdone" hidden><p>Mission complete. 50 of 50 XP.</p></div>
+<nav class="mtabs" aria-label="Steps in this mission"></nav>
+<section class="mstep" id="m1s0" data-step="0" aria-labelledby="m1s0h">
+<h3 class="label" id="m1s0h" tabindex="-1">Try it</h3>
+<div class="lab">
+        <p class="ctxline">Brand voice in play: <b id="ctxName1">Discount sports chain</b></p>
+        <p class="stem">Our new running shoe is built for <span class="blank" id="blank1">&nbsp;</span>.</p>
+        <p class="ask" id="ask1">Which word does the AI rate most likely to come next? Tap your guess.</p>
+        <div class="chips" id="guess1"></div>
+        <div id="reveal1" hidden style="display:grid;gap:14px">
+          <div class="bars" id="bars1"></div>
+          <p class="verdict" id="verdict1" aria-live="polite" style="margin:0"></p>
+          <p class="ask" style="margin:0">Now change who is talking and watch the odds move.</p>
+          <div class="chips" id="ctx1"></div>
+          <p id="ctxnote1" class="msg" aria-live="polite" style="margin:0"></p>
+          <p class="tracker" id="trk1" style="margin:0"></p>
+        </div>
+      </div>
+</section>
+
+<section class="mstep" id="m1s1" data-step="1" aria-labelledby="m1s1h">
+<h3 class="label" id="m1s1h" tabindex="-1">Why it works</h3>
+<p>An AI writing tool reads everything so far and rates every possible next word by how likely it is. Then it picks one, adds it, and repeats. That is the whole trick, run thousands of times per answer.</p>
+      <p>It is not looking up facts or deciding what is true. It is ranking what usually follows what. That is why it writes smoothly even when it is wrong, and why context matters so much. Change the voice in the first lines and the whole ranking shifts.</p>
+</section>
+
+<section class="mstep" id="m1s2" data-step="2" aria-labelledby="m1s2h">
+<h3 class="label" id="m1s2h" tabindex="-1">Check</h3>
+<div id="quiz1"></div>
+</section>
+
+<section class="mstep" id="m1s3" data-step="3" aria-labelledby="m1s3h">
+<h3 class="label" id="m1s3h" tabindex="-1">Go deeper</h3>
+<details class="deeper">
+        <summary>Tokens, temperature, and why you get different answers</summary>
+        <div class="body">
+          <p>The model works in tokens, which are chunks of words rather than whole words. After rating the options it does not always take the top one. A setting called temperature controls how adventurous the pick is.</p>
+          <p>Low temperature plays it safe and repeats itself. High temperature takes more risks. That is why the same prompt can return a different answer each time you run it. Most chat tools set this for you.</p>
+        </div>
+      </details>
+</section>
+
+<div class="pager"></div>
+</article>
+
+<article class="mission" data-m="2" id="mission2" hidden>
+<header class="mhead">
+<p class="mmeta"><span class="mnum">Mission 2 of 4</span><span>About 10 min</span><span class="mstate">Not started</span></p>
+<h2 tabindex="-1">Brief the Machine</h2>
+<p class="hook">Same AI, same task, five different answers. The only thing that changes is what you tell it. Add one ingredient at a time and watch.</p>
+<p class="objective"><span>Objective</span><b>Add four prompt ingredients one at a time and see how each one improves the result.</b></p>
+<div class="mprog"><div class="bar-track" role="progressbar" aria-label="Mission 2 progress" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><i></i></div><span class="mprogtxt">0 / 50 XP</span></div>
+</header>
+<div class="mdone" hidden><p>Mission complete. 50 of 50 XP.</p></div>
+<nav class="mtabs" aria-label="Steps in this mission"></nav>
+<section class="mstep" id="m2s0" data-step="0" aria-labelledby="m2s0h">
+<h3 class="label" id="m2s0h" tabindex="-1">Try it</h3>
+<div class="lab">
+        <p class="ask">Task: subject lines for a spring plant sale at a small shop. Tap to add each ingredient.</p>
+        <div class="actions">
+          <button type="button" class="btn" id="add2">Add: Audience</button>
+          <button type="button" class="btn ghost" id="reset2" data-smoke="skip">Start over</button>
+          <span class="note" id="count2">0 of 4 ingredients</span>
+        </div>
+        <div class="split">
+          <div>
+            <p class="mini">What you typed</p>
+            <div class="prompt" id="prompt2"></div>
+          </div>
+          <div>
+            <p class="mini">What came back</p>
+            <ul class="out" id="out2" aria-live="polite"></ul>
+            <div class="meter" id="meter2" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+            <p class="mlabel" id="mlabel2"></p>
+          </div>
+        </div>
+        <p class="msg" id="note2"></p>
+      </div>
+</section>
+
+<section class="mstep" id="m2s1" data-step="1" aria-labelledby="m2s1h">
+<h3 class="label" id="m2s1h" tabindex="-1">Why it works</h3>
+<p>Remember the odds from Mission 1? Every line you add narrows the field. With no audience, the AI guesses “everyone” and writes for no one. Give it an audience, a goal, some rules, and a voice, and it stops guessing at things you already know.</p>
+      <p>Better prompts are mostly better briefs, the same kind you would hand a freelancer on day one. Voice is the hardest to put in words. “Friendly” means almost nothing. One real subject line that worked shows it in a single line.</p>
+</section>
+
+<section class="mstep" id="m2s2" data-step="2" aria-labelledby="m2s2h">
+<h3 class="label" id="m2s2h" tabindex="-1">Check</h3>
+<div id="quiz2"></div>
+</section>
+
+<section class="mstep" id="m2s3" data-step="3" aria-labelledby="m2s3h">
+<h3 class="label" id="m2s3h" tabindex="-1">Go deeper</h3>
+<details class="deeper">
+        <summary>Fix a near miss without starting over</summary>
+        <div class="body">
+          <p>If the output is close but off, do not start a new chat. Tell it what to change: “shorter, drier, drop the second line.” It keeps the context and adjusts, and you spend your effort on the part that is actually wrong.</p>
+          <p>When you can, show instead of describe. One example of the result you want usually beats a paragraph of adjectives.</p>
+        </div>
+      </details>
+</section>
+
+<div class="pager"></div>
+</article>
+
+<article class="mission" data-m="3" id="mission3" hidden>
+<header class="mhead">
+<p class="mmeta"><span class="mnum">Mission 3 of 4</span><span>About 10 min</span><span class="mstate">Not started</span></p>
+<h2 tabindex="-1">Spot the Fake</h2>
+<p class="hook">AI writes confident sentences whether or not they are true. Your job is catching the bad one before it ships. Three rounds, one problem sentence in each.</p>
+<p class="objective"><span>Objective</span><b>Catch the invented number, quote, or rule in an AI draft before it ships.</b></p>
+<div class="mprog"><div class="bar-track" role="progressbar" aria-label="Mission 3 progress" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><i></i></div><span class="mprogtxt">0 / 50 XP</span></div>
+</header>
+<div class="mdone" hidden><p>Mission complete. 50 of 50 XP.</p></div>
+<nav class="mtabs" aria-label="Steps in this mission"></nav>
+<section class="mstep" id="m3s0" data-step="0" aria-labelledby="m3s0h">
+<h3 class="label" id="m3s0h" tabindex="-1">Try it</h3>
+<div class="lab" id="rounds3"></div>
+</section>
+
+<section class="mstep" id="m3s1" data-step="1" aria-labelledby="m3s1h">
+<h3 class="label" id="m3s1h" tabindex="-1">Why it works</h3>
+<p>It ranks likely words. It does not check facts. A statistic with a source attached sounds right because real statistics with sources are common in what it learned from, so it produces one with the right shape and nothing behind it.</p>
+      <p>Four tells give most of them away. Run this 10-second check on anything you plan to publish.</p>
+      <ul class="tells">
+        <li><b>Numbers</b><span>Did I give it this number?</span></li>
+        <li><b>Quotes and names</b><span>Did this person really say this?</span></li>
+        <li><b>Dates and “latest”</b><span>Could this have changed since it learned it?</span></li>
+        <li><b>Always and never</b><span>Is it really that absolute?</span></li>
+      </ul>
+</section>
+
+<section class="mstep" id="m3s2" data-step="2" aria-labelledby="m3s2h">
+<h3 class="label" id="m3s2h" tabindex="-1">Check</h3>
+<div id="quiz3"></div>
+</section>
+
+<section class="mstep" id="m3s3" data-step="3" aria-labelledby="m3s3h">
+<h3 class="label" id="m3s3h" tabindex="-1">Go deeper</h3>
+<details class="deeper">
+        <summary>How to make it more honest</summary>
+        <div class="body">
+          <p>Paste in your own facts and tell it to use only those. Tell it to ask you, or say “I don’t know,” when something is missing. If your tool has web search, turn it on, then open the sources it cites, because it can still cite the wrong thing.</p>
+          <p>None of this removes the check. It just makes the pile of things to check smaller.</p>
+        </div>
+      </details>
+</section>
+
+<div class="pager"></div>
+</article>
+
+<article class="mission" data-m="4" id="mission4" hidden>
+<header class="mhead">
+<p class="mmeta"><span class="mnum">Mission 4 of 4</span><span>About 10 min</span><span class="mstate">Not started</span></p>
+<h2 tabindex="-1">Your First Win</h2>
+<p class="hook">Time for the real thing. Fill in a few boxes, copy the prompt, paste it into any AI tool you already use, then grade what comes back.</p>
+<p class="objective"><span>Objective</span><b>Write a complete prompt for your own offer, run it, and grade what comes back.</b></p>
+<div class="mprog"><div class="bar-track" role="progressbar" aria-label="Mission 4 progress" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><i></i></div><span class="mprogtxt">0 / 50 XP</span></div>
+</header>
+<div class="mdone" hidden><p>Mission complete. 50 of 50 XP.</p></div>
+<nav class="mtabs" aria-label="Steps in this mission"></nav>
+<section class="mstep" id="m4s0" data-step="0" aria-labelledby="m4s0h">
+<h3 class="label" id="m4s0h" tabindex="-1">Try it</h3>
+<div class="lab">
+        <p class="note">Prefilled with an example. Swap in your own.</p>
+        <div class="form">
+          <label class="fld" for="f-channel"><span>What are you writing?</span>
+            <select id="f-channel"><option>email subject lines</option><option selected>Instagram captions</option><option>Google ad headlines</option></select></label>
+          <label class="fld" for="f-goal"><span>Goal</span>
+            <select id="f-goal"><option selected>get sign-ups</option><option>get replies</option><option>get clicks</option><option>get first-time buyers</option></select></label>
+          <label class="fld wide" for="f-offer"><span>What are you promoting?</span>
+            <input id="f-offer" type="text" value="beginner pottery classes on Saturday mornings, $45 per class" autocomplete="off"></label>
+          <label class="fld wide" for="f-audience"><span>Who is it for?</span>
+            <input id="f-audience" type="text" value="adults who say they aren’t creative" autocomplete="off"></label>
+          <label class="fld" for="f-tone"><span>Tone</span>
+            <select id="f-tone"><option selected>friendly and a little dry</option><option>warm and expert</option><option>bold and direct</option><option>calm and reassuring</option></select></label>
+          <label class="fld" for="f-limit"><span>Length limit</span>
+            <input id="f-limit" type="text" value="each under 25 words" autocomplete="off"></label>
+        </div>
+        <div>
+          <p class="mini">Your prompt</p>
+          <pre class="prompt" id="p4" tabindex="0"></pre>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" id="copy4">Copy prompt</button>
+          <span class="note" id="copynote4" aria-live="polite"></span>
+        </div>
+      </div>
+</section>
+
+<section class="mstep" id="m4s1" data-step="1" aria-labelledby="m4s1h">
+<h3 class="label" id="m4s1h" tabindex="-1">Why it works</h3>
+<p>This prompt uses everything from the last three missions: an audience, a goal, rules, a voice, and a line that blocks invented facts. The last line asks the AI to pick a favorite, so you react to one option instead of judging three at once.</p>
+</section>
+
+<section class="mstep" id="m4s2" data-step="2" aria-labelledby="m4s2h">
+<h3 class="label" id="m4s2h" tabindex="-1">Check</h3>
+<div class="lab">
+        <p class="ask">Paste the prompt into your AI tool, read what comes back, then tick whatever is true.</p>
+        <ul class="checklist" id="checklist4">
+          <li><label><input type="checkbox"> It speaks to my audience, not just “everyone.”</label></li>
+          <li><label><input type="checkbox"> Every number, quote, and claim in it came from me.</label></li>
+          <li><label><input type="checkbox"> At least one version sounds like something I would say.</label></li>
+          <li><label><input type="checkbox"> I know one thing I would change before sending.</label></li>
+        </ul>
+        <p class="msg" id="ckmsg" aria-live="polite"></p>
+      </div>
+</section>
+
+<section class="mstep" id="m4s3" data-step="3" aria-labelledby="m4s3h">
+<h3 class="label" id="m4s3h" tabindex="-1">Go deeper</h3>
+<details class="deeper">
+        <summary>Turn this prompt into a template</summary>
+        <div class="body">
+          <p>Save the version that worked in a note. Next time, change only the offer and the audience and leave the rest alone. That is a prompt you have turned into a template, and it is the start of the kit you will build in Level 2.</p>
+          <p>If the first result is weak, change one thing at a time. Tighten the audience first, then the tone, then the limits, so you learn which change helped.</p>
+        </div>
+      </details>
+</section>
+<div class="level" id="levelcard" hidden>
+<div class="stamp" id="stamp">Level complete</div>
+<p id="levelsub" style="font-weight:600"></p>
+<ul class="recap"><li>AI ranks likely next words. Context moves the odds.</li><li>Audience, goal, rules, and voice turn a generic answer into yours.</li><li>Check numbers, quotes, dates, and “always.” The AI cannot vouch for itself.</li><li>You ran a real prompt and graded the result.</li></ul>
+<p class="next">Next up: Level 2, Prompt Craft. Build a reusable prompt kit for ads, emails, and landing pages.</p>
+<a class="btn nextlevel" href="level2.html" style="justify-self:start">Open Level 2</a>
+</div>
+<div class="pager"></div>
+</article>
+  </div>
+</div>
+</main>
+
+<footer class="wrap foot" id="foot">
+  <h2>Progress</h2>
+  <p>Your answers and XP save automatically in this browser. Each reset below says exactly what it erases and asks you to confirm.</p>
+  <div class="row2">
+    <button type="button" class="btn ghost" id="restartM">Restart this mission</button>
+    <button type="button" class="btn ghost" id="reset">Reset this level</button>
+    <button type="button" class="btn ghost" id="resetAll">Reset the whole course</button>
+    <span class="note" id="confirmNote" aria-live="polite"></span>
+  </div>
+</footer>
+<div class="toast" id="toast" aria-hidden="true"></div>
+<div class="sr" id="live" aria-live="polite"></div>
+
+<script>window.LEVEL={"level": 1, "name": "Boot Camp", "missions": [{"name": "Guess the Next Word", "min": 10}, {"name": "Brief the Machine", "min": 10}, {"name": "Spot the Fake", "min": 10}, {"name": "Your First Win", "min": 10}]};</script>
+<script>
+(function(){
+'use strict';
+var L=window.LEVEL;
+var NEED=50,COUNT=4,TOTAL=NEED*COUNT;
+var PKEY='aimbc-prefs-v1';
+var NAMES=L.missions.map(function(m){return m.name});
+var viewAll={};
+var root=document.documentElement;
+var CHECK='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
+function lsGet(k){try{return window.localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{window.localStorage.setItem(k,v)}catch(e){}}
+function lsDel(k){try{window.localStorage.removeItem(k)}catch(e){}}
+
+/* ---------- progress store: one record for the whole course, shared by all five level pages ----------
+   Key aimbc-course-v3 = {v:3, last:{level,t}, levels:{ "1":{got,cur,step,seen,ex,t}, ... }}
+   Older per-level keys (aimbc-levelN-v2 / -v1) are imported once and left in place as a backup. */
+var STORE='aimbc-course-v3',LEVELS=5,CORRUPT='aimbc-course-v3-corrupt';
+var storageOK=true;
+var state={got:{},cur:0,step:{},seen:{},ex:{}};
+var hadSaved=false,frozen=false;
+function cleanLevel(p){
+  var o={got:{},cur:0,step:{},seen:{},ex:{},t:0};
+  if(!p||typeof p!=='object')return o;
+  if(p.got&&typeof p.got==='object'){for(var k in p.got){var v=p.got[k];if(/^m[1-4]:/.test(k)&&typeof v==='number'&&v>0&&v<=NEED)o.got[k]=v}}
+  o.cur=clamp(p.cur|0,0,COUNT-1);
+  if(p.step&&typeof p.step==='object'){for(var i=0;i<COUNT;i++){if(typeof p.step[i]==='number')o.step[i]=clamp(p.step[i]|0,0,3)}}
+  if(p.seen&&typeof p.seen==='object'){for(var s in p.seen){if(/^[0-3]:[0-3]$/.test(s))o.seen[s]=1}}
+  if(p.ex&&typeof p.ex==='object'){for(var e in p.ex){if(/^[A-Za-z0-9_.:\-]{1,80}$/.test(e)&&p.ex[e]!==undefined)o.ex[e]=p.ex[e]}}
+  o.t=typeof p.t==='number'?p.t:0;
+  return o;
+}
+function hasProgress(o){return Object.keys(o.got).length>0||o.cur>0||Object.keys(o.step).some(function(k){return o.step[k]>0})||Object.keys(o.seen).length>1||Object.keys(o.ex).length>0}
+function readStore(){
+  var raw=lsGet(STORE),st={v:3,last:null,levels:{}};
+  if(raw){
+    try{
+      var p=JSON.parse(raw);
+      if(p&&typeof p==='object'){
+        if(p.levels&&typeof p.levels==='object'){for(var n=1;n<=LEVELS;n++){if(p.levels[n])st.levels[n]=cleanLevel(p.levels[n])}}
+        if(p.last&&typeof p.last.level==='number')st.last={level:clamp(p.last.level|0,1,LEVELS),t:p.last.t||0};
+      }
+    }catch(e){lsSet(CORRUPT,raw)}
+  }
+  for(var m=1;m<=LEVELS;m++){
+    if(!st.levels[m]){
+      var old=lsGet('aimbc-level'+m+'-v2')||lsGet('aimbc-level'+m+'-v1');
+      if(old){try{var q=cleanLevel(JSON.parse(old));if(hasProgress(q))st.levels[m]=q}catch(e){}}
+    }
+  }
+  return st;
+}
+function writeStore(st){
+  try{window.localStorage.setItem(STORE,JSON.stringify(st));return true}catch(e){storageOK=false;return false}
+}
+(function(){
+  try{window.localStorage.setItem('aimbc-probe','1');window.localStorage.removeItem('aimbc-probe')}catch(e){storageOK=false}
+  var st=readStore(),mine=st.levels[L.level];
+  if(mine&&hasProgress(mine)){
+    hadSaved=true;
+    state.got=mine.got;state.cur=mine.cur;state.step=mine.step;state.seen=mine.seen;state.ex=mine.ex;
+  }
+  /* write the migrated record right away so every level page sees the same data */
+  if(storageOK&&Object.keys(st.levels).length)writeStore(st);
+})();
+/* save merges with whatever is stored now, so a stale tab or a default value can never wipe saved progress */
+function save(quiet){
+  if(frozen)return;
+  var st=readStore(),prev=st.levels[L.level]||cleanLevel(null),g={},k;
+  for(k in prev.got)g[k]=prev.got[k];
+  for(k in state.got)g[k]=Math.max(g[k]||0,state.got[k]);
+  var seen={};for(k in prev.seen)seen[k]=1;for(k in state.seen)seen[k]=1;
+  var ex={};for(k in prev.ex)ex[k]=prev.ex[k];for(k in state.ex)ex[k]=state.ex[k];
+  st.levels[L.level]={got:g,cur:state.cur,step:state.step,seen:seen,ex:ex,t:Date.now()};
+  if(!quiet||!st.last)st.last={level:L.level,t:Date.now()};
+  writeStore(st);
+}
+function courseSummary(){
+  var st=readStore(),out=[];
+  for(var n=1;n<=LEVELS;n++){
+    var lv=n===L.level?{got:state.got}:(st.levels[n]||{got:{}}),xp=0,done=0,per={};
+    for(var k in lv.got){xp+=lv.got[k];var m=k.charAt(1);per[m]=(per[m]||0)+lv.got[k]}
+    for(var m2 in per){if(per[m2]>=NEED)done++}
+    out.push({n:n,xp:xp,done:done});
+  }
+  return {levels:out,last:st.last};
+}
+function totalXp(){var t=0;for(var k in state.got)t+=state.got[k];return t}
+function mxp(i){var t=0;for(var k in state.got){if(k.indexOf('m'+i+':')===0)t+=state.got[k]}return t}
+function has(k){return !!state.got[k]}
+
+/* ---------- exercise state: levels register what to save; the engine saves it ----------
+   persist(id, {get:function(){return jsonValue}, set:function(value){...apply it...}})
+   get/set must be pure state, no awards. The engine restores once on registration and saves after
+   every click, input, change, and when the page is hidden. Ids start with "mN." for mission N. */
+var reg={},flushT=null,restoring=false;
+function persist(id,h){
+  if(!/^m[1-4]\.[A-Za-z0-9_.\-]{1,60}$/.test(id)||!h||typeof h.get!=='function'||typeof h.set!=='function')return;
+  var e={get:h.get,set:h.set,broken:false,last:null};reg[id]=e;
+  if(Object.prototype.hasOwnProperty.call(state.ex,id)){
+    restoring=true;
+    try{h.set(JSON.parse(JSON.stringify(state.ex[id])))}catch(err){e.broken=true}
+    restoring=false;
+  }
+  try{var j=JSON.stringify(h.get());e.last=j===undefined?null:j}catch(err2){e.broken=true}
+}
+function flush(){
+  clearTimeout(flushT);flushT=null;
+  var changed=false;
+  for(var id in reg){
+    var e=reg[id];if(e.broken)continue;
+    var j;try{j=JSON.stringify(e.get())}catch(x){continue}
+    if(j===undefined||j===e.last)continue;
+    e.last=j;state.ex[id]=JSON.parse(j);changed=true;
+  }
+  if(changed)save();
+}
+function schedule(){if(frozen)return;clearTimeout(flushT);flushT=setTimeout(flush,150)}
+function clearEx(prefix){
+  Object.keys(state.ex).forEach(function(k){if(k.indexOf(prefix)===0)delete state.ex[k]});
+}
+/* every plain form field in a mission is saved automatically; levels only register custom state */
+function autoFields(){
+  articles.forEach(function(a,i){
+    var n=i+1,idx=0;
+    $$('input,textarea,select',a).forEach(function(f){
+      var t=(f.type||'').toLowerCase();
+      if(t==='button'||t==='submit'||t==='reset'||t==='hidden'||t==='file')return;
+      var base=f.id?f.id.replace(/[^A-Za-z0-9_\-]/g,'_'):('i'+idx);idx++;
+      var id='m'+n+'.f_'+base.slice(0,50),box=(t==='checkbox'||t==='radio');
+      persist(id,{
+        get:function(){return box?!!f.checked:f.value},
+        set:function(v){
+          if(box){f.checked=!!v}else if(typeof v==='string'){f.value=v}
+          f.dispatchEvent(new Event('input',{bubbles:true}));f.dispatchEvent(new Event('change',{bubbles:true}));
+        }
+      });
+    });
+  });
+}
+
+/* ---------- preferences (one record shared by every level page of this course) ---------- */
+var DEF={theme:'system',text:'normal',motion:null,calm:false,focus:false,steps:true,hints:true,sound:false};
+var prefs={};for(var dk in DEF)prefs[dk]=DEF[dk];
+(function(){
+  var raw=lsGet(PKEY);
+  if(raw){
+    try{
+      var p=JSON.parse(raw);
+      if(p&&typeof p==='object'){
+        if(/^(system|light|dark)$/.test(p.theme))prefs.theme=p.theme;
+        if(/^(normal|large)$/.test(p.text))prefs.text=p.text;
+        if(p.motion==='reduce'||p.motion==='allow')prefs.motion=p.motion;
+        ['calm','focus','steps','hints','sound'].forEach(function(k){if(typeof p[k]==='boolean')prefs[k]=p[k]});
+      }
+    }catch(e){}
+  }
+})();
+function savePrefs(){lsSet(PKEY,JSON.stringify(prefs))}
+var osReduce=false;
+try{osReduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(e){}
+function motionReduced(){return prefs.motion===null?osReduce:prefs.motion==='reduce'}
+function oneStep(){return prefs.focus||prefs.steps}
+var origTheme=root.getAttribute('data-theme'),themeForced=false;
+function applyPrefs(){
+  if(prefs.theme==='system'){
+    if(themeForced){if(origTheme===null)root.removeAttribute('data-theme');else root.setAttribute('data-theme',origTheme);themeForced=false}
+  }else{root.setAttribute('data-theme',prefs.theme);themeForced=true}
+  root.setAttribute('data-text',prefs.text);
+  root.setAttribute('data-motion',motionReduced()?'reduce':'allow');
+  root.setAttribute('data-calm',prefs.calm?'on':'off');
+  root.setAttribute('data-focus',prefs.focus?'on':'off');
+  root.setAttribute('data-steps',oneStep()?'one':'all');
+  $$('input[name="pf-theme"]').forEach(function(r){r.checked=(r.value===prefs.theme)});
+  $$('input[name="pf-text"]').forEach(function(r){r.checked=(r.value===prefs.text)});
+  var set=function(id,v,dis){var c=$('#'+id);if(c){c.checked=v;c.disabled=!!dis}};
+  set('pf-focus',prefs.focus);
+  set('pf-steps',oneStep(),prefs.focus);
+  set('pf-hints',prefs.hints);
+  set('pf-motion',motionReduced());
+  set('pf-calm',prefs.calm);
+  set('pf-sound',prefs.sound);
+}
+
+/* ---------- announcements, toast, sound ---------- */
+var liveEl=$('#live'),toastEl=$('#toast'),toastT,flip=false;
+function announce(msg){flip=!flip;liveEl.textContent=msg+(flip?' ':'')}
+function toast(msg){
+  announce(msg);
+  if(prefs.calm)return;
+  toastEl.textContent=msg;toastEl.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show')},1600);
+}
+var actx=null;
+function tone(f,t0,d,v){
+  var o=actx.createOscillator(),g=actx.createGain(),n=actx.currentTime;
+  o.type='sine';o.frequency.value=f;
+  g.gain.setValueAtTime(0.0001,n+t0);g.gain.exponentialRampToValueAtTime(v,n+t0+0.02);g.gain.exponentialRampToValueAtTime(0.0001,n+t0+d);
+  o.connect(g);g.connect(actx.destination);o.start(n+t0);o.stop(n+t0+d+0.05);
+}
+function chime(kind){
+  if(!prefs.sound)return;
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    actx=actx||new AC();if(actx.state==='suspended')actx.resume();
+    if(kind==='done'){tone(523,0,.16,.05);tone(784,.14,.24,.05)}else{tone(660,0,.14,.04)}
+  }catch(e){}
+}
+
+/* ---------- elements ---------- */
+var articles=$$('.mission'),nodes=$$('.node');
+var xpEl=$('#xp'),ctxEl=$('#ctxbar'),resumeEl=$('#resume'),resumeText=$('#resumeText'),resumeBtn=$('#resumeBtn');
+var card=$('#levelcard'),stampEl=$('#stamp'),levelSub=$('#levelsub');
+function stepsOf(a){return $$('.mstep',a)}
+function stepName(s){var h=$('h3.label',s);return h?h.textContent:'Step'}
+
+/* ---------- views ---------- */
+function headerH(){var t=$('#top');return t?t.offsetHeight:0}
+function scrollToEl(e){
+  if(!e)return;
+  var y=e.getBoundingClientRect().top+window.pageYOffset-headerH()-12;
+  try{window.scrollTo({top:Math.max(0,y),behavior:motionReduced()?'auto':'smooth'})}catch(x){window.scrollTo(0,Math.max(0,y))}
+}
+function renderCtx(){
+  var i=state.cur,k=state.step[i]||0,secs=stepsOf(articles[i]);
+  ctxEl.textContent='';
+  var b=el('b',null,'Mission '+(i+1)+' of '+COUNT);
+  ctxEl.appendChild(b);
+  var cn=el('span','cn',' · '+NAMES[i]);
+  ctxEl.appendChild(cn);
+  ctxEl.appendChild(document.createTextNode(' · '+(secs[k]?stepName(secs[k]):'')));
+}
+function show(i,k,o){
+  o=o||{};
+  i=clamp(i,0,COUNT-1);
+  var secs=stepsOf(articles[i]);k=clamp(k,0,secs.length-1);
+  state.cur=i;state.step[i]=k;state.seen[i+':'+k]=1;save(!!o.init);
+  articles.forEach(function(a,x){a.hidden=(x!==i)});
+  nodes.forEach(function(n,x){n.setAttribute('aria-current',x===i?'true':'false')});
+  var one=oneStep()&&!viewAll[i];
+  articles[i].classList.toggle('viewing-all',oneStep()&&!!viewAll[i]);
+  var va=$('.viewall',articles[i]);
+  if(va){va.setAttribute('aria-pressed',viewAll[i]?'true':'false');va.textContent=viewAll[i]?'Back to one step at a time':'Show the whole mission'}
+  secs.forEach(function(s,x){s.hidden=(one&&x!==k)});
+  $$('.stepbtn',articles[i]).forEach(function(b,x){
+    if(x===k)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');
+    b.classList.toggle('seen',!!state.seen[i+':'+x]);
+  });
+  renderCtx();
+  if(window.__resetLabels)window.__resetLabels();
+  if(o.focus){
+    var t=(o.focus==='mission')?$('h2',articles[i]):$('h3.label',secs[k]);
+    if(t)t.focus({preventScroll:true});
+  }
+  if(o.scroll==='layout')scrollToEl($('.layout'));
+  else if(o.scroll==='steps')scrollToEl($('.mtabs',articles[i]));
+  else if(o.scroll==='section')scrollToEl($('h3.label',secs[k]));
+  if(o.say)announce('Mission '+(i+1)+', step '+(k+1)+' of '+secs.length+': '+stepName(secs[k]));
+}
+function hideResume(){if(resumeEl)resumeEl.hidden=true}
+
+/* ---------- render progress ---------- */
+function renderHud(){
+  var t=totalXp();
+  xpEl.textContent='';
+  xpEl.appendChild(el('b',null,String(t)));
+  xpEl.appendChild(document.createTextNode(' / '+TOTAL+' XP'));
+  xpEl.setAttribute('aria-label','Level progress: '+t+' of '+TOTAL+' XP');
+  for(var i=1;i<=COUNT;i++){
+    var x=mxp(i),done=x>=NEED,started=x>0,n=nodes[i-1],a=articles[i-1];
+    n.classList.toggle('done',done);
+    var ni=$('.ni',n);if(done)ni.innerHTML=CHECK;else ni.textContent=String(i);
+    var status=done?'Done':(started?'In progress, '+x+' of '+NEED+' XP':'Not started');
+    $('.ns',n).textContent=status;
+    $('.nshort',n).textContent=done?'Done':x+'/'+NEED;
+    var ms=$('.mstate',a);
+    ms.className='mstate'+(done?' is-done':'');
+    ms.innerHTML='';
+    if(done){ms.insertAdjacentHTML('beforeend',CHECK);ms.appendChild(document.createTextNode('Complete'))}
+    else ms.textContent=started?'In progress':'Not started';
+    var pg=$('.mprog',a),bar=$('.bar-track',a);
+    pg.classList.toggle('is-done',done);
+    $('i',bar).style.width=Math.min(100,(x/NEED)*100)+'%';
+    bar.setAttribute('aria-valuenow',String(Math.min(x,NEED)));
+    $('.mprogtxt',a).textContent=Math.min(x,NEED)+' / '+NEED+' XP';
+    $('.mdone',a).hidden=!done;
+  }
+  var show4=mxp(COUNT)>=NEED,wasHidden=card.hidden;
+  card.hidden=!show4;
+  if(show4){
+    var full=t>=TOTAL;
+    stampEl.innerHTML='';
+    if(full)stampEl.insertAdjacentHTML('beforeend',CHECK);
+    stampEl.appendChild(document.createTextNode(full?'Level complete':'Almost there'));
+    stampEl.classList.toggle('pending',!full);
+    levelSub.textContent=full?t+' of '+TOTAL+' XP. '+L.name+' cleared.':t+' of '+TOTAL+' XP. A mission in the list is not marked Done yet. Open it to finish the level.';
+    if(wasHidden){stampEl.style.animation='none';void stampEl.offsetWidth;stampEl.style.animation=''}
+  }
+}
+function award(key,pts){
+  if(state.got[key]||restoring)return;
+  var m=parseInt(key.charAt(1),10),before=mxp(m);
+  state.got[key]=pts;save();hideResume();renderHud();renderCourse();
+  if(before<NEED&&mxp(m)>=NEED){toast('Mission '+m+' complete');chime('done')}
+  else{toast('+'+pts+' XP');chime('xp')}
+}
+
+/* ---------- quiz helper ----------
+   items: [{q, o:[...], c:correctIndex, xp, why, hint}]  XP keys: mk+':q'+index */
+function makeQuiz(host,mk,items){
+  items.forEach(function(it,qi){
+    var key=mk+':q'+qi;
+    var fs=el('fieldset','q');fs.appendChild(el('legend',null,it.q));
+    var list=el('div','qopts');var msg=el('p','why');msg.setAttribute('aria-live','polite');
+    var hb=el('button','btn quiet hintbtn','Show a hint');hb.type='button';hb.hidden=true;
+    hb.addEventListener('click',function(){msg.textContent='Hint: '+it.hint;hb.hidden=true});
+    var btns=it.o.map(function(t,oi){
+      var b=el('button','choice',t);b.type='button';
+      b.addEventListener('click',function(){pick(oi)});
+      list.appendChild(b);return b;
+    });
+    function solve(fresh){
+      btns.forEach(function(b,k){b.disabled=true;if(k===it.c)b.classList.add('ok');else b.classList.add('dim')});
+      msg.className='why good';msg.textContent='Right. '+it.why;hb.hidden=true;
+      if(fresh)award(key,it.xp);
+    }
+    function pick(oi){
+      if(oi===it.c){solve(true);return}
+      btns[oi].classList.add('no');btns[oi].disabled=true;msg.className='why bad';
+      if(prefs.hints){msg.textContent='Not quite. '+it.hint;hb.hidden=true}
+      else{msg.textContent='Not quite. Try another answer.';hb.hidden=false}
+    }
+    if(state.got[key])solve(false);
+    fs.appendChild(list);fs.appendChild(msg);fs.appendChild(hb);host.appendChild(fs);
+  });
+}
+
+/* ---------- copy helper ----------
+   cb(true) when the text reached the clipboard, cb(false) when it could only be selected. */
+function copyText(text,selEl,cb){
+  function fallback(){
+    var sel=false,ok=false;
+    try{var r=document.createRange();r.selectNodeContents(selEl);var s=window.getSelection();s.removeAllRanges();s.addRange(r);sel=true}catch(e){}
+    try{ok=document.execCommand('copy')}catch(e){}
+    cb(!!(ok&&sel));
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){cb(true)},fallback);
+  }else{fallback()}
+}
+
+/* ---------- build the step tabs and step navigation ---------- */
+function buildSteps(){
+  articles.forEach(function(a,i){
+    var secs=stepsOf(a),nav=$('.mtabs',a),ol=el('ol');
+    secs.forEach(function(s,k){
+      var li=el('li'),b=el('button','stepbtn');b.type='button';
+      var sn=el('span','sn',String(k+1));sn.setAttribute('aria-hidden','true');
+      var tx=el('span',null,stepName(s));
+      if(k===secs.length-1){tx.appendChild(el('small',null,'Optional'))}
+      b.appendChild(sn);b.appendChild(tx);
+      b.addEventListener('click',function(){hideResume();show(i,k,{focus:'step',scroll:(oneStep()&&!viewAll[i])?'steps':'section',say:true})});
+      li.appendChild(b);ol.appendChild(li);
+    });
+    nav.appendChild(ol);
+    var vb=el('button','btn quiet viewall','Show the whole mission');vb.type='button';vb.setAttribute('aria-pressed','false');
+    vb.addEventListener('click',function(){viewAll[i]=!viewAll[i];show(i,state.step[i]||0,{});announce(viewAll[i]?'Showing every step of this mission':'Showing one step at a time')});
+    nav.appendChild(vb);
+    var lines=['Finished the exercise? Next, see why it worked.','Next, check what stuck.','Next, go deeper if you like, or move on.',i<COUNT-1?'Next, start the next mission.':'That is the last mission in this level.'];
+    secs.forEach(function(s,k){
+      var sn=el('div','stepnav'),info=el('p','nextline',lines[k]||''),acts=el('div','acts');
+      if(k>0){
+        var bk=el('button','btn ghost','Back: '+stepName(secs[k-1]));bk.type='button';
+        bk.addEventListener('click',function(){show(i,k-1,{focus:'step',scroll:'steps',say:true})});acts.appendChild(bk);
+      }
+      if(k<secs.length-1){
+        var nx=el('button','btn','Next: '+stepName(secs[k+1]));nx.type='button';
+        nx.addEventListener('click',function(){show(i,k+1,{focus:'step',scroll:'steps',say:true})});acts.appendChild(nx);
+        if(k===secs.length-2&&i<COUNT-1){
+          var sk=el('button','btn ghost','Skip to Mission '+(i+2));sk.type='button';
+          sk.addEventListener('click',function(){show(i+1,0,{focus:'mission',scroll:'layout',say:true})});acts.appendChild(sk);
+        }
+      }else if(i<COUNT-1){
+        var nm=el('button','btn','Next mission: '+NAMES[i+1]);nm.type='button';
+        nm.addEventListener('click',function(){show(i+1,0,{focus:'mission',scroll:'layout',say:true})});acts.appendChild(nm);
+      }
+      sn.appendChild(info);sn.appendChild(acts);s.appendChild(sn);
+    });
+    var pg=$('.pager',a);
+    if(i>0){var b1=el('button','btn ghost','Back: '+NAMES[i-1]);b1.type='button';b1.addEventListener('click',function(){show(i-1,0,{focus:'mission',scroll:'layout'})});pg.appendChild(b1)}
+    if(i<COUNT-1){var b2=el('button','btn','Next: '+NAMES[i+1]);b2.type='button';b2.addEventListener('click',function(){show(i+1,0,{focus:'mission',scroll:'layout'})});pg.appendChild(b2)}
+  });
+}
+
+/* ---------- resume card ---------- */
+function renderResume(returning){
+  var t=totalXp(),i=state.cur,k=state.step[i]||0,secs=stepsOf(articles[i]);
+  resumeText.textContent='';
+  if(t>=TOTAL){
+    resumeText.appendChild(el('b',null,'Level complete.'));
+    resumeText.appendChild(el('span','sub','All four missions are done. Open any mission to review it.'));
+    resumeBtn.hidden=true;return;
+  }
+  resumeBtn.hidden=false;
+  if(returning){
+    resumeText.appendChild(el('b',null,'Welcome back.'));
+    resumeText.appendChild(el('span','sub','You were in Mission '+(i+1)+', '+NAMES[i]+', at step '+(k+1)+': '+stepName(secs[k])+'. '+Math.min(mxp(i+1),NEED)+' of '+NEED+' XP in this mission.'+(Object.keys(state.ex).some(function(k){return k.indexOf('m'+(i+1)+'.')===0})?' Your answers are saved.':'')));
+    resumeBtn.textContent='Continue where you left off';
+    resumeBtn.onclick=function(){hideResume();show(i,k,{focus:'step',scroll:'steps',say:true})};
+  }else{
+    resumeText.appendChild(el('b',null,'Start here.'));
+    resumeText.appendChild(el('span','sub','Mission 1, '+NAMES[0]+', takes about '+(L.missions[0].min||10)+' minutes.'));
+    resumeBtn.textContent='Start Mission 1';
+    resumeBtn.onclick=function(){hideResume();show(0,0,{focus:'step',scroll:'steps',say:true})};
+  }
+}
+
+/* ---------- preferences panel ---------- */
+function wirePrefs(){
+  var btn=$('#prefsBtn'),panel=$('#prefs');
+  function open(){panel.hidden=false;btn.setAttribute('aria-expanded','true');var f=$('input:checked',panel)||$('input',panel);if(f)f.focus()}
+  function close(back){panel.hidden=true;btn.setAttribute('aria-expanded','false');if(back)btn.focus()}
+  btn.addEventListener('click',function(){if(panel.hidden)open();else close(false)});
+  $('#prefsClose').addEventListener('click',function(){close(true)});
+  panel.addEventListener('keydown',function(e){if(e.key==='Escape'){e.stopPropagation();close(true)}});
+  $$('input[name="pf-theme"]').forEach(function(r){r.addEventListener('change',function(){if(r.checked){prefs.theme=r.value;savePrefs();applyPrefs();announce('Theme: '+r.value)}})});
+  $$('input[name="pf-text"]').forEach(function(r){r.addEventListener('change',function(){if(r.checked){prefs.text=r.value;savePrefs();applyPrefs();announce(r.value==='large'?'Larger text on':'Standard text size')}})});
+  function bool(id,fn,label){
+    $('#'+id).addEventListener('change',function(e){fn(e.target.checked);savePrefs();applyPrefs();announce(label+(e.target.checked?' on':' off'))});
+  }
+  bool('pf-focus',function(v){prefs.focus=v;refresh();if(v){close(false);var t=$('h3.label',stepsOf(articles[state.cur])[state.step[state.cur]||0]);if(t)t.focus({preventScroll:true})}},'Focus mode');
+  bool('pf-steps',function(v){prefs.steps=v;refresh()},'One step at a time');
+  bool('pf-hints',function(v){prefs.hints=v},'Hints after a wrong answer');
+  bool('pf-motion',function(v){prefs.motion=v?'reduce':'allow'},'Reduce motion');
+  bool('pf-calm',function(v){prefs.calm=v},'Calmer screen');
+  bool('pf-sound',function(v){prefs.sound=v;if(v)chime('xp')},'Sound effects');
+  function refresh(){
+    root.setAttribute('data-steps',oneStep()?'one':'all');
+    show(state.cur,state.step[state.cur]||0,{});
+    window.scrollTo(0,0);
+  }
+  $('#exitFocus').addEventListener('click',function(){prefs.focus=false;savePrefs();applyPrefs();refresh();announce('Focus mode off');btn.focus()});
+  $('#persistNote').textContent=storageOK?'Preferences, progress and your answers are saved in this browser and shared by all five levels.':'This browser is blocking saved data. The course still works, but progress and answers will be lost when you close the page.';
+  var xb=$('#xferBtn');
+  if(xb)xb.addEventListener('click',function(){
+    var msg=importCode($('#xferIn').value);$('#xferMsg').textContent=msg;
+    if(msg.indexOf('Imported')===0)setTimeout(reloadPage,400);
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!panel.hidden){close(true)}});
+}
+
+/* ---------- restart and reset (two-step confirm) ---------- */
+function reloadPage(){try{window.location.reload()}catch(e){}}
+function missionCounts(m){
+  var xp=0,ans=0,k;
+  for(k in state.got){if(k.indexOf('m'+m+':')===0)xp+=state.got[k]}
+  for(k in state.ex){if(k.indexOf('m'+m+'.')===0)ans++}
+  return {xp:xp,ans:ans};
+}
+function wipe(scope){
+  frozen=true;clearTimeout(flushT);
+  var st=readStore(),n;
+  if(scope==='course'){for(n=1;n<=LEVELS;n++)st.levels[n]=cleanLevel(null);st.last=null}
+  else if(scope==='level'){st.levels[L.level]=cleanLevel(null)}
+  else{
+    var e=st.levels[L.level]||cleanLevel(null),m=state.cur+1,k;
+    for(k in e.got){if(k.indexOf('m'+m+':')===0)delete e.got[k]}
+    for(k in e.ex){if(k.indexOf('m'+m+'.')===0)delete e.ex[k]}
+    for(k in e.seen){if(k.charAt(0)===String(state.cur))delete e.seen[k]}
+    e.step[state.cur]=0;e.cur=state.cur;st.levels[L.level]=e;
+  }
+  if(!writeStore(st)){frozen=false;return false}
+  for(n=1;n<=LEVELS;n++){if(scope==='course'||n===L.level){lsDel('aimbc-level'+n+'-v2');lsDel('aimbc-level'+n+'-v1')}}
+  reloadPage();return true;
+}
+function arm(btn,label,confirmLabel,note,run){
+  var armed=false,t,note$=$('#confirmNote');
+  function disarm(){armed=false;btn.textContent=label();clearTimeout(t)}
+  btn.addEventListener('click',function(){
+    if(!armed){armed=true;btn.textContent=confirmLabel();note$.textContent=note();t=setTimeout(function(){disarm();note$.textContent=''},8000);return}
+    disarm();note$.textContent='';run();
+  });
+  btn.addEventListener('blur',function(){setTimeout(function(){if(document.activeElement!==btn){disarm()}},150)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&armed){disarm();note$.textContent='Cancelled. Nothing was erased.'}});
+  btn.refreshLabel=function(){if(!armed)btn.textContent=label()};
+  btn.refreshLabel();
+}
+function wireReset(){
+  var rm=$('#restartM'),rl=$('#reset'),rc=$('#resetAll');
+  arm(rm,function(){return 'Restart Mission '+(state.cur+1)},function(){return 'Confirm: erase Mission '+(state.cur+1)},function(){
+    var c=missionCounts(state.cur+1);
+    return 'This erases '+c.xp+' XP and your saved answers in Mission '+(state.cur+1)+' of Level '+L.level+'. Other missions and levels are not touched. Press Escape to cancel.';
+  },function(){wipe('mission')});
+  arm(rl,function(){return 'Reset Level '+L.level},function(){return 'Confirm: erase Level '+L.level},function(){
+    return 'This erases '+totalXp()+' XP and all saved answers in all four missions of Level '+L.level+'. Other levels are not touched. Press Escape to cancel.';
+  },function(){wipe('level')});
+  arm(rc,function(){return 'Reset the whole course'},function(){return 'Confirm: erase all five levels'},function(){
+    var s=courseSummary(),x=0;s.levels.forEach(function(l){x+=l.xp});
+    return 'This erases '+x+' XP and all saved answers in all five levels, and cannot be undone. Your display preferences are kept. Press Escape to cancel.';
+  },function(){wipe('course')});
+  window.__resetLabels=function(){rm.refreshLabel&&rm.refreshLabel()};
+}
+
+/* ---------- course-wide summary, level chips, last-visited level ---------- */
+function renderCourse(){
+  var s=courseSummary(),xp=0,done=0;
+  s.levels.forEach(function(l){
+    xp+=l.xp;done+=l.done;
+    var c=$('.lvp[data-n="'+l.n+'"]');
+    if(c){
+      c.textContent='';
+      var v=el('span',null,l.done+'/'+COUNT);v.setAttribute('aria-hidden','true');
+      var r=el('span','sr',' '+l.done+' of '+COUNT+' missions done');
+      c.appendChild(v);c.appendChild(r);
+    }
+  });
+  var cb=$('#coursebar');
+  if(cb)cb.textContent='Whole course: '+xp+' of '+(TOTAL*LEVELS)+' XP, '+done+' of '+(COUNT*LEVELS)+' missions done.';
+  var ro=$('#resumeOther');
+  if(ro){
+    ro.textContent='';ro.hidden=true;
+    var last=s.last;
+    if(last&&last.level!==L.level){
+      var lv=s.levels[last.level-1];
+      if(lv&&(lv.xp>0)&&lv.done<COUNT){
+        var a=el('a',null,'Open Level '+last.level);a.href='level'+last.level+'.html';
+        ro.appendChild(document.createTextNode('You were last in Level '+last.level+' ('+lv.done+' of '+COUNT+' missions done). '));
+        ro.appendChild(a);ro.hidden=false;
+      }
+    }
+  }
+}
+
+/* ---------- carry progress from an older link (transfer code) ---------- */
+function importCode(str){
+  try{
+    str=String(str||'').replace(/\s+/g,'');
+    if(str.indexOf('AIMBC1.')!==0)return 'That is not a transfer code from this course.';
+    var data=JSON.parse(decodeURIComponent(escape(atob(str.slice(7)))));
+    if(!data||typeof data!=='object'||!data.levels)return 'That code is empty.';
+    var st=readStore(),n,added=0;
+    for(n=1;n<=LEVELS;n++){
+      if(!data.levels[n])continue;
+      var inc=cleanLevel(data.levels[n]);if(!hasProgress(inc))continue;
+      var cur=(n===L.level)?{got:state.got,cur:state.cur,step:state.step,seen:state.seen,ex:state.ex}:(st.levels[n]||cleanLevel(null));
+      var had=hasProgress(cur),k;
+      for(k in inc.got){if((cur.got[k]||0)<inc.got[k]){cur.got[k]=inc.got[k];added++}}
+      if(!had){cur.cur=inc.cur;cur.step=inc.step}
+      for(k in inc.seen)cur.seen[k]=1;
+      for(k in inc.ex){if(!(k in cur.ex))cur.ex[k]=inc.ex[k]}
+      cur.t=Date.now();
+      st.levels[n]=cleanLevel(cur);
+    }
+    if(!writeStore(st))return 'This browser is blocking saved progress, so nothing could be imported.';
+    return 'Imported. Reloading.';
+  }catch(e){return 'That code could not be read. Check that you copied all of it.'}
+}
+
+/* ---------- scrollable tables must be reachable by keyboard ---------- */
+function enhanceScrollers(r){
+  $$('.tblwrap,.tablewrap',r).forEach(function(w){
+    if(w.getAttribute('tabindex')===null){w.setAttribute('tabindex','0');w.setAttribute('role','region');w.setAttribute('aria-label','Table. Scroll sideways if it does not fit.')}
+  });
+}
+
+/* ---------- start ---------- */
+function start(){
+  if(!root.getAttribute('lang'))root.setAttribute('lang','en');
+  enhanceScrollers(document);
+  try{new MutationObserver(function(){enhanceScrollers(document)}).observe($('#stage'),{childList:true,subtree:true})}catch(e){}
+  var returning=hadSaved&&(totalXp()>0||state.cur>0||(state.step[state.cur]||0)>0||Object.keys(state.seen).length>1||Object.keys(state.ex).length>0);
+  buildSteps();
+  autoFields();
+  ['click','input','change','keyup'].forEach(function(t){document.addEventListener(t,schedule,true)});
+  window.addEventListener('pagehide',flush);
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')flush()});
+  window.addEventListener('storage',function(e){
+    if(e.key!==STORE||frozen)return;
+    var m=readStore().levels[L.level];if(!m)return;
+    var grew=false;for(var k in m.got){if((state.got[k]||0)<m.got[k]){state.got[k]=m.got[k];grew=true}}
+    if(grew)renderHud();
+    renderCourse();
+  });
+  nodes.forEach(function(n,i){n.addEventListener('click',function(){hideResume();show(i,state.step[i]||0,{focus:'mission',scroll:'layout',say:true})})});
+  $('#skip').addEventListener('click',function(e){e.preventDefault();var h=$('h2',articles[state.cur]);if(h){h.focus({preventScroll:true});scrollToEl(h)}});
+  applyPrefs();
+  wirePrefs();wireReset();
+  show(state.cur,state.step[state.cur]||0,{init:true});
+  renderHud();
+  renderCourse();
+  renderResume(returning);
+  if(!storageOK){
+    var w=el('span','sub','This browser is blocking saved data, so progress will not be kept after you close the page.');
+    resumeText.appendChild(w);
+  }
+}
+
+window.Course={$:$,$$:$$,el:el,award:award,has:has,persist:persist,toast:toast,makeQuiz:makeQuiz,copy:copyText,start:start,level:L.level,prefs:function(){return prefs}};
+})();
+
+</script>
+<script>
+(function(C){
+'use strict';
+var $=C.$,$$=C.$$,el=C.el,award=C.award,makeQuiz=C.makeQuiz;
+
+/* ---------- Mission 1 ---------- */
+(function(){
+  var ALL=['everyday runs','comfort','speed','the trail','champions'];
+  var SHOW=['comfort','champions','the trail','everyday runs','speed'];
+  var CTX=[
+    {n:'Discount sports chain',p:[38,30,14,10,8]},
+    {n:'Luxury performance label',p:[10,18,28,8,36]},
+    {n:'Trail-running club',p:[8,16,14,52,10]}
+  ];
+  var guessWrap=$('#guess1'),reveal=$('#reveal1'),barsEl=$('#bars1'),verdict=$('#verdict1'),ctxWrap=$('#ctx1');
+  var note=$('#ctxnote1'),trk=$('#trk1'),blank=$('#blank1'),ask=$('#ask1'),ctxName=$('#ctxName1');
+  var guess=null,cur=0,seen={0:true},rows=[],gbtns=[],cbtns=[];
+
+  function paint(){
+    rows.forEach(function(r,i){r.fill.style.width=CTX[cur].p[i]+'%';r.pc.textContent=CTX[cur].p[i]+'%'});
+  }
+  function tracker(){
+    var n=Object.keys(seen).length;
+    trk.textContent=n>=3?'All three voices tried.':'Voices tried: '+n+' of 3';
+  }
+  var ctxUsed=false;
+  function showGuess(g,fresh){
+      var w=ALL[g],b=gbtns[SHOW.indexOf(w)];
+      guess=g;
+      gbtns.forEach(function(x){x.disabled=true});
+      b.setAttribute('aria-pressed','true');
+      blank.textContent=w;
+      ask.textContent='Here is how the AI ranked all five.';
+      var pr=CTX[0].p,rank=1,top=0;
+      for(var j=0;j<pr.length;j++){if(pr[j]>pr[guess])rank++;if(pr[j]>pr[top])top=j}
+      verdict.textContent=(rank===1)
+        ?'“'+w+'” is the top pick at '+pr[guess]+'%. You think like the model.'
+        :'You picked “'+w+'”. The AI rates it #'+rank+' at '+pr[guess]+'%. Its favorite is “'+ALL[top]+'” at '+pr[top]+'%.';
+      rows[guess].row.classList.add('mine');
+      reveal.hidden=false;
+      if(fresh)requestAnimationFrame(function(){requestAnimationFrame(paint)});else paint();
+      tracker();
+  }
+  SHOW.forEach(function(w){
+    var b=el('button','chip',w);b.type='button';
+    b.addEventListener('click',function(){
+      if(guess!==null)return;
+      showGuess(ALL.indexOf(w),true);
+      award('m1:guess',10);
+    });
+    guessWrap.appendChild(b);gbtns.push(b);
+  });
+  ALL.forEach(function(w){
+    var row=el('div','row');
+    var wl=el('span','w',w);var tr=el('span','track');var f=document.createElement('i');tr.appendChild(f);
+    var pc=el('span','pc','0%');
+    row.appendChild(wl);row.appendChild(tr);row.appendChild(pc);barsEl.appendChild(row);
+    rows.push({row:row,fill:f,pc:pc});
+  });
+  CTX.forEach(function(c,idx){
+    var b=el('button','chip',c.n);b.type='button';b.setAttribute('aria-pressed',idx===0?'true':'false');
+    if(idx===0)b.classList.add('seen');
+    b.addEventListener('click',function(){
+      selectCtx(idx);
+      if(Object.keys(seen).length>=3)award('m1:explore',10);
+    });
+    ctxWrap.appendChild(b);cbtns.push(b);
+  });
+  function selectCtx(idx){
+      var c=CTX[idx];
+      ctxUsed=true;
+      cur=idx;seen[idx]=true;
+      cbtns.forEach(function(x,k){x.setAttribute('aria-pressed',k===idx?'true':'false');if(seen[k])x.classList.add('seen')});
+      ctxName.textContent=c.n;paint();
+      if(idx===0){note.textContent='Back to the baseline.'}
+      else{
+        var best=0,bi=0;
+        for(var j=0;j<ALL.length;j++){var d=c.p[j]-CTX[0].p[j];if(Math.abs(d)>Math.abs(best)){best=d;bi=j}}
+        note.textContent='“'+ALL[bi]+'” '+(best>0?'jumped':'dropped')+' from '+CTX[0].p[bi]+'% to '+c.p[bi]+'%. Same sentence, different voice, different odds.';
+      }
+      tracker();
+  }
+  C.persist('m1.state',{
+    get:function(){return {g:guess,c:cur,u:ctxUsed,s:Object.keys(seen).map(Number)}},
+    set:function(v){
+      if(!v||typeof v!=='object'||guess!==null)return;
+      var g=v.g,c=v.c;
+      if(typeof g!=='number'||g%1!==0||g<0||g>=ALL.length)return;
+      if(typeof c!=='number'||c%1!==0||c<0||c>=CTX.length)c=0;
+      if(Array.isArray(v.s)){seen={0:true};v.s.forEach(function(k){if(typeof k==='number'&&k>=0&&k<CTX.length&&k%1===0)seen[k]=true})}
+      showGuess(g,false);
+      if(v.u===true){selectCtx(c)}
+      else{cur=c;cbtns.forEach(function(x,k){x.setAttribute('aria-pressed',k===c?'true':'false')});ctxName.textContent=CTX[c].n;paint()}
+    }
+  });
+  makeQuiz($('#quiz1'),'m1',[
+    {q:'At its core, what is an AI writing tool doing?',
+     o:['Looking up answers in a database of facts','Rating likely next words based on the text so far','Working out what is true, then writing it down'],c:1,xp:15,
+     why:'It ranks what usually comes next. Facts can show up in that ranking, but it is not checking them.',
+     hint:'Think about the shoe sentence. It was weighing odds, not looking anything up.'},
+    {q:'You paste your brand voice guide above your request. What changes?',
+     o:['The odds shift toward words that fit that voice','The AI permanently learns your brand','Nothing, it ignores anything above the request'],c:0,xp:15,
+     why:'Context moves the odds for this conversation. It does not retrain the model.',
+     hint:'Remember the three brand voices. What moved when you switched?'}
+  ]);
+})();
+
+/* ---------- Mission 2 ---------- */
+(function(){
+  var base='Write email subject lines for our spring plant sale.';
+  var adds=[
+    {n:'Audience',l:'Audience: first-time plant owners who are nervous about killing plants.'},
+    {n:'Goal and offer',l:'Goal: get opens from people who have never bought from us. Offer: 20% off, ends Sunday.'},
+    {n:'Constraints',l:'Constraints: under 45 characters, no exclamation marks, no emoji.'},
+    {n:'Voice',l:'Voice: friendly and a little dry. A past winner: “Your fern called. It’s fine.”'}
+  ];
+  var outs=[
+    ['Spring Plant Sale: Save Up To 30% Today!','Don’t Miss Our Spring Sale','Refresh Your Space With Beautiful Plants'],
+    ['Plants that forgive you for forgetting to water them','Beginner-proof plants, now on sale','Yes, you can keep this one alive'],
+    ['Beginner-proof plants, 20% off until Sunday','Your first plant is 20% off (we’ll help you keep it alive)','20% off ends Sunday: start with a plant that forgives you'],
+    ['Beginner-proof plants, 20% off till Sunday','Your first plant is 20% off till Sunday','Plants that forgive you: 20% off till Sunday'],
+    ['20% off plants that forgive mistakes.','Beginner plants, 20% off till Sunday. Easy.','Hard to kill, 20% off until Sunday.']
+  ];
+  var notes=[
+    'Generic. Could be any store, and it invented a 30% discount you never mentioned.',
+    'It knows who is reading now.',
+    'It has a job and a deadline.',
+    'It follows your rules. Check the character counts.',
+    'It sounds like someone from your shop wrote it.'
+  ];
+  var levels=['Could be anyone’s','Knows the reader','Has a job','Fits the rules','Sounds like us'];
+  var s=0;
+  var pr=$('#prompt2'),out=$('#out2'),meter=$$('#meter2 i'),ml=$('#mlabel2'),nt=$('#note2'),add=$('#add2'),rs=$('#reset2'),cnt=$('#count2');
+  function render(){
+    pr.textContent='';
+    var l0=el('div','ln'+(s===0?' new':''),base);pr.appendChild(l0);
+    for(var i=0;i<s;i++){pr.appendChild(el('div','ln'+(i===s-1?' new':''),adds[i].l))}
+    out.textContent='';
+    outs[s].forEach(function(t){
+      var li=el('li');li.appendChild(el('span','t',t));
+      var len=t.length;var constrained=s>=3;
+      var n=el('span','n'+(constrained&&len<45?' fit':''),len+' chars'+(constrained&&len<45?' ✓':''));
+      li.appendChild(n);out.appendChild(li);
+    });
+    meter.forEach(function(m,k){m.classList.toggle('on',k<=s)});
+    ml.textContent=levels[s];nt.textContent=notes[s];
+    cnt.textContent=s+' of 4 ingredients';
+    if(s<4){add.disabled=false;add.textContent='Add: '+adds[s].n}else{add.disabled=true;add.textContent='All four added'}
+  }
+  add.addEventListener('click',function(){if(s<4){s++;render();if(s===4)award('m2:build',20)}});
+  rs.addEventListener('click',function(){s=0;render()});
+  render();
+  C.persist('m2.step',{
+    get:function(){return s},
+    set:function(v){if(typeof v==='number'&&v%1===0&&v>=0&&v<=4){s=v;render()}}
+  });
+  makeQuiz($('#quiz2'),'m2',[
+    {q:'Which ingredient stopped the AI from guessing who was reading?',
+     o:['Audience','Constraints','Voice'],c:0,xp:15,
+     why:'Audience was the first fix. Before it, the AI wrote for everyone.',
+     hint:'Look at what changed between the first and second set of lines.'},
+    {q:'You get 12 generic subject lines. What is the best first fix?',
+     o:['Ask it to try harder','Add who it is for and what the offer is','Regenerate until one works'],c:1,xp:15,
+     why:'A tighter brief narrows the odds. “Try harder” gives it nothing new to work with.',
+     hint:'Which choice gives the AI new information?'}
+  ]);
+})();
+
+/* ---------- Mission 3 ---------- */
+(function(){
+  var R=[
+    {brief:'Intro paragraph for Fernwood Coffee’s cold brew post. Facts you gave it: small-batch roaster, cold brew steeped 12 to 18 hours. No statistics.',
+     s:['Fernwood steeps its small-batch cold brew for 12 to 18 hours.',
+        'A 2024 Harvard study found that 87% of cold brew drinkers feel more focused within ten minutes.',
+        'Because the water is cold, the brew tastes less acidic than hot coffee, which many people find smoother.',
+        'The long steep is what gives it that rounded, slow-sipping character.'],
+     bad:1,tag:'Invented statistic',hint:'Look for something precise that you never supplied.',
+     why:'A specific number and a named source sound trustworthy. You gave it neither, so it produced something shaped like a citation. Find the real source or cut the line.'},
+    {brief:'Press blurb for a loyalty program. Facts you gave it: 1 point per dollar, free bag after 10 purchases, launches in March. No quotes.',
+     s:['Fernwood Rewards launches in March.',
+        'Members earn one point for every dollar spent.',
+        '“It’s the best loyalty program in the Midwest,” said a leading food critic.',
+        'After ten purchases, members get a free bag.'],
+     bad:2,tag:'Invented quote',hint:'Check each line against the brief. Which one has no source in it?',
+     why:'You never gave it a quote, so nobody said this. AI will happily write one and attribute it to someone vague or real. Only publish quotes from people who actually said them.'},
+    {brief:'Summary of Instagram posting-time advice for a small bakery. Facts you gave it: none, general advice only.',
+     s:['Posting at consistent times helps followers know when to expect you.',
+        'The best time to post on Instagram is always 11 a.m. on Tuesdays.',
+        'Your own account insights show when your followers are most active.',
+        'Try a few time slots for two weeks, then compare reach.'],
+     bad:1,tag:'Overconfident rule',hint:'Look for a word that leaves no room for exceptions.',
+     why:'“Always” is the tell. Best times shift by audience and over time. Treat any universal rule as a guess and check it against your own analytics.'}
+  ];
+  var host=$('#rounds3'),idx=0,wrong=[],solved=false;
+  function render(pre){
+    var r=R[idx],tries=0;
+    wrong=[];solved=false;
+    host.textContent='';
+    host.appendChild(el('p','roundline','Round '+(idx+1)+' of '+R.length));
+    var br=el('div','brief');var bb=el('b',null,'Your brief: ');br.appendChild(bb);br.appendChild(document.createTextNode(r.brief));host.appendChild(br);
+    host.appendChild(el('p','ask','The AI wrote this. Tap the one sentence you would not publish without checking.'));
+    var list=el('div','sent');var btns=[];
+    var msg=el('p','msg');msg.setAttribute('aria-live','polite');
+    var rev=el('div','reveal');rev.hidden=true;
+    r.s.forEach(function(t,i){
+      var b=el('button','choice',t);b.type='button';
+      b.addEventListener('click',function(){
+        if(solved)return;
+        if(i===r.bad){
+          solve(true);
+        }else{
+          miss(b,i);
+        }
+      });
+      list.appendChild(b);btns.push(b);
+    });
+    function solve(fresh){
+          solved=true;
+          var i=r.bad;
+          btns.forEach(function(x,k){x.disabled=true;if(k===i)x.classList.add('ok');else x.classList.add('dim')});
+          msg.textContent='';
+          rev.textContent='';
+          rev.appendChild(el('span','tagchip',r.tag));
+          rev.appendChild(el('p',null,r.why));
+          if(idx<R.length-1){
+            var nb=el('button','btn','Next round');nb.type='button';nb.style.justifySelf='start';
+            nb.addEventListener('click',function(){idx++;render()});rev.appendChild(nb);
+          }else{
+            rev.appendChild(el('p','note','That is all three rounds. The four tells below are your 10-second check.'));
+          }
+          rev.hidden=false;
+          if(fresh)award('m3:r'+idx,10);
+    }
+    function miss(b,i){
+          tries++;wrong.push(i);b.disabled=true;b.classList.add('no');
+          msg.textContent=tries<2?'That one holds up against your brief. Keep looking.':'Hint: '+r.hint;
+    }
+    host.appendChild(list);host.appendChild(msg);host.appendChild(rev);
+    if(pre){
+      pre.w.forEach(function(i){miss(btns[i],i)});
+      if(pre.s)solve(false);
+    }
+  }
+  render();
+  C.persist('m3.round',{
+    get:function(){return {i:idx,w:wrong.slice(),s:solved}},
+    set:function(v){
+      if(!v||typeof v!=='object')return;
+      var i=v.i;
+      if(typeof i!=='number'||i%1!==0||i<0||i>=R.length)return;
+      var w=[];
+      if(Array.isArray(v.w))v.w.forEach(function(k){
+        if(typeof k==='number'&&k%1===0&&k>=0&&k<R[i].s.length&&k!==R[i].bad&&w.indexOf(k)<0)w.push(k);
+      });
+      idx=i;render({w:w,s:v.s===true});
+    }
+  });
+  makeQuiz($('#quiz3'),'m3',[
+    {q:'Your AI draft says: “Studies show 9 in 10 customers prefer fresh-roasted coffee.” What do you do?',
+     o:['Publish it, it sounds right','Ask the AI to confirm it is true','Find the study yourself, or cut the line'],c:2,xp:20,
+     why:'The AI cannot vouch for its own claims. The check has to come from a source you can open.',
+     hint:'Asking the AI to confirm itself is asking the same guesser twice.'}
+  ]);
+})();
+
+/* ---------- Mission 4 ---------- */
+(function(){
+  var f={ch:$('#f-channel'),goal:$('#f-goal'),offer:$('#f-offer'),aud:$('#f-audience'),tone:$('#f-tone'),lim:$('#f-limit')};
+  var pre=$('#p4'),copyBtn=$('#copy4'),cn=$('#copynote4');
+  function v(x,ph){var t=x.value.replace(/\s+/g,' ').trim();return t||ph}
+  function build(){
+    return 'Act as a copywriter for a small business.\n\n'
+      +'Write 3 '+v(f.ch,'[what you are writing]')+' for this offer: '+v(f.offer,'[your offer]')+'.\n'
+      +'Audience: '+v(f.aud,'[your audience]')+'.\n'
+      +'Goal: '+v(f.goal,'[your goal]')+'.\n'
+      +'Tone: '+v(f.tone,'[your tone]')+'.\n'
+      +'Limits: '+v(f.lim,'[your limit]')+'. No exclamation marks.\n\n'
+      +'Use only the facts I gave you. Do not invent statistics, quotes, prices, or deadlines. If you need a fact I did not give you, ask me before writing.\n\n'
+      +'Finish by telling me which of the three you would post and why, in one sentence.';
+  }
+  function refresh(){pre.textContent=build()}
+  Object.keys(f).forEach(function(k){f[k].addEventListener('input',refresh);f[k].addEventListener('change',refresh)});
+  refresh();
+  function selectPre(){
+    try{var r=document.createRange();r.selectNodeContents(pre);var s=window.getSelection();s.removeAllRanges();s.addRange(r);return true}catch(e){return false}
+  }
+  var copied=null;
+  function copyNote(ok){
+    copied=ok;
+    cn.textContent=ok?'Copied. Paste it into your AI tool, then come back and grade the result.':'Text selected. Press copy on your keyboard, then paste it into your AI tool.';
+  }
+  function done(ok){
+    copyNote(ok);
+    award('m4:copy',20);
+  }
+  C.persist('m4.copied',{
+    get:function(){return copied},
+    set:function(v){if(typeof v==='boolean')copyNote(v)}
+  });
+  copyBtn.addEventListener('click',function(){
+    var text=build();
+    function fallback(){
+      var sel=selectPre(),ok=false;
+      try{ok=document.execCommand('copy')}catch(e){}
+      done(ok&&sel);
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){done(true)},fallback);
+    }else{fallback()}
+  });
+  var boxes=$$('#checklist4 input'),ckmsg=$('#ckmsg');
+  function checkAll(){
+    var all=boxes.every(function(b){return b.checked});
+    if(all){ckmsg.textContent='All four ticked. Mission complete.';award('m4:check',30)}
+    else if(!C.has('m4:check')){ckmsg.textContent=''}
+  }
+  boxes.forEach(function(b){b.addEventListener('change',checkAll)});
+  if(C.has('m4:check')){boxes.forEach(function(b){b.checked=true});ckmsg.textContent='All four ticked. Mission complete.'}
+})();
+})(window.Course);
+
+</script>
+<script>Course.start();</script>
+
+</html>

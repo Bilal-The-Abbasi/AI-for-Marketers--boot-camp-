@@ -1,0 +1,67 @@
+<div class="label">Try it</div>
+      <div class="lab">
+        <p class="ask">Wick &amp; Wander is an example candle shop. Here are six weeks of its numbers (all examples).</p>
+        <div class="tablewrap">
+          <table class="data" id="l3m4-table">
+            <thead><tr><th scope="col">Week</th><th scope="col">Sessions</th><th scope="col">Orders</th><th scope="col">Revenue</th><th scope="col">Ad spend</th><th scope="col">Newsletter</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">1</th><td>2,100</td><td>63</td><td>$2,520</td><td>$300</td><td>no</td></tr>
+              <tr><th scope="row">2</th><td>2,250</td><td>65</td><td>$2,600</td><td>$300</td><td>no</td></tr>
+              <tr><th scope="row">3</th><td>2,150</td><td>60</td><td>$2,400</td><td>$300</td><td>no</td></tr>
+              <tr><th scope="row">4</th><td>2,400</td><td>72</td><td>$2,880</td><td>$300</td><td>yes</td></tr>
+              <tr><th scope="row">5</th><td>2,300</td><td>83</td><td>$3,320</td><td>$450</td><td>yes</td></tr>
+              <tr><th scope="row">6</th><td>2,200</td><td>66</td><td>$2,640</td><td>$450</td><td>no</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Extra note (example): 4 of week 5’s 83 orders came from a new Instagram ad.</p>
+        <p class="ask">Step 1. You will paste this table into your AI tool. Which question gets the most useful answer?</p>
+        <div class="sent" id="l3m4-ask"></div>
+        <p class="msg" id="l3m4-askmsg" aria-live="polite"></p>
+      </div>
+
+      <div class="lab">
+        <p class="ask">Step 2. The AI answered. Tap every claim the table cannot support, then check your flags.</p>
+        <div class="sent" id="l3m4-claims"></div>
+        <div class="actions">
+          <button type="button" class="btn" id="l3m4-check">Check my flags</button>
+          <span class="note" id="l3m4-count">0 flagged</span>
+        </div>
+        <p class="verdict" id="l3m4-verdict" aria-live="polite"></p>
+      </div>
+
+      <div class="label">Why it works</div>
+      <p>The good question asks what moved and what else could explain it, and keeps the AI inside your table. The shaky claims share a pattern: a cause read from timing, a conclusion from a handful of orders, and a start and end date picked to look good.</p>
+      <p>AI does the arithmetic and the wording well. You still own the question, and the check.</p>
+
+      <div class="label">Check</div>
+      <div class="lab">
+        <p class="ask">Capstone: build the weekly report prompt you can reuse every Monday. It is prefilled with the example table. Swap in your own numbers.</p>
+        <div class="form">
+          <label class="fld wide" for="l3m4-data"><span>Your data (paste it here)</span>
+            <textarea id="l3m4-data" rows="7"></textarea></label>
+          <label class="fld" for="l3m4-who"><span>Who reads the report?</span>
+            <select id="l3m4-who"><option selected>the shop owner, no jargon</option><option>my manager</option><option>my team</option></select></label>
+          <label class="fld" for="l3m4-fmt"><span>Output format</span>
+            <select id="l3m4-fmt"><option selected>Five short bullets, then one suggested next step</option><option>Three headline numbers with one sentence each, then one next step</option><option>A short note I can paste into an email</option></select></label>
+        </div>
+        <p class="mini">Guardrails</p>
+        <ul class="checklist" id="l3m4-rules"></ul>
+        <div>
+          <p class="mini">Your prompt</p>
+          <pre class="prompt" id="l3m4-prompt" tabindex="0"></pre>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" id="l3m4-copy">Copy prompt</button>
+          <span class="note" id="l3m4-copynote" aria-live="polite"></span>
+        </div>
+      </div>
+
+      <div class="label">Go deeper</div>
+      <details class="deeper">
+        <summary>Make it a Monday habit</summary>
+        <div class="body">
+          <p>Keep the same prompt and the same table layout every week, and change only the numbers. Ask the AI to compare against the previous week and say which weeks it used. A report that always looks the same is easy to read and easy to catch when something looks off.</p>
+          <p>Level 4 turns prompts like this one into workflows that run with less copying and pasting.</p>
+        </div>
+      </details>

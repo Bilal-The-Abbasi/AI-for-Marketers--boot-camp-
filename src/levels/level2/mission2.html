@@ -1,0 +1,41 @@
+<div class="label">Try it</div>
+      <div class="lab">
+        <p class="note">Example task for Tidewater Yoga, a made-up studio. Change the two dials and read what comes back.</p>
+        <p class="mini">Dial 1: How many examples?</p>
+        <div class="chips" id="l2m2-ex" role="group" aria-label="Number of examples"></div>
+        <p class="mini">Dial 2: What shape should it take?</p>
+        <div class="chips" id="l2m2-fmt" role="group" aria-label="Output format"></div>
+        <div class="split">
+          <div>
+            <p class="mini">What you typed</p>
+            <div class="prompt" id="l2m2-prompt"></div>
+          </div>
+          <div>
+            <p class="mini">What came back</p>
+            <div id="l2m2-out" aria-live="polite"></div>
+            <p class="msg" id="l2m2-note"></p>
+          </div>
+        </div>
+        <p class="tracker" id="l2m2-trk"></p>
+      </div>
+
+      <div class="lab" style="margin-top:14px">
+        <p class="roundline" id="l2m2-rl"></p>
+        <div id="l2m2-match"></div>
+      </div>
+
+      <div class="label">Why it works</div>
+      <p>Examples control style. With none, the AI writes the average subject line. With one, it copies that line’s shape, even its first word. With three, it can see what stays the same and what changes, so it copies the pattern and not the sentence.</p>
+      <p>A format line controls shape. It tells the AI how to lay the answer out so you can use it without retyping: a table for a spreadsheet, labeled pairs for an email tool, counts to catch long lines.</p>
+
+      <div class="label">Check</div>
+      <div id="l2m2-quiz"></div>
+
+      <div class="label">Go deeper</div>
+      <details class="deeper">
+        <summary>Good examples, bad examples</summary>
+        <div class="body">
+          <p>Use examples that really worked, not ones you merely like. Make them differ from each other on purpose: different openings, different lengths. If all three start with “Your,” so will the output.</p>
+          <p>You can also show a bad example. “Do not write like this:” followed by a line you hate is a fast way to rule out a whole style.</p>
+        </div>
+      </details>

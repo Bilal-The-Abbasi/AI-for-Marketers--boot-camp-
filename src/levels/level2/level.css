@@ -1,0 +1,23 @@
+.quote{margin:6px 0 0;font-family:var(--f-display);font-weight:600}
+.chain{margin:0;padding-left:1.4em;display:grid;gap:6px;min-height:1.6em}
+.chain li{background:var(--m-tint);border-radius:6px;padding:8px 12px;min-width:0;overflow-wrap:anywhere}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.tbl{border-collapse:collapse;width:100%;font-size:0.875rem}
+.tbl th,.tbl td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{font-family:var(--f-mono);font-size:0.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tbl tr:last-child td{border-bottom:0}
+.pair{display:grid;gap:2px;min-width:0}
+.pair .k{font-family:var(--f-mono);font-size:0.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.out .stack{display:grid;gap:4px;min-width:0;flex:1}
+.out li.block{display:block}
+.seg{border:0;margin:0;padding:0;min-width:0;display:flex;flex-wrap:wrap;gap:8px}
+.seg legend{padding:0;margin-bottom:6px;width:100%}
+.seg label{position:relative;display:inline-flex;min-width:0}
+.seg input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.seg span{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 14px;border:1px solid var(--line);border-radius:6px;background:var(--surface);font-weight:500}
+.seg input:checked+span{border-color:var(--m);background:var(--m-tint);box-shadow:inset 0 0 0 1px var(--m)}
+.seg input:focus-visible+span{outline:3px solid var(--m);outline-offset:2px}
+.seg span.built::after{content:"\2713";color:var(--ok);font-weight:700}
+.mk{display:flex;gap:10px;align-items:center;font-size:0.875rem;min-height:44px;cursor:pointer}
+.mk input{width:20px;height:20px;flex:none;accent-color:var(--ink)}
+.fld textarea{width:100%;font-size:1rem;line-height:1.4;padding:9px 12px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;font-family:inherit;resize:vertical}

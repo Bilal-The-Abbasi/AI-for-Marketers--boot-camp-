@@ -1,0 +1,2126 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Build Mode</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* AI for Marketers: shared theme (v2, calm redesign).
+   Dark-first. One action colour (--accent). Success (--ok) and attention (--warn) appear only for meaningful states.
+   Layout idea: one dominant task panel, quiet navigation. Sizes are rem so the "Larger text" preference scales everything.
+   Legacy token names (--m, --m-tint, --m-on, --no, --no-tint, --key-tint, --yellow-tint, --cyan, --magenta, --yellow)
+   are kept as aliases so level.css files written against v1 keep working. */
+:root{
+  /* surfaces */
+  --bg:#171C26; --surface:#1E2532; --raised:#252D3A; --raised-2:#2D3646;
+  --line:#364152; --line-strong:#7B879B;
+  /* text */
+  --ink:#F1F4F9; --muted:#A9B4C5;
+  /* the one action colour */
+  --accent:#56B8D8; --accent-hover:#7DCAE3; --on-accent:#0D1B24; --accent-tint:#1B3441; --focus:#8FD6EE;
+  /* meaning only */
+  --ok:#46BF95; --ok-tint:#163A31; --on-ok:#0B2A20;
+  --warn:#E6B85C; --warn-tint:#382F1C;
+  /* scales */
+  --s-1:.25rem; --s-2:.5rem; --s-3:.75rem; --s-4:1rem; --s-5:1.5rem; --s-6:2rem; --s-7:3rem;
+  --r-s:6px; --r-m:10px; --r-l:14px;
+  --t-xs:.8125rem; --t-s:.9375rem; --t-m:1.0625rem; --t-l:1.25rem; --t-xl:1.625rem; --t-2xl:2.25rem;
+  --f-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --f-body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    --bg:#F3F5F8; --surface:#FFFFFF; --raised:#EAEEF4; --raised-2:#E1E7F0;
+    --line:#D5DCE6; --line-strong:#6E7B90;
+    --ink:#131923; --muted:#475266;
+    --accent:#0A6B8C; --accent-hover:#08556F; --on-accent:#FFFFFF; --accent-tint:#D9EEF5; --focus:#0A5C78;
+    --ok:#0D7650; --ok-tint:#D7F0E5; --on-ok:#FFFFFF;
+    --warn:#8A5300; --warn-tint:#FAEBCB;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#F3F5F8; --surface:#FFFFFF; --raised:#EAEEF4; --raised-2:#E1E7F0;
+  --line:#D5DCE6; --line-strong:#6E7B90;
+  --ink:#131923; --muted:#475266;
+  --accent:#0A6B8C; --accent-hover:#08556F; --on-accent:#FFFFFF; --accent-tint:#D9EEF5; --focus:#0A5C78;
+  --ok:#0D7650; --ok-tint:#D7F0E5; --on-ok:#FFFFFF;
+  --warn:#8A5300; --warn-tint:#FAEBCB;
+  color-scheme:light;
+}
+:root{
+  /* v1 aliases */
+  --m:var(--accent); --m-on:var(--on-accent); --m-tint:var(--accent-tint);
+  --no:var(--warn); --no-tint:var(--warn-tint); --yellow-tint:var(--warn-tint); --key-tint:var(--raised);
+  --cyan:var(--accent); --magenta:var(--warn); --yellow:var(--warn); --key:var(--ink); --key-on:var(--bg);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{font-size:100%;scroll-padding-top:5.5rem}
+html[data-text="large"]{font-size:125%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:var(--t-m);line-height:1.6}
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:var(--r-s)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:70rem;margin-inline:auto;padding-inline:16px}
+svg.ic{width:1.1em;height:1.1em;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- skip link ---------- */
+.skiplink{position:absolute;left:16px;top:-4rem;z-index:50;background:var(--accent);color:var(--on-accent);padding:.6rem 1rem;border-radius:var(--r-s);font-weight:700;text-decoration:none}
+.skiplink:focus{top:calc(.5rem + env(safe-area-inset-top,0px))}
+
+/* ---------- header ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:0 var(--s-3);min-height:3.5rem}
+.brand{display:flex;align-items:center;gap:var(--s-2);font-family:var(--f-display);font-weight:700;font-size:1.0625rem;white-space:nowrap}
+.hud{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:var(--s-3);min-width:0}
+.xp{font-size:var(--t-s);color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.xp b{color:var(--ink);font-weight:700}
+.pbtn,.exitfocus{display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);min-height:2.75rem;min-width:2.75rem;padding:0 var(--s-3);color:var(--ink);background:transparent;border:1px solid var(--line-strong);border-radius:var(--r-m);cursor:pointer;font-weight:600;font-size:var(--t-s)}
+.pbtn:hover,.exitfocus:hover{background:var(--raised)}
+.pbtn[aria-expanded="true"]{background:var(--raised);border-color:var(--accent)}
+.exitfocus{display:none}
+html[data-focus="on"] .exitfocus{display:inline-flex}
+.ctxbar{display:none;padding-block:0 var(--s-2);font-size:var(--t-s);color:var(--muted);line-height:1.4}
+.ctxbar b{color:var(--ink)}
+@media (max-width:899px){
+  html[data-focus="on"] .bname{display:none}
+  .ctxbar{display:block}
+  .pbtn .ptxt{display:none}
+  .pbtn{padding:0}
+}
+
+/* ---------- preferences panel ---------- */
+.prefs{position:absolute;right:0;top:100%;z-index:40;width:min(24rem,100%);max-height:calc(100dvh - 4rem);overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line-strong);border-radius:0 0 var(--r-m) var(--r-m);padding:var(--s-4) var(--s-5) var(--s-5);box-shadow:0 12px 32px rgba(0,0,0,.28)}
+.prefs[hidden]{display:none}
+.prefs h2{font-family:var(--f-display);font-size:var(--t-l);margin:0 0 var(--s-1)}
+.prefs .sub{margin:0 0 var(--s-4);font-size:var(--t-s);color:var(--muted)}
+.prefs fieldset{border:0;margin:0 0 var(--s-4);padding:0;min-width:0}
+.prefs legend{padding:0;margin-bottom:var(--s-2);font-size:var(--t-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pseg{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.pseg label{position:relative;display:inline-flex;min-width:0}
+.pseg input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.pseg span{display:inline-flex;align-items:center;gap:var(--s-2);min-height:2.75rem;padding:.5rem .9rem;border:1px solid var(--line-strong);border-radius:var(--r-m);background:var(--bg);font-weight:600;font-size:var(--t-s)}
+.pseg input:checked+span{border-color:var(--accent);background:var(--accent-tint);box-shadow:inset 0 0 0 1px var(--accent)}
+.pseg input:checked+span::before{content:"\2713";font-weight:800}
+.pseg input:focus-visible+span{outline:3px solid var(--focus);outline-offset:3px}
+.sw-row{display:flex;gap:var(--s-3);align-items:flex-start;padding:var(--s-2) 0;min-height:2.75rem;cursor:pointer}
+.sw-row input{width:1.375rem;height:1.375rem;flex:none;margin-top:.15rem;accent-color:var(--accent)}
+.sw-row b{display:block;font-weight:600;font-size:var(--t-s)}
+.sw-row small{display:block;font-size:var(--t-xs);color:var(--muted);line-height:1.4}
+.prefs .done{margin-top:var(--s-2)}
+.prefs .persist{margin:var(--s-3) 0 0;font-size:var(--t-xs);color:var(--muted)}
+@media (max-width:899px){.prefs{width:100%;border-radius:0 0 var(--r-m) var(--r-m)}}
+
+/* ---------- intro, resume ---------- */
+.intro{padding-block:var(--s-6) var(--s-4);display:grid;gap:var(--s-3)}
+.intro>*{margin:0;min-width:0}
+.kicker{font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.intro h1{font-family:var(--f-display);font-weight:700;font-size:clamp(2.1rem,6vw,3rem);line-height:1.05;letter-spacing:-.02em}
+.lede{max-width:56ch;color:var(--muted)}
+.resume{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s-3) var(--s-5);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s-4) var(--s-5)}
+.resume p{margin:0;min-width:0;flex:1 1 18rem}
+.resume b{font-weight:700}
+.resume .sub{display:block;color:var(--muted);font-size:var(--t-s)}
+.levelnav{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.lv{display:inline-flex;align-items:center;gap:var(--s-2);font-size:var(--t-s);color:var(--ink);background:transparent;border:1px solid var(--line-strong);border-radius:var(--r-m);padding:.4rem .8rem;min-height:2.75rem;text-decoration:none;font-weight:500}
+.lv b{font-weight:700;color:var(--muted)}
+a.lv:hover{background:var(--raised)}
+.lv.cur{background:var(--raised-2);border-color:var(--ink);font-weight:700}
+.lv.cur b{color:var(--ink)}
+.lv.off{border-style:dashed;color:var(--muted)}
+
+/* ---------- layout ---------- */
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s-5);padding-block:var(--s-4) var(--s-7)}
+.stage{min-width:0}
+@media (min-width:900px){
+  .layout{grid-template-columns:16rem minmax(0,1fr);gap:var(--s-6)}
+  .map{position:sticky;top:5.5rem;align-self:start}
+}
+
+/* ---------- mission map ---------- */
+.map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s-2)}
+.node{display:grid;justify-items:center;align-content:start;gap:var(--s-1);text-align:center;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-2) var(--s-1);min-height:2.75rem;cursor:pointer}
+.node:hover{border-color:var(--line-strong)}
+.node[aria-current="true"]{border-color:var(--accent);background:var(--accent-tint)}
+.ni{display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;border:2px solid var(--line-strong);font-weight:700;font-size:var(--t-s);font-variant-numeric:tabular-nums}
+.node[aria-current="true"] .ni{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.node.done .ni{background:var(--ok);border-color:var(--ok);color:var(--on-ok)}
+.nt,.ns{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.nshort{font-size:var(--t-xs);color:var(--muted);font-variant-numeric:tabular-nums}
+.node.done .nshort{color:var(--ok);font-weight:700}
+@media (min-width:900px){
+  .map{grid-template-columns:minmax(0,1fr)}
+  .node{grid-template-columns:auto minmax(0,1fr);justify-items:start;align-items:center;text-align:left;gap:0 var(--s-3);padding:var(--s-3)}
+  .ni{grid-row:span 2}
+  .nt,.ns{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal}
+  .nt{display:block;font-weight:700;line-height:1.25}
+  .ns{display:block;font-size:var(--t-xs);color:var(--muted)}
+  .node.done .ns{color:var(--ok);font-weight:600}
+  .nshort{display:none}
+}
+
+/* ---------- mission header ---------- */
+.mission{min-width:0}
+.mhead{display:grid;gap:var(--s-3);margin-bottom:var(--s-4)}
+.mhead>*{margin:0;min-width:0}
+.mmeta{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2) var(--s-3);font-size:var(--t-s);color:var(--muted)}
+.mmeta .mnum{font-weight:700;color:var(--ink)}
+.mstate{display:inline-flex;align-items:center;gap:var(--s-1);font-weight:600}
+.mstate.is-done{color:var(--ok)}
+.mission h2{font-family:var(--f-display);font-weight:700;font-size:clamp(1.75rem,4.6vw,2.25rem);line-height:1.1;letter-spacing:-.015em;text-wrap:balance}
+.hook{max-width:60ch;color:var(--muted);font-size:var(--t-m)}
+.objective{display:grid;gap:var(--s-1);max-width:60ch;padding:var(--s-3) var(--s-4);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m)}
+.objective>span{font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.objective>b{font-weight:600;font-size:var(--t-m);line-height:1.45}
+.mprog{display:flex;align-items:center;gap:var(--s-3)}
+.bar-track{flex:1;height:.625rem;border-radius:999px;background:var(--raised-2);overflow:hidden;min-width:0}
+.bar-track i{display:block;height:100%;width:0;background:var(--accent);border-radius:999px;transition:width .4s ease}
+.mprog.is-done .bar-track i{background:var(--ok)}
+.mprogtxt{font-size:var(--t-s);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* ---------- step tabs ---------- */
+.mtabs{margin:0 0 var(--s-5)}
+.mtabs ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s-2)}
+.stepbtn{display:flex;align-items:center;gap:var(--s-2);width:100%;min-height:2.75rem;padding:.4rem var(--s-3);text-align:left;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);cursor:pointer;font-weight:500;font-size:var(--t-s);line-height:1.25}
+.stepbtn:hover{border-color:var(--line-strong)}
+.stepbtn .sn{display:grid;place-items:center;flex:none;width:1.5rem;height:1.5rem;border-radius:50%;border:2px solid var(--line-strong);font-size:var(--t-xs);font-weight:700}
+.stepbtn[aria-current="step"]{background:var(--accent-tint);border-color:var(--accent);font-weight:700}
+.stepbtn[aria-current="step"] .sn{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.stepbtn.seen:not([aria-current="step"]) .sn{border-color:var(--muted);color:var(--muted)}
+.stepbtn small{display:block;font-weight:400;color:var(--muted);font-size:var(--t-xs)}
+@media (max-width:640px){.mtabs ol{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---------- step sections ---------- */
+.mstep{min-width:0}
+.mstep+.mstep{margin-top:var(--s-6);padding-top:var(--s-5);border-top:1px solid var(--line)}
+html[data-steps="one"] .mstep{margin-top:0;padding-top:0;border-top:0}
+h3.label{font-family:var(--f-display);font-weight:700;font-size:var(--t-xl);line-height:1.15;margin:0 0 var(--s-4);letter-spacing:-.01em}
+h3.label:focus{outline:none}
+h3.label:focus-visible{outline:3px solid var(--focus);outline-offset:4px}
+.mission p{max-width:62ch}
+.stepnav{display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center;justify-content:space-between;margin-top:var(--s-6);padding-top:var(--s-4);border-top:1px solid var(--line)}
+.stepnav .nextline{flex:1 1 12rem;margin:0;font-size:var(--t-s);color:var(--muted)}
+.stepnav .acts{display:flex;flex-wrap:wrap;gap:var(--s-3);margin-left:auto}
+html[data-steps="all"] .stepnav{display:none}
+html[data-steps="one"] .pager{display:none}
+.pager{display:flex;flex-wrap:wrap;gap:var(--s-3);justify-content:space-between;margin-top:var(--s-6)}
+.pager .btn:only-child{margin-left:auto}
+
+/* ---------- task panel ---------- */
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s-5);display:grid;gap:var(--s-4)}
+.lab>*{margin:0;min-width:0}
+.note{font-size:var(--t-s);color:var(--muted)}
+.ask{font-weight:600;line-height:1.45}
+.lab>.ask:first-of-type::before{content:"Your move";display:block;font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:var(--s-1)}
+.msg{min-height:1.5em;font-size:var(--t-s)}
+.stem{font-family:var(--f-display);font-weight:600;font-size:clamp(1.3rem,4.4vw,1.75rem);line-height:1.3;max-width:none}
+.blank{display:inline-block;min-width:3.5em;border-bottom:3px solid var(--accent);padding-inline:6px;text-align:center}
+.ctxline{font-size:var(--t-s);color:var(--muted)}
+.ctxline b{color:var(--ink)}
+.eyebrow{display:inline-block;font-size:var(--t-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+
+.chips{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.chip{display:inline-flex;align-items:center;gap:var(--s-2);color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r-m);padding:.5rem .95rem;min-height:2.75rem;cursor:pointer;font-weight:500}
+.chip:hover:not(:disabled){background:var(--raised)}
+.chip:disabled{cursor:default;opacity:.8}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-tint);box-shadow:inset 0 0 0 1px var(--accent);opacity:1;font-weight:700}
+.chip[aria-pressed="true"]::before{content:"\2713";font-weight:800}
+.chip.seen::after{content:"\2713";color:var(--ok);font-weight:700}
+
+.bars{display:grid;gap:var(--s-1)}
+.row{display:grid;grid-template-columns:7.5rem minmax(0,1fr) 3rem;gap:var(--s-3);align-items:center;padding:var(--s-1) 0}
+.row .w{overflow-wrap:anywhere}
+.row.mine .w{font-weight:700;text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:3px;text-underline-offset:4px}
+.track{height:1.125rem;background:var(--raised-2);border-radius:var(--r-s);overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--accent);transition:width .45s ease}
+.pc{font-family:var(--f-mono);font-size:var(--t-xs);text-align:right;font-variant-numeric:tabular-nums}
+.verdict{font-weight:600}
+.tracker{font-family:var(--f-mono);font-size:var(--t-xs);color:var(--muted)}
+
+.split{display:grid;gap:var(--s-4);grid-template-columns:minmax(0,1fr)}
+@media (min-width:760px){.split{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.mini{font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 var(--s-2)}
+.prompt{font-family:var(--f-mono);font-size:.875rem;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-4);margin:0;color:var(--ink)}
+.ln{padding:2px 6px;margin:0 -6px;border-radius:var(--r-s)}
+.ln.new{background:var(--accent-tint);box-shadow:inset 0 0 0 1px var(--accent)}
+.ln+.ln{margin-top:var(--s-2)}
+.out{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-2)}
+.out li{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s-3);background:var(--bg);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-3)}
+.out .t{min-width:0;overflow-wrap:anywhere}
+.out .n{font-family:var(--f-mono);font-size:var(--t-xs);color:var(--muted);white-space:nowrap}
+.out .n.fit{color:var(--ok)}
+.meter{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-top:var(--s-1)}
+.meter i{height:.5rem;background:var(--raised-2);border-radius:3px;transition:background .3s}
+.meter i.on{background:var(--accent)}
+.mlabel{font-size:var(--t-s);font-weight:600;margin:var(--s-2) 0 0}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-3)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);font-weight:700;color:var(--on-accent);background:var(--accent);border:1px solid var(--accent);border-radius:var(--r-m);padding:.6rem 1.15rem;min-height:2.75rem;cursor:pointer;text-decoration:none;line-height:1.25}
+.btn:hover:not(:disabled){background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line-strong);font-weight:600}
+.btn.ghost:hover:not(:disabled){background:var(--raised);border-color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.quiet{background:transparent;border-color:transparent;color:var(--muted);font-weight:600;text-decoration:underline;text-underline-offset:3px;padding-inline:var(--s-2)}
+.btn.quiet:hover:not(:disabled){background:var(--raised);color:var(--ink)}
+.btn.warnbtn{background:var(--warn-tint);color:var(--ink);border-color:var(--warn)}
+
+/* ---------- answers, quiz, rounds ---------- */
+.choice{display:block;width:100%;text-align:left;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r-m);padding:var(--s-3) var(--s-4);min-height:2.75rem;cursor:pointer;transition:border-color .15s,background .15s}
+.choice:hover:not(:disabled){background:var(--raised)}
+.choice:disabled{color:var(--ink);cursor:default}
+.choice.ok{border-color:var(--ok);background:var(--ok-tint)}
+.choice.ok::before{content:"\2713\00a0Correct:\00a0";font-weight:700;color:var(--ok)}
+.choice.no{border-color:var(--warn);background:var(--warn-tint)}
+.choice.no::before{content:"Not this one:\00a0";font-weight:700;color:var(--warn)}
+.choice.dim{opacity:.7}
+fieldset.q{border:0;padding:0;margin:0 0 var(--s-5);min-width:0}
+.q legend{font-weight:700;font-size:var(--t-m);padding:0;margin-bottom:var(--s-3);line-height:1.4}
+.qopts,.sent{display:grid;gap:var(--s-2);list-style:none;margin:0;padding:0}
+.why{margin:var(--s-3) 0 0;font-size:var(--t-s);min-height:1.5em}
+.why.good{color:var(--ok);font-weight:600}
+.why.bad{color:var(--warn);font-weight:600}
+.hintbtn{margin-top:var(--s-2)}
+.roundline{font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.brief{background:var(--raised);border-radius:var(--r-m);padding:var(--s-3) var(--s-4);font-size:var(--t-s)}
+.brief b{font-weight:700}
+.reveal{display:grid;gap:var(--s-3);background:var(--bg);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-4)}
+.reveal>*{margin:0}
+.tagchip{justify-self:start;font-size:var(--t-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--warn-tint);color:var(--ink);border:1px solid var(--warn);border-radius:var(--r-s);padding:.2rem .55rem}
+.tells{display:grid;gap:var(--s-2);grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));margin:var(--s-4) 0 0;padding:0;list-style:none}
+.tells li{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-3) var(--s-4)}
+.tells b{display:block;font-family:var(--f-display);font-size:var(--t-m)}
+.tells span{font-size:var(--t-s);color:var(--muted)}
+
+/* ---------- forms ---------- */
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-3)}
+.fld{display:grid;gap:var(--s-1);min-width:0}
+.fld.wide{grid-column:1/-1}
+.fld span{font-size:var(--t-s);font-weight:700}
+.fld input,.fld select,.fld textarea{width:100%;min-height:2.75rem;font-size:1rem;padding:.55rem .75rem;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r-m)}
+@media (max-width:560px){.form{grid-template-columns:minmax(0,1fr)}}
+.checklist{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.checklist label{display:flex;gap:var(--s-3);align-items:flex-start;padding:var(--s-3) 0;cursor:pointer;min-height:2.75rem}
+.checklist input{width:1.375rem;height:1.375rem;flex:none;margin-top:.15rem;accent-color:var(--accent)}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--accent)}
+
+/* ---------- details ---------- */
+details.deeper{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m)}
+details.deeper summary{cursor:pointer;padding:var(--s-3) var(--s-4);font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:var(--s-3);min-height:2.75rem}
+details.deeper summary::-webkit-details-marker{display:none}
+details.deeper summary::after{content:"+";font-family:var(--f-mono);font-size:1.25rem;transition:transform .2s}
+details.deeper[open] summary::after{transform:rotate(45deg)}
+details.deeper .body{padding:0 var(--s-4) var(--s-4)}
+details.deeper .body p{margin:0 0 var(--s-3)}
+
+/* ---------- completion ---------- */
+.level{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s-5);display:grid;gap:var(--s-4);margin-top:var(--s-6)}
+.level>*{margin:0;min-width:0}
+.stamp{justify-self:start;display:inline-flex;align-items:center;gap:var(--s-2);font-family:var(--f-display);font-weight:700;font-size:var(--t-l);color:var(--ok);border:2px solid var(--ok);border-radius:var(--r-m);padding:.3rem .9rem;animation:pop .35s ease-out both}
+.stamp.pending{color:var(--muted);border-color:var(--line-strong)}
+@keyframes pop{from{transform:scale(.94)}to{transform:scale(1)}}
+.recap{margin:0;padding-left:1.2em;display:grid;gap:var(--s-2)}
+.next{font-weight:700}
+.mdone{display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center;justify-content:space-between;background:var(--ok-tint);border:1px solid var(--ok);border-radius:var(--r-m);padding:var(--s-3) var(--s-4);margin-top:var(--s-5)}
+.mdone[hidden]{display:none}
+.mdone p{margin:0;font-weight:600}
+.mdone p::before{content:"\2713\00a0";color:var(--ok);font-weight:800}
+
+/* ---------- footer, toast ---------- */
+.foot{display:grid;gap:var(--s-3);padding-block:var(--s-5) var(--s-7);border-top:1px solid var(--line)}
+.foot h2{margin:0;font-size:var(--t-s);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.foot .row2{display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center}
+.foot p{margin:0;font-size:var(--t-s);color:var(--muted);max-width:60ch}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);visibility:hidden;background:var(--ink);color:var(--bg);font-weight:700;font-size:var(--t-s);padding:.5rem 1rem;border-radius:var(--r-m);pointer-events:none;z-index:60}
+.toast.show{visibility:visible}
+
+/* ---------- modes ---------- */
+/* Focus mode: only the current step. Navigation, intro, level links, and footer are hidden. */
+html[data-focus="on"] .intro>:not(h1),
+html[data-focus="on"] .map,
+html[data-focus="on"] .foot,
+html[data-focus="on"] .hook,
+html[data-focus="on"] .ctxbar{display:none}
+html[data-focus="on"] .intro{padding:0;gap:0}
+html[data-focus="on"] .intro h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+html[data-focus="on"] .layout{grid-template-columns:minmax(0,46rem);justify-content:center;padding-top:var(--s-5)}
+html[data-focus="on"] .wrap.layout{max-width:50rem}
+/* Calm mode: no popups, no celebration animation, fewer extras. */
+html[data-calm="on"] .toast{display:none}
+html[data-calm="on"] .stamp{animation:none}
+html[data-calm="on"] .objective{background:transparent}
+/* Motion */
+html[data-motion="reduce"] *,html[data-motion="reduce"] *::before,html[data-motion="reduce"] *::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+@media (prefers-reduced-motion:reduce){
+  html:not([data-motion="allow"]) *,html:not([data-motion="allow"]) *::before,html:not([data-motion="allow"]) *::after{transition:none!important;animation:none!important}
+}
+@media (max-width:460px){
+  .row{grid-template-columns:5.5rem minmax(0,1fr) 2.75rem}
+  .lab{padding:var(--s-4)}
+  .brand .bname{font-size:1rem}
+}
+
+/* v3: course-wide progress, view-all toggle, transfer */
+.lvp{font-size:var(--t-xs);font-weight:600;color:var(--muted)}
+.lv.cur .lvp{color:var(--ink)}
+.coursebar{margin:var(--s-2) 0 0;font-size:var(--t-s);color:var(--muted)}
+.resume .other{flex-basis:100%;font-size:var(--t-s);color:var(--muted)}
+.resume .other a{color:var(--accent);font-weight:600}
+.viewall{margin-top:var(--s-3)}
+html[data-steps="all"] .viewall,html[data-focus="on"] .viewall{display:none}
+.viewing-all .stepnav{display:none}
+.xfer{margin:var(--s-4) 0 0;display:grid;gap:var(--s-2);font-size:var(--t-s)}
+.xfer summary{cursor:pointer;color:var(--ink);font-weight:600;min-height:2.75rem;display:flex;align-items:center}
+.xfer input{width:100%;font:inherit;padding:.6rem .75rem;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r-m)}
+.foot .row2 .btn{flex:0 1 auto}
+
+/* small phones: one compact header row */
+@media (max-width:480px){
+  .bname{display:none}
+  .ctxbar .cn{display:none}
+  .ctxbar{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+
+/* level 4 */
+/* Level 4 extras: tokens only */
+.seq{list-style:none;margin:0;padding:0;display:grid;gap:8px;counter-reset:s}
+.seq li{counter-increment:s;display:grid;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;min-width:0}
+.seq li .sline{display:flex;gap:10px;align-items:baseline;min-width:0}
+.seq li .sline::before{content:counter(s);flex:none;min-width:1.6em;text-align:center;font-family:var(--f-mono);font-size:0.75rem;background:var(--m);color:var(--m-on);border-radius:3px;padding:1px 4px}
+.seq li .stxt{min-width:0;overflow-wrap:anywhere}
+.seq li.empty{counter-increment:none;border-style:dashed;color:var(--muted);font-size:0.9375rem}
+.seq li.empty .sline::before{content:none}
+.seq li.done{border-color:var(--ok)}
+.seq .chip{min-height:44px;padding:6px 12px}
+.sumrow{display:grid;gap:6px}
+.sumrow>*{margin:0}
+.warnbox{background:var(--no-tint);border:1px solid var(--no);border-radius:6px;padding:10px 12px;font-size:0.9375rem}
+.stages{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;list-style:none;margin:0;padding:0}
+.stages li{font-family:var(--f-mono);font-size:0.6875rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-top:4px solid var(--line);padding-top:4px;min-width:0;overflow-wrap:anywhere}
+.stages li.done{border-top-color:var(--muted)}
+.stages li.on{border-top-color:var(--m);color:var(--ink);font-weight:700}
+.log{display:grid;gap:12px}
+.scene{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:14px;min-width:0}
+.scene>*{margin:0;min-width:0}
+.scene h3{font-family:var(--f-display);font-size:1.15rem;line-height:1.2}
+.tool{font-family:var(--f-mono);font-size:0.8125rem;color:var(--muted);overflow-wrap:anywhere}
+.draft{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--key-tint);border:1px solid var(--line);border-radius:6px;padding:12px;font-size:0.9375rem}
+.opts{display:grid;gap:8px}
+.choice.mid{border-color:var(--ink)}
+.tagchip.good{background:var(--ok-tint);color:var(--ok);border-color:var(--ok)}
+.tagchip.mid{background:var(--key-tint);color:var(--ink);border-color:var(--muted)}
+.ctl{display:grid;gap:14px;min-width:0}
+.ctl>*{margin:0;min-width:0}
+.grp{display:grid;gap:6px;min-width:0}
+.grp .chip{min-height:44px}
+.out .n.open{color:var(--no);font-weight:700}
+.out li.stack{display:grid;gap:4px}
+.cands{display:grid;gap:10px}
+.cand{display:grid;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:12px;min-width:0}
+.cand>*{margin:0;min-width:0}
+.cand .qt{overflow-wrap:anywhere}
+.cand .rub{display:grid;gap:6px}
+.res{font-size:0.9375rem}
+.res.bad{color:var(--no)}
+.res.good{color:var(--ok)}
+.res b{color:var(--ink)}
+.polcard{display:grid;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:12px;min-width:0}
+.polcard>*{margin:0;min-width:0}
+.polcard .rk{font-family:var(--f-mono);font-size:0.6875rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+</style>
+
+<a class="skiplink" href="#stage" id="skip">Skip to the mission</a>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand">
+        <svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><path d="M12 2v20M2 12h20"/></svg>
+        <span class="bname">AI for Marketers</span>
+      </div>
+      <div class="hud">
+        <span class="xp" id="xp" aria-label="Level progress"><b>0</b> / 200 XP</span>
+        <button type="button" class="exitfocus" id="exitFocus">Exit focus</button>
+        <button type="button" class="pbtn" id="prefsBtn" aria-expanded="false" aria-controls="prefs" aria-label="Preferences">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+          <span class="ptxt">Preferences</span>
+        </button>
+      </div>
+    </div>
+    <p class="ctxbar" id="ctxbar"></p>
+  </div>
+  <section class="prefs" id="prefs" aria-labelledby="prefsTitle" hidden>
+    <h2 id="prefsTitle">Preferences</h2>
+    <p class="sub">Change how this course looks and behaves. Saved in this browser.</p>
+    <fieldset>
+      <legend>Theme</legend>
+      <div class="pseg">
+        <label><input type="radio" name="pf-theme" value="system"><span>System</span></label>
+        <label><input type="radio" name="pf-theme" value="light"><span>Light</span></label>
+        <label><input type="radio" name="pf-theme" value="dark"><span>Dark</span></label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Text size</legend>
+      <div class="pseg">
+        <label><input type="radio" name="pf-text" value="normal"><span>Standard</span></label>
+        <label><input type="radio" name="pf-text" value="large"><span>Larger</span></label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Focus</legend>
+      <label class="sw-row" for="pf-focus"><input type="checkbox" id="pf-focus"><span><b>Focus mode</b><small>One step at a time. Hides menus and extras.</small></span></label>
+      <label class="sw-row" for="pf-steps"><input type="checkbox" id="pf-steps"><span><b>One step at a time</b><small>Turn off to see a whole mission on one page.</small></span></label>
+      <label class="sw-row" for="pf-hints"><input type="checkbox" id="pf-hints"><span><b>Show hints after a wrong answer</b><small>Off keeps hints behind a button.</small></span></label>
+    </fieldset>
+    <fieldset>
+      <legend>Comfort</legend>
+      <label class="sw-row" for="pf-motion"><input type="checkbox" id="pf-motion"><span><b>Reduce motion</b><small>Follows your device setting until you change it.</small></span></label>
+      <label class="sw-row" for="pf-calm"><input type="checkbox" id="pf-calm"><span><b>Calmer screen</b><small>No pop-up messages or celebration effects.</small></span></label>
+      <label class="sw-row" for="pf-sound"><input type="checkbox" id="pf-sound"><span><b>Sound effects</b><small>Soft tones for progress. Off by default.</small></span></label>
+    </fieldset>
+    <details class="xfer">
+      <summary>Bring over progress from an older link</summary>
+      <label for="xferIn">Transfer code</label>
+      <input type="text" id="xferIn" autocomplete="off" spellcheck="false">
+      <button type="button" class="btn ghost" id="xferBtn">Import</button>
+      <p class="persist" id="xferMsg" aria-live="polite"></p>
+    </details>
+    <button type="button" class="btn done" id="prefsClose">Done</button>
+    <p class="persist" id="persistNote"></p>
+  </section>
+</header>
+
+<main id="main">
+<section class="wrap intro" id="intro">
+  <p class="kicker">AI for Marketers · Level 4 of 5</p>
+  <h1>Build Mode</h1>
+  <p class="lede">Four missions, about ten minutes each. You move from one-off prompts to workflows, agents, and automations you can run every week, and you learn when to trust what comes back. Jump to any mission in any order.</p>
+  <div class="resume" id="resume">
+    <p id="resumeText"></p>
+    <button type="button" class="btn" id="resumeBtn">Continue</button>
+    <p class="other" id="resumeOther" hidden></p>
+  </div>
+  <nav class="levelnav" aria-label="Course levels"><a class="lv" href="level1.html"><b>1</b> Boot Camp<span class="lvp" data-n="1"></span></a><a class="lv" href="level2.html"><b>2</b> Prompt Craft<span class="lvp" data-n="2"></span></a><a class="lv" href="level3.html"><b>3</b> Marketing Machine<span class="lvp" data-n="3"></span></a><span class="lv cur" aria-current="page"><b>4</b> Build Mode<span class="lvp" data-n="4"></span></span><a class="lv" href="level5.html"><b>5</b> Boss Level<span class="lvp" data-n="5"></span></a></nav>
+  <p class="coursebar" id="coursebar"></p>
+</section>
+
+<div class="wrap layout">
+  <nav class="map" id="map" aria-label="Missions in this level">
+    <button type="button" class="node" data-m="1"><span class="ni" aria-hidden="true">1</span><span class="nt"><span class="sr">Mission 1: </span>From Prompt to Process</span><span class="ns">Not started</span><span class="nshort" aria-hidden="true">0/50</span></button>
+    <button type="button" class="node" data-m="2"><span class="ni" aria-hidden="true">2</span><span class="nt"><span class="sr">Mission 2: </span>Meet the Agent</span><span class="ns">Not started</span><span class="nshort" aria-hidden="true">0/50</span></button>
+    <button type="button" class="node" data-m="3"><span class="ni" aria-hidden="true">3</span><span class="nt"><span class="sr">Mission 3: </span>Wire It Up</span><span class="ns">Not started</span><span class="nshort" aria-hidden="true">0/50</span></button>
+    <button type="button" class="node" data-m="4"><span class="ni" aria-hidden="true">4</span><span class="nt"><span class="sr">Mission 4: </span>Trust Test</span><span class="ns">Not started</span><span class="nshort" aria-hidden="true">0/50</span></button>
+  </nav>
+
+  <div class="stage" id="stage">
+<article class="mission" data-m="1" id="mission1">
+<header class="mhead">
+<p class="mmeta"><span class="mnum">Mission 1 of 4</span><span>About 10 min</span><span class="mstate">Not started</span></p>
+<h2 tabindex="-1">From Prompt to Process</h2>
+<p class="hook">A good prompt gets you one good answer. A process gets you the same good answer every Friday. Build one for a small bakery and decide who does each step.</p>
+<p class="objective"><span>Objective</span><b>Turn a weekly task into a clear process and decide where a person stays involved.</b></p>
+<div class="mprog"><div class="bar-track" role="progressbar" aria-label="Mission 1 progress" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><i></i></div><span class="mprogtxt">0 / 50 XP</span></div>
+</header>
+<div class="mdone" hidden><p>Mission complete. 50 of 50 XP.</p></div>
+<nav class="mtabs" aria-label="Steps in this mission"></nav>
+<section class="mstep" id="m1s0" data-step="0" aria-labelledby="m1s0h">
+<h3 class="label" id="m1s0h" tabindex="-1">Try it</h3>
+<div class="lab">
+        <p class="note">Example business: Juniper Row Bakery sends a newsletter every Friday. Done by hand it takes the owner about 86 minutes (example numbers).</p>
+        <p class="ask" id="l4m1-ask">Step 1 of 3. Tap the steps in the order you would do them.</p>
+        <div class="split">
+          <div>
+            <p class="mini">Steps (tap to add)</p>
+            <div class="chips" id="l4m1-pile"></div>
+          </div>
+          <div>
+            <p class="mini">Your process</p>
+            <ol class="seq" id="l4m1-seq"></ol>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" id="l4m1-check" disabled>Check my order</button>
+          <button type="button" class="btn ghost" id="l4m1-fix">Show me a sensible order</button>
+          <button type="button" class="btn ghost" id="l4m1-undo" data-smoke="skip">Undo last</button>
+          <button type="button" class="btn ghost" id="l4m1-reset" data-smoke="skip">Start over</button>
+        </div>
+        <p class="msg" id="l4m1-msg" aria-live="polite">Tap a step to start. Several orders work. Each step just needs what it depends on to come first.</p>
+        <div id="l4m1-sumwrap" hidden>
+          <div class="actions"><button type="button" class="btn" id="l4m1-sumbtn" disabled>Show where the time goes</button><span class="note" id="l4m1-tagcount">0 of 7 tagged</span></div>
+        </div>
+        <div id="l4m1-sum" hidden style="display:grid;gap:14px"></div>
+      </div>
+</section>
+
+<section class="mstep" id="m1s1" data-step="1" aria-labelledby="m1s1h">
+<h3 class="label" id="m1s1h" tabindex="-1">Why it works</h3>
+<p>A prompt gets you one answer. A process gets you the same good answer every week, because the steps around the AI are written down: what goes in, what the AI does, and who checks what comes out.</p>
+      <p>Tag every step honestly. AI is strong at drafts and options. A person stays wherever a wrong detail costs money or trust.</p>
+      <ul class="tells">
+        <li><b>Human</b><span>Choosing, fact-checking, sending.</span></li>
+        <li><b>AI</b><span>First drafts, options, rewrites.</span></li>
+        <li><b>Both</b><span>The AI proposes, you decide.</span></li>
+      </ul>
+</section>
+
+<section class="mstep" id="m1s2" data-step="2" aria-labelledby="m1s2h">
+<h3 class="label" id="m1s2h" tabindex="-1">Check</h3>
+<div id="quiz1"></div>
+</section>
+
+<section class="mstep" id="m1s3" data-step="3" aria-labelledby="m1s3h">
+<h3 class="label" id="m1s3h" tabindex="-1">Go deeper</h3>
+<details class="deeper">
+        <summary>Write it down before you build anything</summary>
+        <div class="body">
+          <p>Run the task by hand three times and write the steps in a note. Save one example of a result you were proud of. If you cannot describe a step in a sentence, it is not ready to hand off.</p>
+          <p>Start with the task you repeat most and dislike least to explain. A weekly newsletter, a lead follow-up, and a monthly report are all good first picks.</p>
+        </div>
+      </details>
+</section>
+
+<div class="pager"></div>
+</article>
+
+<article class="mission" data-m="2" id="mission2" hidden>
+<header class="mhead">
+<p class="mmeta"><span class="mnum">Mission 2 of 4</span><span>About 10 min</span><span class="mstate">Not started</span></p>
+<h2 tabindex="-1">Meet the Agent</h2>
+<p class="hook">An agent is an AI that plans steps and uses tools, while you set the goal and the limits. Watch one work, and decide when to let it keep going.</p>
+<p class="objective"><span>Objective</span><b>Follow an AI agent through a task and decide when to approve, edit, or stop it.</b></p>
+<div class="mprog"><div class="bar-track" role="progressbar" aria-label="Mission 2 progress" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><i></i></div><span class="mprogtxt">0 / 50 XP</span></div>
+</header>
+<div class="mdone" hidden><p>Mission complete. 50 of 50 XP.</p></div>
+<nav class="mtabs" aria-label="Steps in this mission"></nav>
+<section class="mstep" id="m2s0" data-step="0" aria-labelledby="m2s0h">
+<h3 class="label" id="m2s0h" tabindex="-1">Try it</h3>
+<div class="lab">
+        <p class="note">A scripted example. No real AI is running and nothing is actually sent. Fictional business: Tidewater Tea Co., a small iced tea maker.</p>
+        <div class="brief">
+          <b>Goal you set:</b> Find 3 independent cafes within 10 miles that could stock Tidewater Tea, and draft a short intro email to each.<br>
+          <b>Facts you gave it:</b> small-batch, three flavors, free tasting case. Nothing else.<br>
+          <b>Limits you set:</b> it may search the web and draft emails. It may not send anything without your OK, and it may not offer discounts.
+        </div>
+        <ol class="stages" id="l4m2-stages" aria-label="Agent loop">
+          <li class="on">Goal</li><li>Plan</li><li>Act</li><li>Check</li><li>Report</li>
+        </ol>
+        <div class="actions">
+          <button type="button" class="btn" id="l4m2-start">Run the agent</button>
+          <button type="button" class="btn ghost" id="l4m2-replay" data-smoke="skip" hidden>Replay with different choices</button>
+        </div>
+        <div id="l4m2-log" class="log" aria-live="polite"></div>
+      </div>
+</section>
+
+<section class="mstep" id="m2s1" data-step="1" aria-labelledby="m2s1h">
+<h3 class="label" id="m2s1h" tabindex="-1">Why it works</h3>
+<p>An agent runs a loop: take the goal, make a plan, act with tools (search, read, draft, send), check its own work, and report. A chat answers once. An agent keeps going until it thinks it is done.</p>
+      <p>That is why the limits matter. Reading and drafting are easy to undo. Sending, spending, and publishing are not. Approve the quiet steps fast and slow down at the ones that touch the outside world.</p>
+</section>
+
+<section class="mstep" id="m2s2" data-step="2" aria-labelledby="m2s2h">
+<h3 class="label" id="m2s2h" tabindex="-1">Check</h3>
+<div id="quiz2"></div>
+</section>
+
+<section class="mstep" id="m2s3" data-step="3" aria-labelledby="m2s3h">
+<h3 class="label" id="m2s3h" tabindex="-1">Go deeper</h3>
+<details class="deeper">
+        <summary>How agents fail in boring ways</summary>
+        <div class="body">
+          <p>Most agent mistakes are not dramatic. It uses a claim you never gave it, repeats a step, or quietly widens the job. A short written goal, a list of facts it may use, and a list of things it may not do prevent most of it.</p>
+          <p>Give a new agent the smallest permissions that do the job. Let it read and draft for a few weeks before it can send anything. Keep its log so you can see what it did and why.</p>
+        </div>
+      </details>
+</section>
+
+<div class="pager"></div>
+</article>
+
+<article class="mission" data-m="3" id="mission3" hidden>
+<header class="mhead">
+<p class="mmeta"><span class="mnum">Mission 3 of 4</span><span>About 10 min</span><span class="mstate">Not started</span></p>
+<h2 tabindex="-1">Wire It Up</h2>
+<p class="hook">An automation is a trigger plus some steps. The trick is not building it, it is building it so a bad day cannot hurt you. Watch the risk meter as you go.</p>
+<p class="objective"><span>Objective</span><b>Build a simple automation and see how each choice changes the risk.</b></p>
+<div class="mprog"><div class="bar-track" role="progressbar" aria-label="Mission 3 progress" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><i></i></div><span class="mprogtxt">0 / 50 XP</span></div>
+</header>
+<div class="mdone" hidden><p>Mission complete. 50 of 50 XP.</p></div>
+<nav class="mtabs" aria-label="Steps in this mission"></nav>
+<section class="mstep" id="m3s0" data-step="0" aria-labelledby="m3s0h">
+<h3 class="label" id="m3s0h" tabindex="-1">Try it</h3>
+<div class="lab">
+        <p class="note">Example: Juniper Row Bakery wants every cake enquiry form entry to get a reply. The chain starts risky on purpose. Change the settings and watch the meter. Aim for 1 or lower.</p>
+        <div class="split">
+          <div class="ctl" id="l4m3-ctl"></div>
+          <div class="ctl">
+            <div>
+              <p class="mini">Your automation</p>
+              <div class="prompt" id="l4m3-chain"></div>
+            </div>
+            <div>
+              <p class="mini">Risk meter</p>
+              <div class="meter" id="l4m3-meter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+              <p class="mlabel" id="l4m3-mlabel"></p>
+            </div>
+            <ul class="out" id="l4m3-risks"></ul>
+          </div>
+        </div>
+        <p class="msg" id="l4m3-msg" aria-live="polite"></p>
+        <div class="actions"><button type="button" class="btn" id="l4m3-test">Run a test with 5 example entries</button></div>
+        <ul class="out" id="l4m3-testout" aria-live="polite"></ul>
+        <p class="msg" id="l4m3-testmsg" aria-live="polite">The test shows what your settings would do with five made-up entries.</p>
+      </div>
+</section>
+
+<section class="mstep" id="m3s1" data-step="1" aria-labelledby="m3s1h">
+<h3 class="label" id="m3s1h" tabindex="-1">Why it works</h3>
+<p>Every automation is a trigger (something happens) followed by actions (do this, then that). Filters sit in between and decide whether the chain keeps going. The AI step is just one link.</p>
+      <p>Most bad days come from three things: the same entry arriving twice, an entry with missing or broken data, and a message leaving before anyone read it. A filter, a repeat check, and a draft step cover all three.</p>
+</section>
+
+<section class="mstep" id="m3s2" data-step="2" aria-labelledby="m3s2h">
+<h3 class="label" id="m3s2h" tabindex="-1">Check</h3>
+<div id="quiz3"></div>
+</section>
+
+<section class="mstep" id="m3s3" data-step="3" aria-labelledby="m3s3h">
+<h3 class="label" id="m3s3h" tabindex="-1">Go deeper</h3>
+<details class="deeper">
+        <summary>Switching on a new automation safely</summary>
+        <div class="body">
+          <p>Test with made-up entries first, including a messy one and a double. Start in draft mode and read every output for a couple of weeks. Only consider auto-send for the kinds of messages that have stayed clean the whole time.</p>
+          <p>Keep one visible off switch, a daily limit, and a log you can read. Any tool you use will have its own names for these. The ideas are the same everywhere.</p>
+        </div>
+      </details>
+</section>
+
+<div class="pager"></div>
+</article>
+
+<article class="mission" data-m="4" id="mission4" hidden>
+<header class="mhead">
+<p class="mmeta"><span class="mnum">Mission 4 of 4</span><span>About 10 min</span><span class="mstate">Not started</span></p>
+<h2 tabindex="-1">Trust Test</h2>
+<p class="hook">Output that looks fine is not the same as output that is right. Score five drafts two ways, then write the approval rules you will actually use.</p>
+<p class="objective"><span>Objective</span><b>Score AI output two ways and set approval rules you will actually use.</b></p>
+<div class="mprog"><div class="bar-track" role="progressbar" aria-label="Mission 4 progress" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><i></i></div><span class="mprogtxt">0 / 50 XP</span></div>
+</header>
+<div class="mdone" hidden><p>Mission complete. 50 of 50 XP.</p></div>
+<nav class="mtabs" aria-label="Steps in this mission"></nav>
+<section class="mstep" id="m4s0" data-step="0" aria-labelledby="m4s0h">
+<h3 class="label" id="m4s0h" tabindex="-1">Try it</h3>
+<div class="lab">
+        <p class="note">Example: Brightside Pet Supply asked an AI for a Saturday text reminder. Five versions came back. All names, facts, and prices are examples.</p>
+        <div class="brief">
+          <b>Brief:</b> two sentences, with the time and the price. Voice: friendly, a little dry, no exclamation marks.<br>
+          <b>Fact sheet:</b> dog-wash day, Saturday, 10 to 2. $12 per wash. No appointment needed. Nothing else is promised.
+        </div>
+        <p class="ask" id="l4m4-ask">Round 1, the quick look. Five seconds each. Does it look fine, or off?</p>
+        <div id="l4m4-list" class="cands"></div>
+        <div class="actions" id="l4m4-actions">
+          <button type="button" class="btn" id="l4m4-lock" disabled>Lock my quick scores</button>
+          <span class="note" id="l4m4-count">0 of 5 scored</span>
+        </div>
+        <p class="msg" id="l4m4-msg" aria-live="polite"></p>
+        <div id="l4m4-sum" hidden class="reveal"></div>
+      </div>
+      <div class="lab" id="l4m4-part2" hidden style="margin-top:14px"></div>
+</section>
+
+<section class="mstep" id="m4s1" data-step="1" aria-labelledby="m4s1h">
+<h3 class="label" id="m4s1h" tabindex="-1">Why it works</h3>
+<p>A quick look is good at tone and length. It is bad at facts, because a wrong number reads exactly like a right one. A careful score against the brief and a source is slower, and it is the only thing that catches those.</p>
+      <p>You cannot carefully check everything forever. So you match the effort to the risk: a person on anything that makes a promise or moves money, a sample check on the middle, and a log for the low-stakes rest.</p>
+</section>
+
+<section class="mstep" id="m4s2" data-step="2" aria-labelledby="m4s2h">
+<h3 class="label" id="m4s2h" tabindex="-1">Check</h3>
+<div id="quiz4"></div>
+      <div class="lab" id="l4m4-card" style="margin-top:14px">
+        <p class="ask">Capstone. Your approval rules card. It fills in from the rules you set above. Add one rule of your own, then copy it.</p>
+        <div class="form">
+          <label class="fld wide" for="l4m4-own"><span>One rule of your own</span>
+            <input id="l4m4-own" type="text" value="Anything with a price, a date, or a promise gets a person." autocomplete="off"></label>
+          <label class="fld wide" for="l4m4-who"><span>Who checks, and when</span>
+            <input id="l4m4-who" type="text" value="Me, Friday mornings." autocomplete="off"></label>
+        </div>
+        <div>
+          <p class="mini">Approval rules card</p>
+          <pre class="prompt" id="l4m4-pre" tabindex="0"></pre>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" id="l4m4-copy" disabled>Copy my approval rules</button>
+          <span class="note" id="l4m4-copynote" aria-live="polite">Set a rule for each task in Try it first.</span>
+        </div>
+      </div>
+</section>
+
+<section class="mstep" id="m4s3" data-step="3" aria-labelledby="m4s3h">
+<h3 class="label" id="m4s3h" tabindex="-1">Go deeper</h3>
+<details class="deeper">
+        <summary>When to tighten the rules again</summary>
+        <div class="body">
+          <p>Raise your checking whenever something changes: a new prompt, a new tool, a new kind of customer, a new offer. A workflow that was clean for a month is only proven for the conditions it ran in.</p>
+          <p>Keep a short list of the mistakes you catch. If the same one shows up twice, fix the prompt or the checklist, not just the draft.</p>
+        </div>
+      </details>
+</section>
+<div class="level" id="levelcard" hidden>
+<div class="stamp" id="stamp">Level complete</div>
+<p id="levelsub" style="font-weight:600"></p>
+<ul class="recap"><li>A process is steps plus owners. Tag each one Human, AI, or Both.</li><li>An agent plans, acts with tools, checks, and reports. You hold the goal, the limits, and the approvals.</li><li>An automation is a trigger plus steps. Filters, repeat checks, and drafts keep a bad day small.</li><li>Quick looks catch tone, not facts. Set approval rules by risk: always check, spot-check, or run alone.</li></ul>
+<p class="next">Next up: Level 5, Boss Level. Set strategy and rules, prove the return, and ship a real workflow.</p>
+<a class="btn nextlevel" href="level5.html" style="justify-self:start">Open Level 5</a>
+</div>
+<div class="pager"></div>
+</article>
+  </div>
+</div>
+</main>
+
+<footer class="wrap foot" id="foot">
+  <h2>Progress</h2>
+  <p>Your answers and XP save automatically in this browser. Each reset below says exactly what it erases and asks you to confirm.</p>
+  <div class="row2">
+    <button type="button" class="btn ghost" id="restartM">Restart this mission</button>
+    <button type="button" class="btn ghost" id="reset">Reset this level</button>
+    <button type="button" class="btn ghost" id="resetAll">Reset the whole course</button>
+    <span class="note" id="confirmNote" aria-live="polite"></span>
+  </div>
+</footer>
+<div class="toast" id="toast" aria-hidden="true"></div>
+<div class="sr" id="live" aria-live="polite"></div>
+
+<script>window.LEVEL={"level": 4, "name": "Build Mode", "missions": [{"name": "From Prompt to Process", "min": 10}, {"name": "Meet the Agent", "min": 10}, {"name": "Wire It Up", "min": 10}, {"name": "Trust Test", "min": 10}]};</script>
+<script>
+(function(){
+'use strict';
+var L=window.LEVEL;
+var NEED=50,COUNT=4,TOTAL=NEED*COUNT;
+var PKEY='aimbc-prefs-v1';
+var NAMES=L.missions.map(function(m){return m.name});
+var viewAll={};
+var root=document.documentElement;
+var CHECK='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
+function lsGet(k){try{return window.localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{window.localStorage.setItem(k,v)}catch(e){}}
+function lsDel(k){try{window.localStorage.removeItem(k)}catch(e){}}
+
+/* ---------- progress store: one record for the whole course, shared by all five level pages ----------
+   Key aimbc-course-v3 = {v:3, last:{level,t}, levels:{ "1":{got,cur,step,seen,ex,t}, ... }}
+   Older per-level keys (aimbc-levelN-v2 / -v1) are imported once and left in place as a backup. */
+var STORE='aimbc-course-v3',LEVELS=5,CORRUPT='aimbc-course-v3-corrupt';
+var storageOK=true;
+var state={got:{},cur:0,step:{},seen:{},ex:{}};
+var hadSaved=false,frozen=false;
+function cleanLevel(p){
+  var o={got:{},cur:0,step:{},seen:{},ex:{},t:0};
+  if(!p||typeof p!=='object')return o;
+  if(p.got&&typeof p.got==='object'){for(var k in p.got){var v=p.got[k];if(/^m[1-4]:/.test(k)&&typeof v==='number'&&v>0&&v<=NEED)o.got[k]=v}}
+  o.cur=clamp(p.cur|0,0,COUNT-1);
+  if(p.step&&typeof p.step==='object'){for(var i=0;i<COUNT;i++){if(typeof p.step[i]==='number')o.step[i]=clamp(p.step[i]|0,0,3)}}
+  if(p.seen&&typeof p.seen==='object'){for(var s in p.seen){if(/^[0-3]:[0-3]$/.test(s))o.seen[s]=1}}
+  if(p.ex&&typeof p.ex==='object'){for(var e in p.ex){if(/^[A-Za-z0-9_.:\-]{1,80}$/.test(e)&&p.ex[e]!==undefined)o.ex[e]=p.ex[e]}}
+  o.t=typeof p.t==='number'?p.t:0;
+  return o;
+}
+function hasProgress(o){return Object.keys(o.got).length>0||o.cur>0||Object.keys(o.step).some(function(k){return o.step[k]>0})||Object.keys(o.seen).length>1||Object.keys(o.ex).length>0}
+function readStore(){
+  var raw=lsGet(STORE),st={v:3,last:null,levels:{}};
+  if(raw){
+    try{
+      var p=JSON.parse(raw);
+      if(p&&typeof p==='object'){
+        if(p.levels&&typeof p.levels==='object'){for(var n=1;n<=LEVELS;n++){if(p.levels[n])st.levels[n]=cleanLevel(p.levels[n])}}
+        if(p.last&&typeof p.last.level==='number')st.last={level:clamp(p.last.level|0,1,LEVELS),t:p.last.t||0};
+      }
+    }catch(e){lsSet(CORRUPT,raw)}
+  }
+  for(var m=1;m<=LEVELS;m++){
+    if(!st.levels[m]){
+      var old=lsGet('aimbc-level'+m+'-v2')||lsGet('aimbc-level'+m+'-v1');
+      if(old){try{var q=cleanLevel(JSON.parse(old));if(hasProgress(q))st.levels[m]=q}catch(e){}}
+    }
+  }
+  return st;
+}
+function writeStore(st){
+  try{window.localStorage.setItem(STORE,JSON.stringify(st));return true}catch(e){storageOK=false;return false}
+}
+(function(){
+  try{window.localStorage.setItem('aimbc-probe','1');window.localStorage.removeItem('aimbc-probe')}catch(e){storageOK=false}
+  var st=readStore(),mine=st.levels[L.level];
+  if(mine&&hasProgress(mine)){
+    hadSaved=true;
+    state.got=mine.got;state.cur=mine.cur;state.step=mine.step;state.seen=mine.seen;state.ex=mine.ex;
+  }
+  /* write the migrated record right away so every level page sees the same data */
+  if(storageOK&&Object.keys(st.levels).length)writeStore(st);
+})();
+/* save merges with whatever is stored now, so a stale tab or a default value can never wipe saved progress */
+function save(quiet){
+  if(frozen)return;
+  var st=readStore(),prev=st.levels[L.level]||cleanLevel(null),g={},k;
+  for(k in prev.got)g[k]=prev.got[k];
+  for(k in state.got)g[k]=Math.max(g[k]||0,state.got[k]);
+  var seen={};for(k in prev.seen)seen[k]=1;for(k in state.seen)seen[k]=1;
+  var ex={};for(k in prev.ex)ex[k]=prev.ex[k];for(k in state.ex)ex[k]=state.ex[k];
+  st.levels[L.level]={got:g,cur:state.cur,step:state.step,seen:seen,ex:ex,t:Date.now()};
+  if(!quiet||!st.last)st.last={level:L.level,t:Date.now()};
+  writeStore(st);
+}
+function courseSummary(){
+  var st=readStore(),out=[];
+  for(var n=1;n<=LEVELS;n++){
+    var lv=n===L.level?{got:state.got}:(st.levels[n]||{got:{}}),xp=0,done=0,per={};
+    for(var k in lv.got){xp+=lv.got[k];var m=k.charAt(1);per[m]=(per[m]||0)+lv.got[k]}
+    for(var m2 in per){if(per[m2]>=NEED)done++}
+    out.push({n:n,xp:xp,done:done});
+  }
+  return {levels:out,last:st.last};
+}
+function totalXp(){var t=0;for(var k in state.got)t+=state.got[k];return t}
+function mxp(i){var t=0;for(var k in state.got){if(k.indexOf('m'+i+':')===0)t+=state.got[k]}return t}
+function has(k){return !!state.got[k]}
+
+/* ---------- exercise state: levels register what to save; the engine saves it ----------
+   persist(id, {get:function(){return jsonValue}, set:function(value){...apply it...}})
+   get/set must be pure state, no awards. The engine restores once on registration and saves after
+   every click, input, change, and when the page is hidden. Ids start with "mN." for mission N. */
+var reg={},flushT=null,restoring=false;
+function persist(id,h){
+  if(!/^m[1-4]\.[A-Za-z0-9_.\-]{1,60}$/.test(id)||!h||typeof h.get!=='function'||typeof h.set!=='function')return;
+  var e={get:h.get,set:h.set,broken:false,last:null};reg[id]=e;
+  if(Object.prototype.hasOwnProperty.call(state.ex,id)){
+    restoring=true;
+    try{h.set(JSON.parse(JSON.stringify(state.ex[id])))}catch(err){e.broken=true}
+    restoring=false;
+  }
+  try{var j=JSON.stringify(h.get());e.last=j===undefined?null:j}catch(err2){e.broken=true}
+}
+function flush(){
+  clearTimeout(flushT);flushT=null;
+  var changed=false;
+  for(var id in reg){
+    var e=reg[id];if(e.broken)continue;
+    var j;try{j=JSON.stringify(e.get())}catch(x){continue}
+    if(j===undefined||j===e.last)continue;
+    e.last=j;state.ex[id]=JSON.parse(j);changed=true;
+  }
+  if(changed)save();
+}
+function schedule(){if(frozen)return;clearTimeout(flushT);flushT=setTimeout(flush,150)}
+function clearEx(prefix){
+  Object.keys(state.ex).forEach(function(k){if(k.indexOf(prefix)===0)delete state.ex[k]});
+}
+/* every plain form field in a mission is saved automatically; levels only register custom state */
+function autoFields(){
+  articles.forEach(function(a,i){
+    var n=i+1,idx=0;
+    $$('input,textarea,select',a).forEach(function(f){
+      var t=(f.type||'').toLowerCase();
+      if(t==='button'||t==='submit'||t==='reset'||t==='hidden'||t==='file')return;
+      var base=f.id?f.id.replace(/[^A-Za-z0-9_\-]/g,'_'):('i'+idx);idx++;
+      var id='m'+n+'.f_'+base.slice(0,50),box=(t==='checkbox'||t==='radio');
+      persist(id,{
+        get:function(){return box?!!f.checked:f.value},
+        set:function(v){
+          if(box){f.checked=!!v}else if(typeof v==='string'){f.value=v}
+          f.dispatchEvent(new Event('input',{bubbles:true}));f.dispatchEvent(new Event('change',{bubbles:true}));
+        }
+      });
+    });
+  });
+}
+
+/* ---------- preferences (one record shared by every level page of this course) ---------- */
+var DEF={theme:'system',text:'normal',motion:null,calm:false,focus:false,steps:true,hints:true,sound:false};
+var prefs={};for(var dk in DEF)prefs[dk]=DEF[dk];
+(function(){
+  var raw=lsGet(PKEY);
+  if(raw){
+    try{
+      var p=JSON.parse(raw);
+      if(p&&typeof p==='object'){
+        if(/^(system|light|dark)$/.test(p.theme))prefs.theme=p.theme;
+        if(/^(normal|large)$/.test(p.text))prefs.text=p.text;
+        if(p.motion==='reduce'||p.motion==='allow')prefs.motion=p.motion;
+        ['calm','focus','steps','hints','sound'].forEach(function(k){if(typeof p[k]==='boolean')prefs[k]=p[k]});
+      }
+    }catch(e){}
+  }
+})();
+function savePrefs(){lsSet(PKEY,JSON.stringify(prefs))}
+var osReduce=false;
+try{osReduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(e){}
+function motionReduced(){return prefs.motion===null?osReduce:prefs.motion==='reduce'}
+function oneStep(){return prefs.focus||prefs.steps}
+var origTheme=root.getAttribute('data-theme'),themeForced=false;
+function applyPrefs(){
+  if(prefs.theme==='system'){
+    if(themeForced){if(origTheme===null)root.removeAttribute('data-theme');else root.setAttribute('data-theme',origTheme);themeForced=false}
+  }else{root.setAttribute('data-theme',prefs.theme);themeForced=true}
+  root.setAttribute('data-text',prefs.text);
+  root.setAttribute('data-motion',motionReduced()?'reduce':'allow');
+  root.setAttribute('data-calm',prefs.calm?'on':'off');
+  root.setAttribute('data-focus',prefs.focus?'on':'off');
+  root.setAttribute('data-steps',oneStep()?'one':'all');
+  $$('input[name="pf-theme"]').forEach(function(r){r.checked=(r.value===prefs.theme)});
+  $$('input[name="pf-text"]').forEach(function(r){r.checked=(r.value===prefs.text)});
+  var set=function(id,v,dis){var c=$('#'+id);if(c){c.checked=v;c.disabled=!!dis}};
+  set('pf-focus',prefs.focus);
+  set('pf-steps',oneStep(),prefs.focus);
+  set('pf-hints',prefs.hints);
+  set('pf-motion',motionReduced());
+  set('pf-calm',prefs.calm);
+  set('pf-sound',prefs.sound);
+}
+
+/* ---------- announcements, toast, sound ---------- */
+var liveEl=$('#live'),toastEl=$('#toast'),toastT,flip=false;
+function announce(msg){flip=!flip;liveEl.textContent=msg+(flip?' ':'')}
+function toast(msg){
+  announce(msg);
+  if(prefs.calm)return;
+  toastEl.textContent=msg;toastEl.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show')},1600);
+}
+var actx=null;
+function tone(f,t0,d,v){
+  var o=actx.createOscillator(),g=actx.createGain(),n=actx.currentTime;
+  o.type='sine';o.frequency.value=f;
+  g.gain.setValueAtTime(0.0001,n+t0);g.gain.exponentialRampToValueAtTime(v,n+t0+0.02);g.gain.exponentialRampToValueAtTime(0.0001,n+t0+d);
+  o.connect(g);g.connect(actx.destination);o.start(n+t0);o.stop(n+t0+d+0.05);
+}
+function chime(kind){
+  if(!prefs.sound)return;
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    actx=actx||new AC();if(actx.state==='suspended')actx.resume();
+    if(kind==='done'){tone(523,0,.16,.05);tone(784,.14,.24,.05)}else{tone(660,0,.14,.04)}
+  }catch(e){}
+}
+
+/* ---------- elements ---------- */
+var articles=$$('.mission'),nodes=$$('.node');
+var xpEl=$('#xp'),ctxEl=$('#ctxbar'),resumeEl=$('#resume'),resumeText=$('#resumeText'),resumeBtn=$('#resumeBtn');
+var card=$('#levelcard'),stampEl=$('#stamp'),levelSub=$('#levelsub');
+function stepsOf(a){return $$('.mstep',a)}
+function stepName(s){var h=$('h3.label',s);return h?h.textContent:'Step'}
+
+/* ---------- views ---------- */
+function headerH(){var t=$('#top');return t?t.offsetHeight:0}
+function scrollToEl(e){
+  if(!e)return;
+  var y=e.getBoundingClientRect().top+window.pageYOffset-headerH()-12;
+  try{window.scrollTo({top:Math.max(0,y),behavior:motionReduced()?'auto':'smooth'})}catch(x){window.scrollTo(0,Math.max(0,y))}
+}
+function renderCtx(){
+  var i=state.cur,k=state.step[i]||0,secs=stepsOf(articles[i]);
+  ctxEl.textContent='';
+  var b=el('b',null,'Mission '+(i+1)+' of '+COUNT);
+  ctxEl.appendChild(b);
+  var cn=el('span','cn',' · '+NAMES[i]);
+  ctxEl.appendChild(cn);
+  ctxEl.appendChild(document.createTextNode(' · '+(secs[k]?stepName(secs[k]):'')));
+}
+function show(i,k,o){
+  o=o||{};
+  i=clamp(i,0,COUNT-1);
+  var secs=stepsOf(articles[i]);k=clamp(k,0,secs.length-1);
+  state.cur=i;state.step[i]=k;state.seen[i+':'+k]=1;save(!!o.init);
+  articles.forEach(function(a,x){a.hidden=(x!==i)});
+  nodes.forEach(function(n,x){n.setAttribute('aria-current',x===i?'true':'false')});
+  var one=oneStep()&&!viewAll[i];
+  articles[i].classList.toggle('viewing-all',oneStep()&&!!viewAll[i]);
+  var va=$('.viewall',articles[i]);
+  if(va){va.setAttribute('aria-pressed',viewAll[i]?'true':'false');va.textContent=viewAll[i]?'Back to one step at a time':'Show the whole mission'}
+  secs.forEach(function(s,x){s.hidden=(one&&x!==k)});
+  $$('.stepbtn',articles[i]).forEach(function(b,x){
+    if(x===k)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');
+    b.classList.toggle('seen',!!state.seen[i+':'+x]);
+  });
+  renderCtx();
+  if(window.__resetLabels)window.__resetLabels();
+  if(o.focus){
+    var t=(o.focus==='mission')?$('h2',articles[i]):$('h3.label',secs[k]);
+    if(t)t.focus({preventScroll:true});
+  }
+  if(o.scroll==='layout')scrollToEl($('.layout'));
+  else if(o.scroll==='steps')scrollToEl($('.mtabs',articles[i]));
+  else if(o.scroll==='section')scrollToEl($('h3.label',secs[k]));
+  if(o.say)announce('Mission '+(i+1)+', step '+(k+1)+' of '+secs.length+': '+stepName(secs[k]));
+}
+function hideResume(){if(resumeEl)resumeEl.hidden=true}
+
+/* ---------- render progress ---------- */
+function renderHud(){
+  var t=totalXp();
+  xpEl.textContent='';
+  xpEl.appendChild(el('b',null,String(t)));
+  xpEl.appendChild(document.createTextNode(' / '+TOTAL+' XP'));
+  xpEl.setAttribute('aria-label','Level progress: '+t+' of '+TOTAL+' XP');
+  for(var i=1;i<=COUNT;i++){
+    var x=mxp(i),done=x>=NEED,started=x>0,n=nodes[i-1],a=articles[i-1];
+    n.classList.toggle('done',done);
+    var ni=$('.ni',n);if(done)ni.innerHTML=CHECK;else ni.textContent=String(i);
+    var status=done?'Done':(started?'In progress, '+x+' of '+NEED+' XP':'Not started');
+    $('.ns',n).textContent=status;
+    $('.nshort',n).textContent=done?'Done':x+'/'+NEED;
+    var ms=$('.mstate',a);
+    ms.className='mstate'+(done?' is-done':'');
+    ms.innerHTML='';
+    if(done){ms.insertAdjacentHTML('beforeend',CHECK);ms.appendChild(document.createTextNode('Complete'))}
+    else ms.textContent=started?'In progress':'Not started';
+    var pg=$('.mprog',a),bar=$('.bar-track',a);
+    pg.classList.toggle('is-done',done);
+    $('i',bar).style.width=Math.min(100,(x/NEED)*100)+'%';
+    bar.setAttribute('aria-valuenow',String(Math.min(x,NEED)));
+    $('.mprogtxt',a).textContent=Math.min(x,NEED)+' / '+NEED+' XP';
+    $('.mdone',a).hidden=!done;
+  }
+  var show4=mxp(COUNT)>=NEED,wasHidden=card.hidden;
+  card.hidden=!show4;
+  if(show4){
+    var full=t>=TOTAL;
+    stampEl.innerHTML='';
+    if(full)stampEl.insertAdjacentHTML('beforeend',CHECK);
+    stampEl.appendChild(document.createTextNode(full?'Level complete':'Almost there'));
+    stampEl.classList.toggle('pending',!full);
+    levelSub.textContent=full?t+' of '+TOTAL+' XP. '+L.name+' cleared.':t+' of '+TOTAL+' XP. A mission in the list is not marked Done yet. Open it to finish the level.';
+    if(wasHidden){stampEl.style.animation='none';void stampEl.offsetWidth;stampEl.style.animation=''}
+  }
+}
+function award(key,pts){
+  if(state.got[key]||restoring)return;
+  var m=parseInt(key.charAt(1),10),before=mxp(m);
+  state.got[key]=pts;save();hideResume();renderHud();renderCourse();
+  if(before<NEED&&mxp(m)>=NEED){toast('Mission '+m+' complete');chime('done')}
+  else{toast('+'+pts+' XP');chime('xp')}
+}
+
+/* ---------- quiz helper ----------
+   items: [{q, o:[...], c:correctIndex, xp, why, hint}]  XP keys: mk+':q'+index */
+function makeQuiz(host,mk,items){
+  items.forEach(function(it,qi){
+    var key=mk+':q'+qi;
+    var fs=el('fieldset','q');fs.appendChild(el('legend',null,it.q));
+    var list=el('div','qopts');var msg=el('p','why');msg.setAttribute('aria-live','polite');
+    var hb=el('button','btn quiet hintbtn','Show a hint');hb.type='button';hb.hidden=true;
+    hb.addEventListener('click',function(){msg.textContent='Hint: '+it.hint;hb.hidden=true});
+    var btns=it.o.map(function(t,oi){
+      var b=el('button','choice',t);b.type='button';
+      b.addEventListener('click',function(){pick(oi)});
+      list.appendChild(b);return b;
+    });
+    function solve(fresh){
+      btns.forEach(function(b,k){b.disabled=true;if(k===it.c)b.classList.add('ok');else b.classList.add('dim')});
+      msg.className='why good';msg.textContent='Right. '+it.why;hb.hidden=true;
+      if(fresh)award(key,it.xp);
+    }
+    function pick(oi){
+      if(oi===it.c){solve(true);return}
+      btns[oi].classList.add('no');btns[oi].disabled=true;msg.className='why bad';
+      if(prefs.hints){msg.textContent='Not quite. '+it.hint;hb.hidden=true}
+      else{msg.textContent='Not quite. Try another answer.';hb.hidden=false}
+    }
+    if(state.got[key])solve(false);
+    fs.appendChild(list);fs.appendChild(msg);fs.appendChild(hb);host.appendChild(fs);
+  });
+}
+
+/* ---------- copy helper ----------
+   cb(true) when the text reached the clipboard, cb(false) when it could only be selected. */
+function copyText(text,selEl,cb){
+  function fallback(){
+    var sel=false,ok=false;
+    try{var r=document.createRange();r.selectNodeContents(selEl);var s=window.getSelection();s.removeAllRanges();s.addRange(r);sel=true}catch(e){}
+    try{ok=document.execCommand('copy')}catch(e){}
+    cb(!!(ok&&sel));
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){cb(true)},fallback);
+  }else{fallback()}
+}
+
+/* ---------- build the step tabs and step navigation ---------- */
+function buildSteps(){
+  articles.forEach(function(a,i){
+    var secs=stepsOf(a),nav=$('.mtabs',a),ol=el('ol');
+    secs.forEach(function(s,k){
+      var li=el('li'),b=el('button','stepbtn');b.type='button';
+      var sn=el('span','sn',String(k+1));sn.setAttribute('aria-hidden','true');
+      var tx=el('span',null,stepName(s));
+      if(k===secs.length-1){tx.appendChild(el('small',null,'Optional'))}
+      b.appendChild(sn);b.appendChild(tx);
+      b.addEventListener('click',function(){hideResume();show(i,k,{focus:'step',scroll:(oneStep()&&!viewAll[i])?'steps':'section',say:true})});
+      li.appendChild(b);ol.appendChild(li);
+    });
+    nav.appendChild(ol);
+    var vb=el('button','btn quiet viewall','Show the whole mission');vb.type='button';vb.setAttribute('aria-pressed','false');
+    vb.addEventListener('click',function(){viewAll[i]=!viewAll[i];show(i,state.step[i]||0,{});announce(viewAll[i]?'Showing every step of this mission':'Showing one step at a time')});
+    nav.appendChild(vb);
+    var lines=['Finished the exercise? Next, see why it worked.','Next, check what stuck.','Next, go deeper if you like, or move on.',i<COUNT-1?'Next, start the next mission.':'That is the last mission in this level.'];
+    secs.forEach(function(s,k){
+      var sn=el('div','stepnav'),info=el('p','nextline',lines[k]||''),acts=el('div','acts');
+      if(k>0){
+        var bk=el('button','btn ghost','Back: '+stepName(secs[k-1]));bk.type='button';
+        bk.addEventListener('click',function(){show(i,k-1,{focus:'step',scroll:'steps',say:true})});acts.appendChild(bk);
+      }
+      if(k<secs.length-1){
+        var nx=el('button','btn','Next: '+stepName(secs[k+1]));nx.type='button';
+        nx.addEventListener('click',function(){show(i,k+1,{focus:'step',scroll:'steps',say:true})});acts.appendChild(nx);
+        if(k===secs.length-2&&i<COUNT-1){
+          var sk=el('button','btn ghost','Skip to Mission '+(i+2));sk.type='button';
+          sk.addEventListener('click',function(){show(i+1,0,{focus:'mission',scroll:'layout',say:true})});acts.appendChild(sk);
+        }
+      }else if(i<COUNT-1){
+        var nm=el('button','btn','Next mission: '+NAMES[i+1]);nm.type='button';
+        nm.addEventListener('click',function(){show(i+1,0,{focus:'mission',scroll:'layout',say:true})});acts.appendChild(nm);
+      }
+      sn.appendChild(info);sn.appendChild(acts);s.appendChild(sn);
+    });
+    var pg=$('.pager',a);
+    if(i>0){var b1=el('button','btn ghost','Back: '+NAMES[i-1]);b1.type='button';b1.addEventListener('click',function(){show(i-1,0,{focus:'mission',scroll:'layout'})});pg.appendChild(b1)}
+    if(i<COUNT-1){var b2=el('button','btn','Next: '+NAMES[i+1]);b2.type='button';b2.addEventListener('click',function(){show(i+1,0,{focus:'mission',scroll:'layout'})});pg.appendChild(b2)}
+  });
+}
+
+/* ---------- resume card ---------- */
+function renderResume(returning){
+  var t=totalXp(),i=state.cur,k=state.step[i]||0,secs=stepsOf(articles[i]);
+  resumeText.textContent='';
+  if(t>=TOTAL){
+    resumeText.appendChild(el('b',null,'Level complete.'));
+    resumeText.appendChild(el('span','sub','All four missions are done. Open any mission to review it.'));
+    resumeBtn.hidden=true;return;
+  }
+  resumeBtn.hidden=false;
+  if(returning){
+    resumeText.appendChild(el('b',null,'Welcome back.'));
+    resumeText.appendChild(el('span','sub','You were in Mission '+(i+1)+', '+NAMES[i]+', at step '+(k+1)+': '+stepName(secs[k])+'. '+Math.min(mxp(i+1),NEED)+' of '+NEED+' XP in this mission.'+(Object.keys(state.ex).some(function(k){return k.indexOf('m'+(i+1)+'.')===0})?' Your answers are saved.':'')));
+    resumeBtn.textContent='Continue where you left off';
+    resumeBtn.onclick=function(){hideResume();show(i,k,{focus:'step',scroll:'steps',say:true})};
+  }else{
+    resumeText.appendChild(el('b',null,'Start here.'));
+    resumeText.appendChild(el('span','sub','Mission 1, '+NAMES[0]+', takes about '+(L.missions[0].min||10)+' minutes.'));
+    resumeBtn.textContent='Start Mission 1';
+    resumeBtn.onclick=function(){hideResume();show(0,0,{focus:'step',scroll:'steps',say:true})};
+  }
+}
+
+/* ---------- preferences panel ---------- */
+function wirePrefs(){
+  var btn=$('#prefsBtn'),panel=$('#prefs');
+  function open(){panel.hidden=false;btn.setAttribute('aria-expanded','true');var f=$('input:checked',panel)||$('input',panel);if(f)f.focus()}
+  function close(back){panel.hidden=true;btn.setAttribute('aria-expanded','false');if(back)btn.focus()}
+  btn.addEventListener('click',function(){if(panel.hidden)open();else close(false)});
+  $('#prefsClose').addEventListener('click',function(){close(true)});
+  panel.addEventListener('keydown',function(e){if(e.key==='Escape'){e.stopPropagation();close(true)}});
+  $$('input[name="pf-theme"]').forEach(function(r){r.addEventListener('change',function(){if(r.checked){prefs.theme=r.value;savePrefs();applyPrefs();announce('Theme: '+r.value)}})});
+  $$('input[name="pf-text"]').forEach(function(r){r.addEventListener('change',function(){if(r.checked){prefs.text=r.value;savePrefs();applyPrefs();announce(r.value==='large'?'Larger text on':'Standard text size')}})});
+  function bool(id,fn,label){
+    $('#'+id).addEventListener('change',function(e){fn(e.target.checked);savePrefs();applyPrefs();announce(label+(e.target.checked?' on':' off'))});
+  }
+  bool('pf-focus',function(v){prefs.focus=v;refresh();if(v){close(false);var t=$('h3.label',stepsOf(articles[state.cur])[state.step[state.cur]||0]);if(t)t.focus({preventScroll:true})}},'Focus mode');
+  bool('pf-steps',function(v){prefs.steps=v;refresh()},'One step at a time');
+  bool('pf-hints',function(v){prefs.hints=v},'Hints after a wrong answer');
+  bool('pf-motion',function(v){prefs.motion=v?'reduce':'allow'},'Reduce motion');
+  bool('pf-calm',function(v){prefs.calm=v},'Calmer screen');
+  bool('pf-sound',function(v){prefs.sound=v;if(v)chime('xp')},'Sound effects');
+  function refresh(){
+    root.setAttribute('data-steps',oneStep()?'one':'all');
+    show(state.cur,state.step[state.cur]||0,{});
+    window.scrollTo(0,0);
+  }
+  $('#exitFocus').addEventListener('click',function(){prefs.focus=false;savePrefs();applyPrefs();refresh();announce('Focus mode off');btn.focus()});
+  $('#persistNote').textContent=storageOK?'Preferences, progress and your answers are saved in this browser and shared by all five levels.':'This browser is blocking saved data. The course still works, but progress and answers will be lost when you close the page.';
+  var xb=$('#xferBtn');
+  if(xb)xb.addEventListener('click',function(){
+    var msg=importCode($('#xferIn').value);$('#xferMsg').textContent=msg;
+    if(msg.indexOf('Imported')===0)setTimeout(reloadPage,400);
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!panel.hidden){close(true)}});
+}
+
+/* ---------- restart and reset (two-step confirm) ---------- */
+function reloadPage(){try{window.location.reload()}catch(e){}}
+function missionCounts(m){
+  var xp=0,ans=0,k;
+  for(k in state.got){if(k.indexOf('m'+m+':')===0)xp+=state.got[k]}
+  for(k in state.ex){if(k.indexOf('m'+m+'.')===0)ans++}
+  return {xp:xp,ans:ans};
+}
+function wipe(scope){
+  frozen=true;clearTimeout(flushT);
+  var st=readStore(),n;
+  if(scope==='course'){for(n=1;n<=LEVELS;n++)st.levels[n]=cleanLevel(null);st.last=null}
+  else if(scope==='level'){st.levels[L.level]=cleanLevel(null)}
+  else{
+    var e=st.levels[L.level]||cleanLevel(null),m=state.cur+1,k;
+    for(k in e.got){if(k.indexOf('m'+m+':')===0)delete e.got[k]}
+    for(k in e.ex){if(k.indexOf('m'+m+'.')===0)delete e.ex[k]}
+    for(k in e.seen){if(k.charAt(0)===String(state.cur))delete e.seen[k]}
+    e.step[state.cur]=0;e.cur=state.cur;st.levels[L.level]=e;
+  }
+  if(!writeStore(st)){frozen=false;return false}
+  for(n=1;n<=LEVELS;n++){if(scope==='course'||n===L.level){lsDel('aimbc-level'+n+'-v2');lsDel('aimbc-level'+n+'-v1')}}
+  reloadPage();return true;
+}
+function arm(btn,label,confirmLabel,note,run){
+  var armed=false,t,note$=$('#confirmNote');
+  function disarm(){armed=false;btn.textContent=label();clearTimeout(t)}
+  btn.addEventListener('click',function(){
+    if(!armed){armed=true;btn.textContent=confirmLabel();note$.textContent=note();t=setTimeout(function(){disarm();note$.textContent=''},8000);return}
+    disarm();note$.textContent='';run();
+  });
+  btn.addEventListener('blur',function(){setTimeout(function(){if(document.activeElement!==btn){disarm()}},150)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&armed){disarm();note$.textContent='Cancelled. Nothing was erased.'}});
+  btn.refreshLabel=function(){if(!armed)btn.textContent=label()};
+  btn.refreshLabel();
+}
+function wireReset(){
+  var rm=$('#restartM'),rl=$('#reset'),rc=$('#resetAll');
+  arm(rm,function(){return 'Restart Mission '+(state.cur+1)},function(){return 'Confirm: erase Mission '+(state.cur+1)},function(){
+    var c=missionCounts(state.cur+1);
+    return 'This erases '+c.xp+' XP and your saved answers in Mission '+(state.cur+1)+' of Level '+L.level+'. Other missions and levels are not touched. Press Escape to cancel.';
+  },function(){wipe('mission')});
+  arm(rl,function(){return 'Reset Level '+L.level},function(){return 'Confirm: erase Level '+L.level},function(){
+    return 'This erases '+totalXp()+' XP and all saved answers in all four missions of Level '+L.level+'. Other levels are not touched. Press Escape to cancel.';
+  },function(){wipe('level')});
+  arm(rc,function(){return 'Reset the whole course'},function(){return 'Confirm: erase all five levels'},function(){
+    var s=courseSummary(),x=0;s.levels.forEach(function(l){x+=l.xp});
+    return 'This erases '+x+' XP and all saved answers in all five levels, and cannot be undone. Your display preferences are kept. Press Escape to cancel.';
+  },function(){wipe('course')});
+  window.__resetLabels=function(){rm.refreshLabel&&rm.refreshLabel()};
+}
+
+/* ---------- course-wide summary, level chips, last-visited level ---------- */
+function renderCourse(){
+  var s=courseSummary(),xp=0,done=0;
+  s.levels.forEach(function(l){
+    xp+=l.xp;done+=l.done;
+    var c=$('.lvp[data-n="'+l.n+'"]');
+    if(c){
+      c.textContent='';
+      var v=el('span',null,l.done+'/'+COUNT);v.setAttribute('aria-hidden','true');
+      var r=el('span','sr',' '+l.done+' of '+COUNT+' missions done');
+      c.appendChild(v);c.appendChild(r);
+    }
+  });
+  var cb=$('#coursebar');
+  if(cb)cb.textContent='Whole course: '+xp+' of '+(TOTAL*LEVELS)+' XP, '+done+' of '+(COUNT*LEVELS)+' missions done.';
+  var ro=$('#resumeOther');
+  if(ro){
+    ro.textContent='';ro.hidden=true;
+    var last=s.last;
+    if(last&&last.level!==L.level){
+      var lv=s.levels[last.level-1];
+      if(lv&&(lv.xp>0)&&lv.done<COUNT){
+        var a=el('a',null,'Open Level '+last.level);a.href='level'+last.level+'.html';
+        ro.appendChild(document.createTextNode('You were last in Level '+last.level+' ('+lv.done+' of '+COUNT+' missions done). '));
+        ro.appendChild(a);ro.hidden=false;
+      }
+    }
+  }
+}
+
+/* ---------- carry progress from an older link (transfer code) ---------- */
+function importCode(str){
+  try{
+    str=String(str||'').replace(/\s+/g,'');
+    if(str.indexOf('AIMBC1.')!==0)return 'That is not a transfer code from this course.';
+    var data=JSON.parse(decodeURIComponent(escape(atob(str.slice(7)))));
+    if(!data||typeof data!=='object'||!data.levels)return 'That code is empty.';
+    var st=readStore(),n,added=0;
+    for(n=1;n<=LEVELS;n++){
+      if(!data.levels[n])continue;
+      var inc=cleanLevel(data.levels[n]);if(!hasProgress(inc))continue;
+      var cur=(n===L.level)?{got:state.got,cur:state.cur,step:state.step,seen:state.seen,ex:state.ex}:(st.levels[n]||cleanLevel(null));
+      var had=hasProgress(cur),k;
+      for(k in inc.got){if((cur.got[k]||0)<inc.got[k]){cur.got[k]=inc.got[k];added++}}
+      if(!had){cur.cur=inc.cur;cur.step=inc.step}
+      for(k in inc.seen)cur.seen[k]=1;
+      for(k in inc.ex){if(!(k in cur.ex))cur.ex[k]=inc.ex[k]}
+      cur.t=Date.now();
+      st.levels[n]=cleanLevel(cur);
+    }
+    if(!writeStore(st))return 'This browser is blocking saved progress, so nothing could be imported.';
+    return 'Imported. Reloading.';
+  }catch(e){return 'That code could not be read. Check that you copied all of it.'}
+}
+
+/* ---------- scrollable tables must be reachable by keyboard ---------- */
+function enhanceScrollers(r){
+  $$('.tblwrap,.tablewrap',r).forEach(function(w){
+    if(w.getAttribute('tabindex')===null){w.setAttribute('tabindex','0');w.setAttribute('role','region');w.setAttribute('aria-label','Table. Scroll sideways if it does not fit.')}
+  });
+}
+
+/* ---------- start ---------- */
+function start(){
+  if(!root.getAttribute('lang'))root.setAttribute('lang','en');
+  enhanceScrollers(document);
+  try{new MutationObserver(function(){enhanceScrollers(document)}).observe($('#stage'),{childList:true,subtree:true})}catch(e){}
+  var returning=hadSaved&&(totalXp()>0||state.cur>0||(state.step[state.cur]||0)>0||Object.keys(state.seen).length>1||Object.keys(state.ex).length>0);
+  buildSteps();
+  autoFields();
+  ['click','input','change','keyup'].forEach(function(t){document.addEventListener(t,schedule,true)});
+  window.addEventListener('pagehide',flush);
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')flush()});
+  window.addEventListener('storage',function(e){
+    if(e.key!==STORE||frozen)return;
+    var m=readStore().levels[L.level];if(!m)return;
+    var grew=false;for(var k in m.got){if((state.got[k]||0)<m.got[k]){state.got[k]=m.got[k];grew=true}}
+    if(grew)renderHud();
+    renderCourse();
+  });
+  nodes.forEach(function(n,i){n.addEventListener('click',function(){hideResume();show(i,state.step[i]||0,{focus:'mission',scroll:'layout',say:true})})});
+  $('#skip').addEventListener('click',function(e){e.preventDefault();var h=$('h2',articles[state.cur]);if(h){h.focus({preventScroll:true});scrollToEl(h)}});
+  applyPrefs();
+  wirePrefs();wireReset();
+  show(state.cur,state.step[state.cur]||0,{init:true});
+  renderHud();
+  renderCourse();
+  renderResume(returning);
+  if(!storageOK){
+    var w=el('span','sub','This browser is blocking saved data, so progress will not be kept after you close the page.');
+    resumeText.appendChild(w);
+  }
+}
+
+window.Course={$:$,$$:$$,el:el,award:award,has:has,persist:persist,toast:toast,makeQuiz:makeQuiz,copy:copyText,start:start,level:L.level,prefs:function(){return prefs}};
+})();
+
+</script>
+<script>
+(function(C){
+'use strict';
+var $=C.$,$$=C.$$,el=C.el,award=C.award,makeQuiz=C.makeQuiz;
+
+function btn(cls,text){var b=el('button',cls,text);b.type='button';return b}
+function later(fn){requestAnimationFrame(function(){requestAnimationFrame(fn)})}
+
+/* ---------- Mission 1: From Prompt to Process ---------- */
+(function(){
+  var STEPS=[
+    {id:'a',t:'Choose this week’s one offer',min:5,best:'Human',ok:['Both'],must:false,why:'Strategy is your call. AI can brainstorm, but you decide what the bakery promotes.'},
+    {id:'b',t:'Gather the facts: dates, prices, hours',min:10,best:'Human',ok:[],must:true,why:'These facts live in your head and your files. If the AI guesses them, wrong ones go out.'},
+    {id:'c',t:'Draft the email body from those facts',min:40,best:'AI',ok:['Both'],must:false,why:'Drafting is where AI saves the most time. You still hand it the facts and a voice sample.'},
+    {id:'d',t:'Check every fact against your list',min:10,best:'Human',ok:['Both'],must:true,why:'The AI cannot vouch for itself. A person compares the draft to the real list.'},
+    {id:'e',t:'Write five subject line options',min:10,best:'AI',ok:['Both'],must:false,why:'Options are cheap for AI and slow for people. Quantity is the point.'},
+    {id:'f',t:'Pick one subject line and tune the voice',min:6,best:'Both',ok:['Human'],must:false,why:'The AI proposes, you choose. Your ear for the brand is the final filter.'},
+    {id:'g',t:'Schedule and send',min:5,best:'Human',ok:[],must:true,why:'Sending is the moment a mistake becomes public. A person presses the button.'}
+  ];
+  var TRUE_ORDER=['a','b','c','d','e','f','g'];
+  var PILE_ORDER=['g','c','a','e','b','f','d'];
+  var RULES=[
+    ['a','b','Pick the offer before you gather facts. The facts depend on what you are promoting.'],
+    ['b','c','Gather the facts before the AI drafts. Without them it guesses.'],
+    ['c','d','Fact-check after there is a draft to check.'],
+    ['c','e','Subject lines come from the draft, so draft first.'],
+    ['d','f','Fact-check before the polish, so you are not polishing a wrong line.'],
+    ['e','f','You need the subject line options before you can pick one.'],
+    ['f','g','Nothing sends until the picks are made.']
+  ];
+  var TOTAL=0;STEPS.forEach(function(s){TOTAL+=s.min});
+  var byId={};STEPS.forEach(function(s){byId[s.id]=s});
+  var pile=$('#l4m1-pile'),seq=$('#l4m1-seq'),msg=$('#l4m1-msg'),ask=$('#l4m1-ask');
+  var checkB=$('#l4m1-check'),fixB=$('#l4m1-fix'),undoB=$('#l4m1-undo'),resetB=$('#l4m1-reset');
+  var sumWrap=$('#l4m1-sumwrap'),sumBtn=$('#l4m1-sumbtn'),tagCount=$('#l4m1-tagcount'),sum=$('#l4m1-sum');
+  var placed=[],locked=false,tags={},pileBtns={},rows={},summed=false;
+
+  function emptyRow(){var li=el('li','empty');li.appendChild(el('span','stxt','Your steps appear here, first at the top.'));seq.appendChild(li)}
+  function addRow(id){
+    var e=seq.querySelector('.empty');if(e)seq.removeChild(e);
+    var li=el('li');var line=el('div','sline');line.appendChild(el('span','stxt',byId[id].t));li.appendChild(line);
+    seq.appendChild(li);rows[id]=li;
+  }
+  function place(id){
+    if(locked||placed.indexOf(id)>=0||!byId[id])return;
+    placed.push(id);addRow(id);pileBtns[id].disabled=true;sync();
+  }
+  function sync(){
+    checkB.disabled=placed.length<STEPS.length||locked;
+    undoB.disabled=!placed.length||locked;
+  }
+  function buildPile(){
+    pile.textContent='';
+    PILE_ORDER.forEach(function(id){
+      var b=btn('chip',byId[id].t);
+      b.addEventListener('click',function(){place(id)});
+      pile.appendChild(b);pileBtns[id]=b;
+    });
+  }
+  function reset(){
+    placed=[];locked=false;summed=false;tags={};rows={};seq.textContent='';emptyRow();buildPile();
+    sumWrap.hidden=true;sum.hidden=true;sum.textContent='';sumBtn.disabled=true;tagCount.textContent='0 of 7 tagged';
+    ask.textContent='Step 1 of 3. Tap the steps in the order you would do them.';
+    msg.textContent='Tap a step to start. Several orders work. Each step just needs what it depends on to come first.';
+    sync();
+  }
+  undoB.addEventListener('click',function(){
+    if(locked||!placed.length)return;
+    var id=placed.pop();var li=rows[id];if(li&&li.parentNode)li.parentNode.removeChild(li);delete rows[id];
+    pileBtns[id].disabled=false;if(!placed.length)emptyRow();sync();
+  });
+  resetB.addEventListener('click',reset);
+  fixB.addEventListener('click',function(){
+    if(locked)return;
+    placed=[];rows={};seq.textContent='';
+    TRUE_ORDER.forEach(function(id){placed.push(id);addRow(id);pileBtns[id].disabled=true});
+    msg.textContent='That is one sensible order. Press Check my order to lock it in.';sync();
+  });
+  function firstProblem(){
+    var pos={};placed.forEach(function(id,i){pos[id]=i});
+    for(var i=0;i<RULES.length;i++){if(pos[RULES[i][0]]>pos[RULES[i][1]])return RULES[i][2]}
+    return null;
+  }
+  checkB.addEventListener('click',function(){
+    if(locked||placed.length<STEPS.length)return;
+    var p=firstProblem();
+    if(p){msg.textContent='Not quite. '+p+' Move it with Undo last, or use Show me a sensible order.';return}
+    locked=true;sync();
+    msg.textContent='That order works. No step waits on something it needs.';
+    award('m1:order',10);
+    startTagging();
+  });
+  function allTagged(){return STEPS.every(function(s){return tags[s.id]})}
+  function startTagging(){
+    ask.textContent='Step 2 of 3. Who should do each step? Human: you. AI: the AI does it and you read it. Both: the AI proposes, you decide.';
+    sumWrap.hidden=false;
+    placed.forEach(function(id){
+      var li=rows[id];li.classList.add('done');
+      var grp=el('div','chips');grp.setAttribute('role','group');grp.setAttribute('aria-label','Who does: '+byId[id].t);
+      ['Human','AI','Both'].forEach(function(t){
+        var b=btn('chip',t);b.setAttribute('aria-pressed','false');
+        b.addEventListener('click',function(){
+          tags[id]=t;
+          $$('.chip',grp).forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+          var n=STEPS.filter(function(s){return tags[s.id]}).length;
+          tagCount.textContent=n+' of 7 tagged';
+          if(n===STEPS.length){sumBtn.disabled=false;award('m1:tag',10)}
+        });
+        grp.appendChild(b);
+      });
+      li.appendChild(grp);
+    });
+  }
+  function frac(t){return t==='AI'?0.8:(t==='Both'?0.5:0)}
+  sumBtn.addEventListener('click',function(){
+    if(!locked||!allTagged())return;
+    showSum(false);
+  });
+  function showSum(quiet){
+    var saved=0,agree=0,stays=[],warns=[],firstOff=null,savesList=[];
+    STEPS.forEach(function(s){
+      var t=tags[s.id],sv=s.min*frac(t);saved+=sv;
+      if(t==='Human'||t==='Both')stays.push(s);
+      if(sv>0)savesList.push({s:s,v:sv});
+      if(s.must&&t==='AI')warns.push(s);
+      if(t===s.best||s.ok.indexOf(t)>=0)agree++;else if(!firstOff)firstOff=s;
+    });
+    saved=Math.round(saved);var after=TOTAL-saved;
+    sum.textContent='';
+    var bars=el('div','bars');
+    [['Before',TOTAL],['With AI',after]].forEach(function(r,k){
+      var row=el('div','row');row.appendChild(el('span','w',r[0]));
+      var tr=el('span','track'),f=document.createElement('i');tr.appendChild(f);row.appendChild(tr);
+      row.appendChild(el('span','pc',r[1]+' min'));bars.appendChild(row);
+      if(quiet){f.style.width=Math.round(r[1]/TOTAL*100)+'%'}else{later(function(){f.style.width=Math.round(r[1]/TOTAL*100)+'%'})}
+    });
+    sum.appendChild(bars);
+    sum.appendChild(el('p','verdict','Your tags save about '+saved+' of '+TOTAL+' minutes a week (example numbers). Your tags match the usual call on '+agree+' of 7 steps.'));
+    if(warns.length){
+      var wb=el('div','warnbox');
+      wb.textContent='Careful: you gave the AI '+warns.map(function(s){return '“'+s.t+'”'}).join(' and ')+'. A wrong detail there reaches your readers with no one in between. Switch to Human or Both to keep a person on it.';
+      sum.appendChild(wb);
+    }else if(firstOff){
+      sum.appendChild(el('p',null,'Worth a second look: “'+firstOff.t+'”. '+firstOff.why));
+    }else{
+      sum.appendChild(el('p',null,'Nice split. The AI does the drafting and options, and a person keeps the choices, the facts, and the send button.'));
+    }
+    var a=el('div','sumrow');a.appendChild(el('p','mini','Where a person stays'));
+    var ul=el('ul','out');
+    stays.forEach(function(s){var li=el('li');li.appendChild(el('span','t',s.t));li.appendChild(el('span','n',tags[s.id]));ul.appendChild(li)});
+    if(!stays.length){var l0=el('li');l0.appendChild(el('span','t','Nobody. That is a risky setup.'));ul.appendChild(l0)}
+    a.appendChild(ul);sum.appendChild(a);
+    sum.hidden=false;
+    ask.textContent='Step 3 of 3. That is your process. Next time, write it down and reuse it.';
+    summed=true;
+    if(!quiet)award('m1:sum',10);
+  }
+  reset();
+  C.persist('m1.flow',{
+    get:function(){return {placed:placed.slice(),locked:locked,tags:tags,summed:summed,msg:msg.textContent}},
+    set:function(v){
+      if(!v||typeof v!=='object')return;
+      reset();
+      var pl=Array.isArray(v.placed)?v.placed:[],seen={},i;
+      for(i=0;i<pl.length;i++){if(typeof pl[i]==='string'&&byId[pl[i]]&&!seen[pl[i]]){seen[pl[i]]=1;place(pl[i])}}
+      if(typeof v.msg==='string'&&v.msg.length<400&&placed.length)msg.textContent=v.msg;
+      if(v.locked===true&&placed.length===STEPS.length&&!firstProblem()){
+        locked=true;sync();
+        msg.textContent='That order works. No step waits on something it needs.';
+        startTagging();
+        var tg=(v.tags&&typeof v.tags==='object')?v.tags:{};
+        placed.forEach(function(id){
+          var t=tg[id];if(t!=='Human'&&t!=='AI'&&t!=='Both')return;
+          tags[id]=t;
+          $$('.chip',rows[id]).forEach(function(x){x.setAttribute('aria-pressed',x.textContent===t?'true':'false')});
+        });
+        var n=STEPS.filter(function(s){return tags[s.id]}).length;
+        tagCount.textContent=n+' of 7 tagged';
+        if(n===STEPS.length){
+          sumBtn.disabled=false;
+          if(v.summed===true)showSum(true);
+        }
+      }
+    }
+  });
+  makeQuiz($('#quiz1'),'m1',[
+    {q:'Which task is the best first candidate for a workflow?',
+     o:['A one-off brand video','A task you repeat every week with mostly the same steps','A strategy decision you make once a year'],c:1,xp:10,
+     why:'Repetition is what makes a process pay off. Steps you repeat can be written down, tested, and reused.',
+     hint:'Think about which one you could write the steps for after doing it three times.'},
+    {q:'In the newsletter process, why does the fact check stay with a person?',
+     o:['AI cannot read a price list','A wrong price or date goes out under your name, and the AI cannot vouch for itself','AI checking is too slow'],c:1,xp:10,
+     why:'Same lesson as Level 1: confident does not mean correct. The check needs a source you can open.',
+     hint:'Remember the four tells from Level 1. Who catches a made-up number?'}
+  ]);
+})();
+
+/* ---------- Mission 2: Meet the Agent ---------- */
+(function(){
+  var log=$('#l4m2-log'),stageEls=$$('#l4m2-stages li'),startB=$('#l4m2-start'),replayB=$('#l4m2-replay');
+  var decided=[],kinds=[],tones=[],picks=[],running=false,restoring=false;
+  function setStage(n){stageEls.forEach(function(li,k){li.classList.toggle('on',k===n);li.classList.toggle('done',k<n)})}
+
+  function scenes(){
+    var sent=(kinds[1]==='Stop')?0:1;
+    return [
+      {stage:1,title:'The plan',tools:['Read: your goal, your facts, and your limits'],
+       boxLabel:'The agent proposes this plan',
+       box:'1. Search for independent cafes within 10 miles.\n2. Check which ones sell cold drinks.\n3. Draft a short intro email to the best three.\n4. Ask you before sending anything.',
+       q:'Do you let it start?',
+       opts:[
+        {k:'Approve',l:'Approve the plan as written',tone:'mid',tag:'Fine, a bit loose',
+         r:'The agent finds 6 cafes, including a chain with 14 locations. You never said to skip chains, so it stays on the list and gets a draft. Not harmful, just wasted effort.'},
+        {k:'Edit',l:'Edit: independent cafes only, skip chains',tone:'good',tag:'Sharp edit',
+         r:'The plan updates. The list drops to 5 independent cafes. One sentence from you saved a draft nobody needed.'},
+        {k:'Stop',l:'Stop the run',tone:'safe',tag:'Safe, slower',
+         r:'Nothing is searched, nothing is sent. Stopping is right when the plan is wrong. This plan was close, so a small edit would have kept it moving. For this walkthrough, the run continues.'}
+       ]},
+      {stage:2,title:'Acting with tools',tools:['Tool: web search, found 5 independent cafes','Tool: read the Corner Mug Cafe menu, sells cold brew and iced tea','Tool: drafted an email to Corner Mug Cafe'],
+       boxLabel:'Draft email, ready to send',
+       box:'Subject: A local iced tea for your cold case\n\nHi, I’m with Tidewater Tea Co. We make small-batch iced tea in three flavors, and we are already stocked in 40 cafes across the state. Could we drop off a free tasting case this week?',
+       q:'Your fact sheet says small-batch, three flavors, free tasting case. Nothing else. Sending is permanent. What do you do?',
+       opts:[
+        {k:'Approve',l:'Approve: send it as written',tone:'bad',tag:'Costly',
+         r:'Sent. The owner replies that afternoon: “Which 40 cafes?” You have no list. A sent email cannot be pulled back, and your first impression is a claim you cannot back up.'},
+        {k:'Edit',l:'Edit: cut the “40 cafes” line, then send',tone:'good',tag:'Good catch',
+         r:'You delete the line. The agent sends the cleaner version. The owner replies the next morning: “Sure, send the tasting case.”'},
+        {k:'Stop',l:'Stop: do not send',tone:'safe',tag:'Safe, slower',
+         r:'Nothing goes out. The agent asks which facts it may use, and you still have to fix the draft. Safe, but you did the work twice.'}
+       ]},
+      {stage:4,title:'Check and report',tools:['Check: re-read its drafts against your fact sheet','Check: dropped Seawall Coffee, closed since last year','Report: drafted 3, sent '+sent+', '+(3-sent)+' waiting for your OK'],
+       boxLabel:'The agent also suggests',
+       box:'“To close these faster, I will follow up with all three cafes every day this week and offer a 15% launch discount.”',
+       q:'Your limits said no discounts. Does the suggestion fit the goal?',
+       opts:[
+        {k:'Approve',l:'Approve the extra plan',tone:'bad',tag:'Costly',
+         r:'The agent offers 15% to three cafes, three days in a row. You never chose a discount. One cafe forwards the offer to a friend, and now you are holding a deal you did not pick.'},
+        {k:'Edit',l:'Edit: one follow-up after 5 days, no discounts',tone:'good',tag:'Sharp edit',
+         r:'The agent schedules one polite follow-up and leaves pricing alone. Discounts are your call, so they stay with you.'},
+        {k:'Stop',l:'Stop: skip the extra plan',tone:'safe',tag:'Safe, slower',
+         r:'The agent files its report and ends. Nothing extra happens. You can still add a follow-up later, on your terms.'}
+       ]}
+    ];
+  }
+  var toneClass={good:'ok',bad:'no',safe:'mid',mid:'mid'};
+  var tagClass={good:'good',bad:'',safe:'mid',mid:'mid'};
+
+  function showScene(i){
+    var S=scenes()[i];setStage(S.stage);
+    var card=el('div','scene');
+    card.appendChild(el('h3',null,'Step '+(i+1)+' of 3: '+S.title));
+    S.tools.forEach(function(t){card.appendChild(el('p','tool',t))});
+    card.appendChild(el('p','mini',S.boxLabel));
+    card.appendChild(el('div','draft',S.box));
+    card.appendChild(el('p','ask',S.q));
+    var opts=el('div','opts');var bs=[];
+    var out=el('div','reveal');out.hidden=true;out.setAttribute('aria-live','polite');
+    S.opts.forEach(function(o,oi){
+      var b=btn('choice',o.l);
+      function choose(){
+        if(decided[i])return;
+        decided[i]=true;kinds[i]=o.k;tones[i]=o.tone;picks[i]=oi;
+        bs.forEach(function(x,k){x.disabled=true;if(k===oi){x.classList.add(toneClass[o.tone])}else{x.classList.add('dim')}});
+        out.textContent='';
+        out.appendChild(el('span','tagchip '+tagClass[o.tone],o.tag));
+        out.appendChild(el('p',null,o.r));
+        out.hidden=false;
+        if(restoring)return;
+        award('m2:d'+(i+1),8);
+        if(i<2){showScene(i+1)}else{finish()}
+      }
+      b.addEventListener('click',choose);
+      b.chooseNow=choose;
+      opts.appendChild(b);bs.push(b);
+    });
+    card.appendChild(opts);card.appendChild(out);
+    log.appendChild(card);
+    if(!restoring){try{card.scrollIntoView({block:'nearest'})}catch(e){}}
+    return bs;
+  }
+  function finish(){
+    setStage(5);
+    var card=el('div','scene');
+    card.appendChild(el('h3',null,'Run finished'));
+    var a=0,e=0,s=0,bad=0;
+    kinds.forEach(function(k,i){if(k==='Approve')a++;else if(k==='Edit')e++;else s++;if(tones[i]==='bad')bad++});
+    card.appendChild(el('p','verdict','Your calls: Approve '+a+', Edit '+e+', Stop '+s+'. Costly moments let through: '+bad+'.'));
+    card.appendChild(el('p',null,bad>0
+      ?'The agent did the legwork, but you owned the moments where its work touched the outside world. Reading and drafting are easy to undo. Sending and spending are not, so that is where the pause belongs.'
+      :'Nothing costly got through. That is the job: you set the goal and limits, the agent does the legwork, and you hold the approval at every step that cannot be undone.'));
+    card.appendChild(el('p','note','The loop you just watched: goal, plan, act with tools, check, report.'));
+    log.appendChild(card);
+    replayB.hidden=false;running=false;
+    if(restoring)return;
+    award('m2:done',6);
+    try{card.scrollIntoView({block:'nearest'})}catch(er){}
+  }
+  startB.addEventListener('click',function(){
+    if(running)return;
+    running=true;startB.disabled=true;decided=[];kinds=[];tones=[];picks=[];
+    showScene(0);
+  });
+  replayB.addEventListener('click',function(){
+    log.textContent='';setStage(0);decided=[];kinds=[];tones=[];picks=[];running=false;
+    startB.disabled=false;replayB.hidden=true;
+  });
+  setStage(0);
+  C.persist('m2.run',{
+    get:function(){return {started:startB.disabled,picks:picks.slice()}},
+    set:function(v){
+      if(!v||typeof v!=='object'||v.started!==true)return;
+      var pk=[],i,src=Array.isArray(v.picks)?v.picks:[];
+      for(i=0;i<3&&i<src.length;i++){
+        if(typeof src[i]==='number'&&src[i]===Math.floor(src[i])&&src[i]>=0&&src[i]<3)pk.push(src[i]);else break;
+      }
+      restoring=true;
+      try{
+        log.textContent='';setStage(0);decided=[];kinds=[];tones=[];picks=[];replayB.hidden=true;
+        running=true;startB.disabled=true;
+        for(i=0;i<pk.length;i++){var bs=showScene(i);bs[pk[i]].chooseNow()}
+        if(pk.length<3)showScene(pk.length);else finish();
+      }catch(err){}
+      restoring=false;
+    }
+  });
+  makeQuiz($('#quiz2'),'m2',[
+    {q:'What makes something an agent rather than a single chat answer?',
+     o:['It costs more to run','It plans steps and uses tools, with you setting the goal and limits','It no longer needs checking'],c:1,xp:10,
+     why:'The loop is the difference: plan, act with tools, check, report. The goal and the limits stay with you.',
+     hint:'Look back at the run. What did the agent do besides write text?'},
+    {q:'Where does an agent most need a human checkpoint?',
+     o:['When it searches the web','Right before an action you cannot undo, like sending or spending','When it writes its final summary'],c:1,xp:10,
+     why:'Searching and drafting are cheap to redo. A sent email or a changed budget is out in the world.',
+     hint:'Which step in the run could not be taken back?'}
+  ]);
+})();
+
+/* ---------- Mission 3: Wire It Up ---------- */
+(function(){
+  var G=[
+    {id:'trigger',label:'When this happens',opts:[
+      {id:'form',l:'A form is submitted',c:'a cake enquiry form is submitted',r:'A form submission starts the chain the moment it arrives.'},
+      {id:'sheet',l:'A new row hits the lead sheet',c:'a new row appears in the lead sheet',r:'A new row starts it. Handy when leads come from several places.'},
+      {id:'weekly',l:'Every Monday at 8:00',c:'every Monday at 8:00, for every row in the lead sheet',r:'A schedule runs on the clock, with or without a new lead. Watch for it re-reading old rows.'}]},
+    {id:'filter',label:'Only continue if',opts:[
+      {id:'all',l:'Run on every entry',c:'every entry, tidy or not',r:'No filter: everything gets through, tidy or not.'},
+      {id:'valid',l:'Only complete entries with a valid email',c:'the email looks valid and the interest box is filled in',r:'Filter on. Broken entries stop before the AI sees them.'}]},
+    {id:'repeats',label:'Repeats',opts:[
+      {id:'allow',l:'Allow repeats',c:'no memory, so one person can start it twice',r:'No memory. The same person can start it twice.'},
+      {id:'skip',l:'Skip people already handled',c:'skip anyone already handled',r:'Repeat check on. Each person is handled once.'}]},
+    {id:'send',label:'What happens to the reply',opts:[
+      {id:'auto',l:'Send automatically',c:'send the reply right away',r:'Auto-send: fast, and nobody reads it first.'},
+      {id:'draft',l:'Save as a draft for me to review',c:'save the reply as a draft and notify me',r:'Drafts only: nothing leaves without you.'}]},
+    {id:'cap',label:'Safety brake',opts:[
+      {id:'none',l:'No daily limit',c:'no daily limit',r:'No limit. A glitch has no brake.'},
+      {id:'cap',l:'Stop after 20 a day',c:'stop after 20 a day',r:'Brake on: it stops after 20 in a day.'}]}
+  ];
+  var sel={trigger:'form',filter:'all',repeats:'allow',send:'auto',cap:'none'};
+  var ctl=$('#l4m3-ctl'),chain=$('#l4m3-chain'),meter=$$('#l4m3-meter i'),mlabel=$('#l4m3-mlabel'),risks=$('#l4m3-risks');
+  var msg=$('#l4m3-msg'),testB=$('#l4m3-test'),testOut=$('#l4m3-testout'),testMsg=$('#l4m3-testmsg');
+  var restoring=false,chipRefs={},LABELS=['Safe to switch on','Mostly safe','Watch it closely','Risky','Risky','Do not switch on'];
+  function opt(gid){var g=G.filter(function(x){return x.id===gid})[0];return g.opts.filter(function(o){return o.id===sel[gid]})[0]}
+
+  function score(){
+    var bad=sel.filter==='all'?1:0,dup=sel.repeats==='allow'?1:0,rev=sel.send==='auto'?2:0,brake=(sel.send==='auto'&&sel.cap==='none')?1:0;
+    return {bad:bad,dup:dup,rev:rev,brake:brake,total:bad+dup+rev+brake};
+  }
+  function dupText(open){
+    if(!open)return 'Covered: people already handled are skipped.';
+    if(sel.trigger==='form')return 'A double-click on submit makes two entries, and each one starts the chain.';
+    if(sel.trigger==='sheet')return 'Edit or re-import the sheet and old rows look new, so they start the chain again.';
+    return 'Every Monday it sees last week’s rows again unless it remembers which were handled.';
+  }
+  function render(changedLine){
+    chain.textContent='';
+    var lines=[
+      ['trigger','WHEN: '+opt('trigger').c],
+      ['filter','ONLY IF: '+opt('filter').c],
+      ['repeats','REPEATS: '+opt('repeats').c],
+      ['ai','THEN: the AI drafts a reply from your template and the entry’s answers'],
+      ['send','FINALLY: '+opt('send').c+'; '+opt('cap').c]
+    ];
+    lines.forEach(function(ln){
+      var d=el('div','ln'+(ln[0]===changedLine||(changedLine==='cap'&&ln[0]==='send')?' new':''),ln[1]);chain.appendChild(d);
+    });
+    var s=score();
+    meter.forEach(function(m,k){m.classList.toggle('on',k<s.total)});
+    mlabel.textContent='Risk '+s.total+' of 5: '+LABELS[s.total];
+    risks.textContent='';
+    var items=[
+      ['Bad data',s.bad?'Entries with a typo email or an empty box still go through, and the AI fills the gaps with guesses.':'Covered: broken entries stop at the filter.',s.bad],
+      ['Duplicates',dupText(s.dup),s.dup],
+      ['No review',s.rev?'Nobody reads the reply before the customer does. An odd entry, like a refund request, gets a cheerful sales email.':'Covered: nothing leaves without your OK.',s.rev],
+      ['No brake',sel.send==='draft'?'Not needed while drafts wait for you.':(s.brake?'If something loops, it can send hundreds before you notice.':'Covered: a runaway stops at 20.'),s.brake]
+    ];
+    items.forEach(function(it){
+      var li=el('li');var t=el('span','t');t.appendChild(el('b',null,it[0]+': '));t.appendChild(document.createTextNode(it[1]));
+      li.appendChild(t);li.appendChild(el('span','n'+(it[2]?' open':' fit'),it[2]?'Open':'Covered'));risks.appendChild(li);
+    });
+    if(s.total<=1&&!restoring)award('m3:low',15);
+    return s;
+  }
+  function clearTest(){
+    if(testOut.children.length){testOut.textContent='';testMsg.textContent='Settings changed. Run the test again to see the new result.'}
+  }
+  G.forEach(function(g){
+    var wrap=el('div','grp');wrap.setAttribute('role','group');wrap.setAttribute('aria-label',g.label);
+    wrap.appendChild(el('p','mini',g.label));
+    var row=el('div','chips');chipRefs[g.id]={};
+    g.opts.forEach(function(o){
+      var b=btn('chip',o.l);b.setAttribute('aria-pressed',sel[g.id]===o.id?'true':'false');
+      b.addEventListener('click',function(){
+        sel[g.id]=o.id;
+        $$('.chip',row).forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+        var s=render(g.id);
+        msg.textContent=o.r+(s.total<=1?' The meter is low. Run the test to see it work.':'');
+        clearTest();
+        if(g.id==='trigger')award('m3:trigger',5);
+      });
+      row.appendChild(b);chipRefs[g.id][o.id]=b;
+    });
+    wrap.appendChild(row);ctl.appendChild(wrap);
+  });
+  var ENTRIES=[
+    {n:'Dana Ruiz',d:'clean entry',k:'clean'},
+    {n:'Dana Ruiz again',d:'double-click, same entry',k:'dupe'},
+    {n:'“asdf”',d:'email “dana@”, interest box empty',k:'bad'},
+    {n:'Marcus Lee',d:'clean entry',k:'clean'},
+    {n:'Priya Nair',d:'asks for a refund, not a cake',k:'odd'}
+  ];
+  testB.addEventListener('click',function(){
+    runTest();
+    award('m3:test',10);
+  });
+  function runTest(){
+    var auto=sel.send==='auto',sent=0,drafts=0,skipped=0,probs=0;
+    testOut.textContent='';
+    ENTRIES.forEach(function(e){
+      var res,st;
+      if(e.k==='clean'){res=auto?'Reply sent.':'Draft waiting for you.';st='ok';auto?sent++:drafts++}
+      else if(e.k==='dupe'){
+        if(sel.repeats==='skip'){res='Skipped: already handled.';st='ok';skipped++}
+        else if(auto){res='A second reply went out to the same person.';st='bad';sent++;probs++}
+        else{res='A second draft is waiting. You delete it.';st='warn';drafts++}
+      }else if(e.k==='bad'){
+        if(sel.filter==='valid'){res='Stopped at the filter.';st='ok';skipped++}
+        else if(auto){res='A guess-filled reply went to a broken address.';st='bad';sent++;probs++}
+        else{res='A draft built from guesses is waiting. You catch it.';st='warn';drafts++}
+      }else{
+        if(auto){res='A cheerful sales reply went to an upset customer.';st='bad';sent++;probs++}
+        else{res='Draft waiting. You see it and answer yourself.';st='ok';drafts++}
+      }
+      var li=el('li');var t=el('span','t');t.appendChild(el('b',null,e.n));t.appendChild(document.createTextNode(' ('+e.d+'): '+res));
+      li.appendChild(t);li.appendChild(el('span','n'+(st==='ok'?' fit':(st==='bad'?' open':'')),st==='ok'?'Fine':(st==='bad'?'Mistake':'Caught')));
+      testOut.appendChild(li);
+    });
+    testMsg.textContent='Of 5 entries: '+sent+' sent, '+drafts+' drafts waiting, '+skipped+' skipped. '+(probs>0
+      ?probs+' mistake'+(probs>1?'s':'')+' reached real people. Change a setting and run it again.'
+      :'No mistakes reached anyone.');
+  }
+  render();
+  msg.textContent='These settings are risky on purpose. Change one and the meter moves.';
+  C.persist('m3.chain',{
+    get:function(){return {sel:sel,tested:testOut.children.length>0,msg:msg.textContent,testMsg:testMsg.textContent}},
+    set:function(v){
+      if(!v||typeof v!=='object')return;
+      var sv=(v.sel&&typeof v.sel==='object')?v.sel:{};
+      restoring=true;
+      try{
+        G.forEach(function(g){
+          var ok=g.opts.some(function(o){return o.id===sv[g.id]});
+          if(ok)sel[g.id]=sv[g.id];
+          $$('.chip',$$('.grp',ctl)[G.indexOf(g)]).forEach(function(x,k){x.setAttribute('aria-pressed',g.opts[k].id===sel[g.id]?'true':'false')});
+        });
+        render();
+        if(typeof v.msg==='string'&&v.msg.length<400)msg.textContent=v.msg;
+        if(v.tested===true)runTest();
+        if(typeof v.testMsg==='string'&&v.testMsg.length<400)testMsg.textContent=v.testMsg;
+      }catch(err){}
+      restoring=false;
+    }
+  });
+  makeQuiz($('#quiz3'),'m3',[
+    {q:'Which setting does the most to lower the risk of a brand-new automation?',
+     o:['Saving replies as drafts for you to review','Adding more steps to the chain','Running it more often'],c:0,xp:10,
+     why:'A draft step puts a person between a mistake and the customer. You can loosen it later, once the drafts have stayed clean.',
+     hint:'Look at which setting moved the meter the most.'},
+    {q:'A customer double-clicks your form button. What protects you?',
+     o:['A faster trigger','A repeat check that skips people already handled','A longer email template'],c:1,xp:10,
+     why:'The chain cannot tell a double-click from a new lead unless it remembers who it already handled.',
+     hint:'Which setting is about remembering who came in already?'}
+  ]);
+})();
+
+/* ---------- Mission 4: Trust Test ---------- */
+(function(){
+  var OUT=[
+    {t:'Dog-wash day is this Saturday, 10 to 2. Bring your dog, skip the appointment, and the wash is $12.',key:[1,1,1],note:'Meets all three.'},
+    {t:'Dog-wash day is this Saturday, 10 to 4. Walk in, no appointment, $12 a wash.',key:[0,1,1],note:'The fact sheet says 10 to 2. This says 10 to 4.'},
+    {t:'Dog-wash day is this Saturday, 10 to 2! Bring your furry friend and make a splash!',key:[1,0,0],note:'Two exclamation marks, and the price is missing.'},
+    {t:'Heads up: dog-wash day is this Saturday, 10 to 2. It is $12 a wash, no appointment, and we will not comment on the smell.',key:[1,1,1],note:'Meets all three.'},
+    {t:'Saturday, 10 to 2: dog-wash day, $12, by appointment only. Come as muddy as you like, we have seen worse.',key:[0,1,1],note:'The fact sheet says no appointment needed. This says by appointment only.'}
+  ];
+  var CRIT=['Accurate','On voice','On brief'];
+  var list=$('#l4m4-list'),lockB=$('#l4m4-lock'),count=$('#l4m4-count'),msg=$('#l4m4-msg'),ask=$('#l4m4-ask');
+  var actions=$('#l4m4-actions'),sum=$('#l4m4-sum'),part2=$('#l4m4-part2');
+  var quick={},careful=[[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]],cards=[],locked=false,compared=false,compareB=null,restoring=false;
+
+  OUT.forEach(function(o,i){
+    var c=el('div','cand');
+    c.appendChild(el('p','mini','Version '+(i+1)));
+    c.appendChild(el('p','qt','“'+o.t+'”'));
+    var row=el('div','chips');row.setAttribute('role','group');row.setAttribute('aria-label','Quick look, version '+(i+1));
+    ['Looks fine','Looks off'].forEach(function(t,k){
+      var b=btn('chip',t);b.setAttribute('aria-pressed','false');
+      b.addEventListener('click',function(){
+        if(locked)return;
+        quick[i]=k===0;
+        $$('.chip',row).forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+        var n=Object.keys(quick).length;count.textContent=n+' of 5 scored';
+        lockB.disabled=n<5;
+      });
+      row.appendChild(b);
+    });
+    c.appendChild(row);list.appendChild(c);
+    cards.push({card:c,quickRow:row});
+  });
+
+  lockB.addEventListener('click',function(){
+    if(locked||Object.keys(quick).length<5)return;
+    lockQuick();
+  });
+  function lockQuick(){
+    locked=true;lockB.disabled=true;
+    cards.forEach(function(cd){$$('.chip',cd.quickRow).forEach(function(b){b.disabled=true})});
+    ask.textContent='Round 2, the careful score. Check each version against the brief and the fact sheet. Tap each rule it meets.';
+    msg.textContent='Accurate: every fact matches the sheet. On voice: friendly, a little dry, no exclamation marks. On brief: two sentences, with the time and the price.';
+    if(!restoring)award('m4:quick',5);
+    OUT.forEach(function(o,i){
+      var rub=el('div','chips');rub.setAttribute('role','group');rub.setAttribute('aria-label','Careful score, version '+(i+1));
+      CRIT.forEach(function(name,k){
+        var b=btn('chip','Meets: '+name);b.setAttribute('aria-pressed','false');
+        b.addEventListener('click',function(){
+          if(compared)return;
+          careful[i][k]=careful[i][k]?0:1;
+          b.setAttribute('aria-pressed',careful[i][k]?'true':'false');
+        });
+        rub.appendChild(b);
+      });
+      cards[i].card.appendChild(rub);cards[i].rub=rub;
+    });
+    compareB=btn('btn','Compare my scores');
+    compareB.addEventListener('click',compare);
+    actions.appendChild(compareB);count.textContent='Tap the rules each version meets, then compare.';
+  }
+
+  function compare(){
+    if(compared)return;
+    compared=true;compareB.disabled=true;
+    var miss=0,right=0,match=0,quickRight=0;
+    OUT.forEach(function(o,i){
+      var pass=o.key[0]&&o.key[1]&&o.key[2];
+      if(quick[i]&&!pass)miss++;
+      if(!!quick[i]===!!pass)quickRight++;
+      var m=0;for(var k=0;k<3;k++){if(careful[i][k]===o.key[k])m++}
+      match+=m;
+      $$('.chip',cards[i].rub).forEach(function(b){b.disabled=true});
+      var r=el('p','res '+(pass?'good':'bad'));
+      r.appendChild(el('b',null,'Quick: '+(quick[i]?'fine':'off')+'. Careful check: '+(pass?'passes':'fails')+'. '));
+      r.appendChild(document.createTextNode(o.note+' Your ticks matched on '+m+' of 3.'));
+      cards[i].card.appendChild(r);
+    });
+    sum.textContent='';
+    sum.appendChild(el('p','verdict','Quick scoring got '+quickRight+' of 5 right. It passed '+miss+' version'+(miss===1?'':'s')+' that failed the careful check. Your careful ticks matched the key on '+match+' of 15.'));
+    sum.appendChild(el('p',null,miss>0
+      ?'Tone and length are easy to judge in five seconds. A wrong hour or a wrong rule reads just like a right one. Facts need a source beside them.'
+      :'Your quick look caught every problem this time. With 5 versions that is doable. With 200 a week it is not, which is why you set rules.'));
+    sum.hidden=false;
+    ask.textContent='Round 2 done. Now decide how much checking each kind of work deserves.';
+    if(!restoring)award('m4:careful',10);
+    buildPolicy();
+  }
+
+  /* ----- Part 2: rules by risk ----- */
+  var TASKS=[
+    {id:'t1',t:'Meeting-notes summaries for the team (internal)',risk:'Low risk',ideal:2,why:'Nobody outside sees it. Skim the weekly log and move on.',loose:''},
+    {id:'t2',t:'Blog topic ideas for the content calendar',risk:'Low risk',ideal:2,why:'Ideas are cheap to throw away. Nothing is published as-is.',loose:''},
+    {id:'t3',t:'Product descriptions for the website',risk:'Medium risk',ideal:1,why:'Facts matter, but a sample checked against the spec sheet shows you the pattern.',loose:'A wrong spec on a live page costs trust. Keep a sample check.'},
+    {id:'t4',t:'Replies to common customer questions (hours, shipping)',risk:'Medium risk',ideal:1,why:'Check a sample against your real hours and policies, and everything it flags.',loose:'A wrong hours line goes to everyone who asks. Keep a sample check.'},
+    {id:'t5',t:'Emails that mention prices, discounts, or deadlines',risk:'High risk',ideal:0,why:'A wrong price or date is a promise you now have to keep.',loose:'A wrong price or date is a promise. Check each one.'},
+    {id:'t6',t:'Anything that changes your ad budget or bids',risk:'High risk',ideal:0,why:'Money moves fast. A person approves every change.',loose:'Money moves fast. Every change needs a person.'}
+  ];
+  var POL=['Check every one','Spot-check','Run alone'];
+  var pol={},touched={},polMsgs={},polRows={},sampleSel=null;
+  TASKS.forEach(function(t){pol[t.id]=1});
+  var pre=$('#l4m4-pre'),own=$('#l4m4-own'),who=$('#l4m4-who'),copyB=$('#l4m4-copy'),copyNote=$('#l4m4-copynote');
+
+  function buildCard(){
+    var rate=sampleSel?sampleSel.value:'1 in 5';
+    function bucket(n){
+      var a=TASKS.filter(function(t){return pol[t.id]===n}).map(function(t){return '- '+t.t});
+      return a.length?a.join('\n'):'- (nothing yet)';
+    }
+    var o=own.value.replace(/\s+/g,' ').trim()||'(none yet)';
+    var w=who.value.replace(/\s+/g,' ').trim()||'(not set)';
+    return 'APPROVAL RULES (example: Brightside Pet Supply)\n\n'
+      +'Always needs a human before it goes out:\n'+bucket(0)+'\n\n'
+      +'Spot-check ('+rate+', plus anything the AI flags):\n'+bucket(1)+'\n\n'
+      +'Can run alone (read the weekly log):\n'+bucket(2)+'\n\n'
+      +'My own rule: '+o+'\n'
+      +'Who checks, and when: '+w+'\n'
+      +'Review these rules: once a month, and whenever the prompt or tool changes.';
+  }
+  function refreshCard(){pre.textContent=buildCard()}
+  function paintPol(t,row,fb){
+    var k=pol[t.id];
+    $$('.chip',row).forEach(function(x,xi){x.setAttribute('aria-pressed',xi===k?'true':'false')});
+    if(k===t.ideal){fb.className='msg res good';fb.textContent='Fits the risk. '+t.why}
+    else if(k<t.ideal){fb.className='msg res';fb.textContent='Safe, but it costs you time. '+t.why}
+    else{fb.className='msg res bad';fb.textContent='Too loose. '+t.loose}
+  }
+  function buildPolicy(){
+    part2.textContent='';
+    part2.appendChild(el('p','ask','Set a rule for each kind of AI work. Starting suggestion: spot-check everything. Change any that should be stricter or looser.'));
+    TASKS.forEach(function(t){
+      var card=el('div','polcard');
+      card.appendChild(el('p','rk',t.risk));
+      card.appendChild(el('p',null,t.t));
+      var row=el('div','chips');row.setAttribute('role','group');row.setAttribute('aria-label','Rule for: '+t.t);
+      var fb=el('p','msg');fb.setAttribute('aria-live','polite');
+      POL.forEach(function(name,k){
+        var b=btn('chip',name);b.setAttribute('aria-pressed',pol[t.id]===k?'true':'false');
+        b.addEventListener('click',function(){
+          pol[t.id]=k;touched[t.id]=true;
+          paintPol(t,row,fb);
+          refreshCard();
+          if(TASKS.every(function(x){return touched[x.id]})){
+            award('m4:policy',5);
+            copyB.disabled=false;copyNote.textContent='Add your own rule, then copy the card.';
+          }
+        });
+        row.appendChild(b);
+      });
+      card.appendChild(row);card.appendChild(fb);part2.appendChild(card);polRows[t.id]={row:row,fb:fb};
+    });
+    var f=el('label','fld');f.setAttribute('for','l4m4-rate');f.appendChild(el('span',null,'How much do you spot-check?'));
+    var s=document.createElement('select');s.id='l4m4-rate';
+    ['1 in 5','1 in 10','1 in 20'].forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v;s.appendChild(o)});
+    s.addEventListener('change',refreshCard);s.addEventListener('input',refreshCard);
+    f.appendChild(s);part2.appendChild(f);sampleSel=s;
+    part2.hidden=false;refreshCard();
+  }
+  own.addEventListener('input',refreshCard);who.addEventListener('input',refreshCard);
+  refreshCard();
+
+  function done(ok){
+    copyNote.textContent=ok?'Copied. Paste it where your team will see it, like the top of your shared folder.':'Text selected. Press copy on your keyboard, then paste it where your team will see it.';
+    award('m4:card',15);
+  }
+  copyB.addEventListener('click',function(){
+    if(copyB.disabled)return;
+    C.copy(buildCard(),pre,done);
+  });
+  C.persist('m4.trust',{
+    get:function(){return {quick:quick,locked:locked,careful:careful,compared:compared,pol:pol,touched:touched,rate:sampleSel?sampleSel.value:null}},
+    set:function(v){
+      if(!v||typeof v!=='object')return;
+      var q=(v.quick&&typeof v.quick==='object')?v.quick:{},i,k,n=0,qq={};
+      for(i=0;i<5;i++){if(typeof q[i]==='boolean'){qq[i]=q[i];n++}}
+      if(!n)return;
+      restoring=true;
+      try{
+        quick=qq;
+        cards.forEach(function(cd,ci){
+          $$('.chip',cd.quickRow).forEach(function(b,bi){b.setAttribute('aria-pressed',(ci in qq)&&((bi===0)===qq[ci])?'true':'false')});
+        });
+        count.textContent=n+' of 5 scored';lockB.disabled=n<5;
+        if(v.locked===true&&n===5){
+          lockQuick();
+          var cr=Array.isArray(v.careful)?v.careful:[];
+          for(i=0;i<5;i++){
+            for(k=0;k<3;k++){careful[i][k]=(cr[i]&&cr[i][k]===1)?1:0}
+            $$('.chip',cards[i].rub).forEach(function(b,bi){b.setAttribute('aria-pressed',careful[i][bi]?'true':'false')});
+          }
+          if(v.compared===true){
+            compare();
+            var pv=(v.pol&&typeof v.pol==='object')?v.pol:{},tv=(v.touched&&typeof v.touched==='object')?v.touched:{};
+            TASKS.forEach(function(t){
+              if(pv[t.id]===0||pv[t.id]===1||pv[t.id]===2)pol[t.id]=pv[t.id];
+              if(tv[t.id]===true){touched[t.id]=true;paintPol(t,polRows[t.id].row,polRows[t.id].fb)}
+              else{$$('.chip',polRows[t.id].row).forEach(function(x,xi){x.setAttribute('aria-pressed',xi===pol[t.id]?'true':'false')})}
+            });
+            if(sampleSel&&typeof v.rate==='string'){
+              for(i=0;i<sampleSel.options.length;i++){if(sampleSel.options[i].value===v.rate)sampleSel.value=v.rate}
+            }
+            refreshCard();
+            if(TASKS.every(function(x){return touched[x.id]})){
+              copyB.disabled=false;copyNote.textContent='Add your own rule, then copy the card.';
+            }
+          }
+        }
+      }catch(err){}
+      restoring=false;
+    }
+  });
+  makeQuiz($('#quiz4'),'m4',[
+    {q:'A quick look said a text was fine, but it listed the wrong store hours. What does that tell you?',
+     o:['Quick looks are useless','Quick looks catch tone, but facts need comparing against a source','The rubric has too many rules'],c:1,xp:8,
+     why:'A glance is good for voice and length. A wrong hour reads just like a right one, so facts need a source beside them.',
+     hint:'Think about which of the three rules a glance can actually test.'},
+    {q:'A new automation drafts emails with prices in them. How often should a person check them?',
+     o:['Every one, until they have stayed clean for a long stretch','1 in 20','Never, the AI is careful with numbers'],c:0,xp:7,
+     why:'Prices are promises. Start with every one, and loosen only after a long clean record. Even then, keep a sample.',
+     hint:'Which risk level did prices land in on your rules card?'}
+  ]);
+})();
+})(window.Course);
+
+</script>
+<script>Course.start();</script>
+
+</html>

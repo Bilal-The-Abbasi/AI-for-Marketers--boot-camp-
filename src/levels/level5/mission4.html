@@ -1,0 +1,56 @@
+<div class="label">Try it</div>
+      <div class="lab">
+        <p class="note">Prefilled with a fictional example. Pick a campaign to swap in a different one, then make every box yours.</p>
+        <div class="form">
+          <label class="fld wide" for="l5m4-campaign"><span>Campaign</span>
+            <select id="l5m4-campaign"></select></label>
+          <label class="fld wide" for="l5m4-goal"><span>Goal</span>
+            <input id="l5m4-goal" type="text" autocomplete="off"></label>
+          <label class="fld wide" for="l5m4-inputs"><span>What goes in (facts, files, past winners)</span>
+            <input id="l5m4-inputs" type="text" autocomplete="off"></label>
+          <label class="fld wide" for="l5m4-steps"><span>Steps, one per line (say who does each: AI or me)</span>
+            <textarea id="l5m4-steps" rows="5" style="width:100%;font-size:1rem;padding:9px 12px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;font-family:inherit"></textarea></label>
+          <label class="fld wide" for="l5m4-checks"><span>Human checkpoints, one per line</span>
+            <textarea id="l5m4-checks" rows="3" style="width:100%;font-size:1rem;padding:9px 12px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;font-family:inherit"></textarea></label>
+          <label class="fld wide" for="l5m4-metric"><span>Success metric</span>
+            <input id="l5m4-metric" type="text" autocomplete="off"></label>
+          <label class="fld wide" for="l5m4-risk"><span>Top risk and your guard against it</span>
+            <input id="l5m4-risk" type="text" autocomplete="off"></label>
+        </div>
+        <div>
+          <p class="mini">Your one-page plan</p>
+          <pre class="prompt plan" id="l5m4-plan" tabindex="0"></pre>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" id="l5m4-review">Check my plan</button>
+        </div>
+        <p class="msg" id="l5m4-reviewmsg" aria-live="polite"></p>
+      </div>
+
+      <div class="label">Why it works</div>
+      <p>A plan this short does one job: it makes every handoff visible. You can see which steps the AI does, which a person does, and where a person must look before anything ships.</p>
+      <p>Share it before you start. If a teammate cannot tell who checks what, the plan is not done.</p>
+
+      <div class="label">Check</div>
+      <div class="lab">
+        <p class="ask">Read your plan one last time, then tick whatever is true. The copy button turns on when your plan is checked and all four boxes are ticked.</p>
+        <ul class="checklist" id="l5m4-list">
+          <li><label><input type="checkbox"> Every step says who does it, the AI or me.</label></li>
+          <li><label><input type="checkbox"> A person reads the output before anything reaches a customer.</label></li>
+          <li><label><input type="checkbox"> The metric has a number and a date.</label></li>
+          <li><label><input type="checkbox"> The top risk has a guard I can actually do.</label></li>
+        </ul>
+        <div class="actions">
+          <button type="button" class="btn" id="l5m4-copy" disabled>Copy my plan</button>
+          <span class="note" id="l5m4-copynote" aria-live="polite">Locked until your plan is checked and the boxes are ticked.</span>
+        </div>
+      </div>
+
+      <div class="label">Go deeper</div>
+      <details class="deeper">
+        <summary>Run it, then review it</summary>
+        <div class="body">
+          <p>Run the plan once on a small slice, such as one email or one week of posts. Note what the AI got wrong and where your checkpoint caught it. Fix the plan, not just the draft.</p>
+          <p>After a month, put the plan next to the numbers from Prove It. Keep what paid off, cut what did not.</p>
+        </div>
+      </details>

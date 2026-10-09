@@ -1,0 +1,31 @@
+<div class="label">Try it</div>
+      <div class="lab">
+        <p class="ctxline">Brand voice in play: <b id="ctxName1">Discount sports chain</b></p>
+        <p class="stem">Our new running shoe is built for <span class="blank" id="blank1">&nbsp;</span>.</p>
+        <p class="ask" id="ask1">Which word does the AI rate most likely to come next? Tap your guess.</p>
+        <div class="chips" id="guess1"></div>
+        <div id="reveal1" hidden style="display:grid;gap:14px">
+          <div class="bars" id="bars1"></div>
+          <p class="verdict" id="verdict1" aria-live="polite" style="margin:0"></p>
+          <p class="ask" style="margin:0">Now change who is talking and watch the odds move.</p>
+          <div class="chips" id="ctx1"></div>
+          <p id="ctxnote1" class="msg" aria-live="polite" style="margin:0"></p>
+          <p class="tracker" id="trk1" style="margin:0"></p>
+        </div>
+      </div>
+
+      <div class="label">Why it works</div>
+      <p>An AI writing tool reads everything so far and rates every possible next word by how likely it is. Then it picks one, adds it, and repeats. That is the whole trick, run thousands of times per answer.</p>
+      <p>It is not looking up facts or deciding what is true. It is ranking what usually follows what. That is why it writes smoothly even when it is wrong, and why context matters so much. Change the voice in the first lines and the whole ranking shifts.</p>
+
+      <div class="label">Check</div>
+      <div id="quiz1"></div>
+
+      <div class="label">Go deeper</div>
+      <details class="deeper">
+        <summary>Tokens, temperature, and why you get different answers</summary>
+        <div class="body">
+          <p>The model works in tokens, which are chunks of words rather than whole words. After rating the options it does not always take the top one. A setting called temperature controls how adventurous the pick is.</p>
+          <p>Low temperature plays it safe and repeats itself. High temperature takes more risks. That is why the same prompt can return a different answer each time you run it. Most chat tools set this for you.</p>
+        </div>
+      </details>

@@ -1,0 +1,40 @@
+{
+ "level": 2,
+ "pageTitle": "AI Prompt Craft",
+ "name": "Prompt Craft",
+ "lede": "Four missions, about ten minutes each. Level 1 got you a good first answer. This level gets you control: your voice, your format, your fixes, and a kit you can reuse.",
+ "description": "Level 2 of an interactive AI course for marketers: match your brand voice, teach with examples, fix near misses, and build a reusable prompt kit.",
+ "missions": [
+  {
+   "name": "Write Like You",
+   "min": 10,
+   "hook": "“Friendly and professional” describes ten thousand brands. Find the traits that make one voice recognizable, then hand them to the AI on a card.",
+   "objective": "Pull the traits out of a real brand voice and turn them into a voice card the AI can follow."
+  },
+  {
+   "name": "Show, Don’t Tell",
+   "min": 10,
+   "hook": "One good example beats a paragraph of adjectives. Add examples, change the format, and watch the same request come back different.",
+   "objective": "Use examples and a clear output format to get the result you want on the first try."
+  },
+  {
+   "name": "Fix the Miss",
+   "min": 10,
+   "hook": "The first draft is rarely the one you send. Three weak drafts, three follow-ups to choose from. Pick the one that actually moves things.",
+   "objective": "Choose the follow-up that fixes a weak draft, and split a big task into three steps."
+  },
+  {
+   "name": "Build Your Kit",
+   "min": 10,
+   "hook": "Time to keep something. Pick a type, fill a few boxes, and get a template you can copy, reuse, and change one placeholder at a time.",
+   "objective": "Leave with reusable prompt templates for an ad, an email, and a landing page section."
+  }
+ ],
+ "recap": [
+  "A voice card is a few followable traits plus one real sample line.",
+  "Examples set the style. A format line sets the shape.",
+  "Follow up with a specific change, or break big jobs into a chain.",
+  "You built reusable templates with placeholders for ads, emails, and pages."
+ ],
+ "next": "Next up: Level 3, Marketing Machine. Put AI to work on research, content, ad tests, and reports."
+}

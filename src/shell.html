@@ -1,0 +1,114 @@
+<title>{{PAGE_TITLE}}</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+{{CSS}}
+</style>
+
+<a class="skiplink" href="#stage" id="skip">Skip to the mission</a>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand">
+        <svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><path d="M12 2v20M2 12h20"/></svg>
+        <span class="bname">AI for Marketers</span>
+      </div>
+      <div class="hud">
+        <span class="xp" id="xp" aria-label="Level progress"><b>0</b> / 200 XP</span>
+        <button type="button" class="exitfocus" id="exitFocus">Exit focus</button>
+        <button type="button" class="pbtn" id="prefsBtn" aria-expanded="false" aria-controls="prefs" aria-label="Preferences">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+          <span class="ptxt">Preferences</span>
+        </button>
+      </div>
+    </div>
+    <p class="ctxbar" id="ctxbar"></p>
+  </div>
+  <section class="prefs" id="prefs" aria-labelledby="prefsTitle" hidden>
+    <h2 id="prefsTitle">Preferences</h2>
+    <p class="sub">Change how this course looks and behaves. Saved in this browser.</p>
+    <fieldset>
+      <legend>Theme</legend>
+      <div class="pseg">
+        <label><input type="radio" name="pf-theme" value="system"><span>System</span></label>
+        <label><input type="radio" name="pf-theme" value="light"><span>Light</span></label>
+        <label><input type="radio" name="pf-theme" value="dark"><span>Dark</span></label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Text size</legend>
+      <div class="pseg">
+        <label><input type="radio" name="pf-text" value="normal"><span>Standard</span></label>
+        <label><input type="radio" name="pf-text" value="large"><span>Larger</span></label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Focus</legend>
+      <label class="sw-row" for="pf-focus"><input type="checkbox" id="pf-focus"><span><b>Focus mode</b><small>One step at a time. Hides menus and extras.</small></span></label>
+      <label class="sw-row" for="pf-steps"><input type="checkbox" id="pf-steps"><span><b>One step at a time</b><small>Turn off to see a whole mission on one page.</small></span></label>
+      <label class="sw-row" for="pf-hints"><input type="checkbox" id="pf-hints"><span><b>Show hints after a wrong answer</b><small>Off keeps hints behind a button.</small></span></label>
+    </fieldset>
+    <fieldset>
+      <legend>Comfort</legend>
+      <label class="sw-row" for="pf-motion"><input type="checkbox" id="pf-motion"><span><b>Reduce motion</b><small>Follows your device setting until you change it.</small></span></label>
+      <label class="sw-row" for="pf-calm"><input type="checkbox" id="pf-calm"><span><b>Calmer screen</b><small>No pop-up messages or celebration effects.</small></span></label>
+      <label class="sw-row" for="pf-sound"><input type="checkbox" id="pf-sound"><span><b>Sound effects</b><small>Soft tones for progress. Off by default.</small></span></label>
+    </fieldset>
+    <details class="xfer">
+      <summary>Bring over progress from an older link</summary>
+      <label for="xferIn">Transfer code</label>
+      <input type="text" id="xferIn" autocomplete="off" spellcheck="false">
+      <button type="button" class="btn ghost" id="xferBtn">Import</button>
+      <p class="persist" id="xferMsg" aria-live="polite"></p>
+    </details>
+    <button type="button" class="btn done" id="prefsClose">Done</button>
+    <p class="persist" id="persistNote"></p>
+  </section>
+</header>
+
+<main id="main">
+<section class="wrap intro" id="intro">
+  <p class="kicker">AI for Marketers · Level {{LEVEL}} of 5</p>
+  <h1>{{H1}}</h1>
+  <p class="lede">{{LEDE}}</p>
+  <div class="resume" id="resume">
+    <p id="resumeText"></p>
+    <button type="button" class="btn" id="resumeBtn">Continue</button>
+    <p class="other" id="resumeOther" hidden></p>
+  </div>
+  <nav class="levelnav" aria-label="Course levels">{{LEVELNAV}}</nav>
+  <p class="coursebar" id="coursebar"></p>
+</section>
+
+<div class="wrap layout">
+  <nav class="map" id="map" aria-label="Missions in this level">
+{{NODES}}
+  </nav>
+
+  <div class="stage" id="stage">
+{{ARTICLES}}
+  </div>
+</div>
+</main>
+
+<footer class="wrap foot" id="foot">
+  <h2>Progress</h2>
+  <p>Your answers and XP save automatically in this browser. Each reset below says exactly what it erases and asks you to confirm.</p>
+  <div class="row2">
+    <button type="button" class="btn ghost" id="restartM">Restart this mission</button>
+    <button type="button" class="btn ghost" id="reset">Reset this level</button>
+    <button type="button" class="btn ghost" id="resetAll">Reset the whole course</button>
+    <span class="note" id="confirmNote" aria-live="polite"></span>
+  </div>
+</footer>
+<div class="toast" id="toast" aria-hidden="true"></div>
+<div class="sr" id="live" aria-live="polite"></div>
+
+<script>window.LEVEL={{LEVEL_JSON}};</script>
+<script>
+{{ENGINE_JS}}
+</script>
+<script>
+{{LEVEL_JS}}
+</script>
+<script>Course.start();</script>

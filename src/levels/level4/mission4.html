@@ -1,0 +1,50 @@
+<div class="label">Try it</div>
+      <div class="lab">
+        <p class="note">Example: Brightside Pet Supply asked an AI for a Saturday text reminder. Five versions came back. All names, facts, and prices are examples.</p>
+        <div class="brief">
+          <b>Brief:</b> two sentences, with the time and the price. Voice: friendly, a little dry, no exclamation marks.<br>
+          <b>Fact sheet:</b> dog-wash day, Saturday, 10 to 2. $12 per wash. No appointment needed. Nothing else is promised.
+        </div>
+        <p class="ask" id="l4m4-ask">Round 1, the quick look. Five seconds each. Does it look fine, or off?</p>
+        <div id="l4m4-list" class="cands"></div>
+        <div class="actions" id="l4m4-actions">
+          <button type="button" class="btn" id="l4m4-lock" disabled>Lock my quick scores</button>
+          <span class="note" id="l4m4-count">0 of 5 scored</span>
+        </div>
+        <p class="msg" id="l4m4-msg" aria-live="polite"></p>
+        <div id="l4m4-sum" hidden class="reveal"></div>
+      </div>
+      <div class="lab" id="l4m4-part2" hidden style="margin-top:14px"></div>
+
+      <div class="label">Why it works</div>
+      <p>A quick look is good at tone and length. It is bad at facts, because a wrong number reads exactly like a right one. A careful score against the brief and a source is slower, and it is the only thing that catches those.</p>
+      <p>You cannot carefully check everything forever. So you match the effort to the risk: a person on anything that makes a promise or moves money, a sample check on the middle, and a log for the low-stakes rest.</p>
+
+      <div class="label">Check</div>
+      <div id="quiz4"></div>
+      <div class="lab" id="l4m4-card" style="margin-top:14px">
+        <p class="ask">Capstone. Your approval rules card. It fills in from the rules you set above. Add one rule of your own, then copy it.</p>
+        <div class="form">
+          <label class="fld wide" for="l4m4-own"><span>One rule of your own</span>
+            <input id="l4m4-own" type="text" value="Anything with a price, a date, or a promise gets a person." autocomplete="off"></label>
+          <label class="fld wide" for="l4m4-who"><span>Who checks, and when</span>
+            <input id="l4m4-who" type="text" value="Me, Friday mornings." autocomplete="off"></label>
+        </div>
+        <div>
+          <p class="mini">Approval rules card</p>
+          <pre class="prompt" id="l4m4-pre" tabindex="0"></pre>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" id="l4m4-copy" disabled>Copy my approval rules</button>
+          <span class="note" id="l4m4-copynote" aria-live="polite">Set a rule for each task in Try it first.</span>
+        </div>
+      </div>
+
+      <div class="label">Go deeper</div>
+      <details class="deeper">
+        <summary>When to tighten the rules again</summary>
+        <div class="body">
+          <p>Raise your checking whenever something changes: a new prompt, a new tool, a new kind of customer, a new offer. A workflow that was clean for a month is only proven for the conditions it ran in.</p>
+          <p>Keep a short list of the mistakes you catch. If the same one shows up twice, fix the prompt or the checklist, not just the draft.</p>
+        </div>
+      </details>

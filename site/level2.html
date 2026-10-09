@@ -1,0 +1,2029 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Prompt Craft</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* AI for Marketers: shared theme (v2, calm redesign).
+   Dark-first. One action colour (--accent). Success (--ok) and attention (--warn) appear only for meaningful states.
+   Layout idea: one dominant task panel, quiet navigation. Sizes are rem so the "Larger text" preference scales everything.
+   Legacy token names (--m, --m-tint, --m-on, --no, --no-tint, --key-tint, --yellow-tint, --cyan, --magenta, --yellow)
+   are kept as aliases so level.css files written against v1 keep working. */
+:root{
+  /* surfaces */
+  --bg:#171C26; --surface:#1E2532; --raised:#252D3A; --raised-2:#2D3646;
+  --line:#364152; --line-strong:#7B879B;
+  /* text */
+  --ink:#F1F4F9; --muted:#A9B4C5;
+  /* the one action colour */
+  --accent:#56B8D8; --accent-hover:#7DCAE3; --on-accent:#0D1B24; --accent-tint:#1B3441; --focus:#8FD6EE;
+  /* meaning only */
+  --ok:#46BF95; --ok-tint:#163A31; --on-ok:#0B2A20;
+  --warn:#E6B85C; --warn-tint:#382F1C;
+  /* scales */
+  --s-1:.25rem; --s-2:.5rem; --s-3:.75rem; --s-4:1rem; --s-5:1.5rem; --s-6:2rem; --s-7:3rem;
+  --r-s:6px; --r-m:10px; --r-l:14px;
+  --t-xs:.8125rem; --t-s:.9375rem; --t-m:1.0625rem; --t-l:1.25rem; --t-xl:1.625rem; --t-2xl:2.25rem;
+  --f-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --f-body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    --bg:#F3F5F8; --surface:#FFFFFF; --raised:#EAEEF4; --raised-2:#E1E7F0;
+    --line:#D5DCE6; --line-strong:#6E7B90;
+    --ink:#131923; --muted:#475266;
+    --accent:#0A6B8C; --accent-hover:#08556F; --on-accent:#FFFFFF; --accent-tint:#D9EEF5; --focus:#0A5C78;
+    --ok:#0D7650; --ok-tint:#D7F0E5; --on-ok:#FFFFFF;
+    --warn:#8A5300; --warn-tint:#FAEBCB;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#F3F5F8; --surface:#FFFFFF; --raised:#EAEEF4; --raised-2:#E1E7F0;
+  --line:#D5DCE6; --line-strong:#6E7B90;
+  --ink:#131923; --muted:#475266;
+  --accent:#0A6B8C; --accent-hover:#08556F; --on-accent:#FFFFFF; --accent-tint:#D9EEF5; --focus:#0A5C78;
+  --ok:#0D7650; --ok-tint:#D7F0E5; --on-ok:#FFFFFF;
+  --warn:#8A5300; --warn-tint:#FAEBCB;
+  color-scheme:light;
+}
+:root{
+  /* v1 aliases */
+  --m:var(--accent); --m-on:var(--on-accent); --m-tint:var(--accent-tint);
+  --no:var(--warn); --no-tint:var(--warn-tint); --yellow-tint:var(--warn-tint); --key-tint:var(--raised);
+  --cyan:var(--accent); --magenta:var(--warn); --yellow:var(--warn); --key:var(--ink); --key-on:var(--bg);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{font-size:100%;scroll-padding-top:5.5rem}
+html[data-text="large"]{font-size:125%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:var(--t-m);line-height:1.6}
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:var(--r-s)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:70rem;margin-inline:auto;padding-inline:16px}
+svg.ic{width:1.1em;height:1.1em;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- skip link ---------- */
+.skiplink{position:absolute;left:16px;top:-4rem;z-index:50;background:var(--accent);color:var(--on-accent);padding:.6rem 1rem;border-radius:var(--r-s);font-weight:700;text-decoration:none}
+.skiplink:focus{top:calc(.5rem + env(safe-area-inset-top,0px))}
+
+/* ---------- header ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:0 var(--s-3);min-height:3.5rem}
+.brand{display:flex;align-items:center;gap:var(--s-2);font-family:var(--f-display);font-weight:700;font-size:1.0625rem;white-space:nowrap}
+.hud{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:var(--s-3);min-width:0}
+.xp{font-size:var(--t-s);color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.xp b{color:var(--ink);font-weight:700}
+.pbtn,.exitfocus{display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);min-height:2.75rem;min-width:2.75rem;padding:0 var(--s-3);color:var(--ink);background:transparent;border:1px solid var(--line-strong);border-radius:var(--r-m);cursor:pointer;font-weight:600;font-size:var(--t-s)}
+.pbtn:hover,.exitfocus:hover{background:var(--raised)}
+.pbtn[aria-expanded="true"]{background:var(--raised);border-color:var(--accent)}
+.exitfocus{display:none}
+html[data-focus="on"] .exitfocus{display:inline-flex}
+.ctxbar{display:none;padding-block:0 var(--s-2);font-size:var(--t-s);color:var(--muted);line-height:1.4}
+.ctxbar b{color:var(--ink)}
+@media (max-width:899px){
+  html[data-focus="on"] .bname{display:none}
+  .ctxbar{display:block}
+  .pbtn .ptxt{display:none}
+  .pbtn{padding:0}
+}
+
+/* ---------- preferences panel ---------- */
+.prefs{position:absolute;right:0;top:100%;z-index:40;width:min(24rem,100%);max-height:calc(100dvh - 4rem);overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line-strong);border-radius:0 0 var(--r-m) var(--r-m);padding:var(--s-4) var(--s-5) var(--s-5);box-shadow:0 12px 32px rgba(0,0,0,.28)}
+.prefs[hidden]{display:none}
+.prefs h2{font-family:var(--f-display);font-size:var(--t-l);margin:0 0 var(--s-1)}
+.prefs .sub{margin:0 0 var(--s-4);font-size:var(--t-s);color:var(--muted)}
+.prefs fieldset{border:0;margin:0 0 var(--s-4);padding:0;min-width:0}
+.prefs legend{padding:0;margin-bottom:var(--s-2);font-size:var(--t-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pseg{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.pseg label{position:relative;display:inline-flex;min-width:0}
+.pseg input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.pseg span{display:inline-flex;align-items:center;gap:var(--s-2);min-height:2.75rem;padding:.5rem .9rem;border:1px solid var(--line-strong);border-radius:var(--r-m);background:var(--bg);font-weight:600;font-size:var(--t-s)}
+.pseg input:checked+span{border-color:var(--accent);background:var(--accent-tint);box-shadow:inset 0 0 0 1px var(--accent)}
+.pseg input:checked+span::before{content:"\2713";font-weight:800}
+.pseg input:focus-visible+span{outline:3px solid var(--focus);outline-offset:3px}
+.sw-row{display:flex;gap:var(--s-3);align-items:flex-start;padding:var(--s-2) 0;min-height:2.75rem;cursor:pointer}
+.sw-row input{width:1.375rem;height:1.375rem;flex:none;margin-top:.15rem;accent-color:var(--accent)}
+.sw-row b{display:block;font-weight:600;font-size:var(--t-s)}
+.sw-row small{display:block;font-size:var(--t-xs);color:var(--muted);line-height:1.4}
+.prefs .done{margin-top:var(--s-2)}
+.prefs .persist{margin:var(--s-3) 0 0;font-size:var(--t-xs);color:var(--muted)}
+@media (max-width:899px){.prefs{width:100%;border-radius:0 0 var(--r-m) var(--r-m)}}
+
+/* ---------- intro, resume ---------- */
+.intro{padding-block:var(--s-6) var(--s-4);display:grid;gap:var(--s-3)}
+.intro>*{margin:0;min-width:0}
+.kicker{font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.intro h1{font-family:var(--f-display);font-weight:700;font-size:clamp(2.1rem,6vw,3rem);line-height:1.05;letter-spacing:-.02em}
+.lede{max-width:56ch;color:var(--muted)}
+.resume{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s-3) var(--s-5);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s-4) var(--s-5)}
+.resume p{margin:0;min-width:0;flex:1 1 18rem}
+.resume b{font-weight:700}
+.resume .sub{display:block;color:var(--muted);font-size:var(--t-s)}
+.levelnav{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.lv{display:inline-flex;align-items:center;gap:var(--s-2);font-size:var(--t-s);color:var(--ink);background:transparent;border:1px solid var(--line-strong);border-radius:var(--r-m);padding:.4rem .8rem;min-height:2.75rem;text-decoration:none;font-weight:500}
+.lv b{font-weight:700;color:var(--muted)}
+a.lv:hover{background:var(--raised)}
+.lv.cur{background:var(--raised-2);border-color:var(--ink);font-weight:700}
+.lv.cur b{color:var(--ink)}
+.lv.off{border-style:dashed;color:var(--muted)}
+
+/* ---------- layout ---------- */
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s-5);padding-block:var(--s-4) var(--s-7)}
+.stage{min-width:0}
+@media (min-width:900px){
+  .layout{grid-template-columns:16rem minmax(0,1fr);gap:var(--s-6)}
+  .map{position:sticky;top:5.5rem;align-self:start}
+}
+
+/* ---------- mission map ---------- */
+.map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s-2)}
+.node{display:grid;justify-items:center;align-content:start;gap:var(--s-1);text-align:center;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-2) var(--s-1);min-height:2.75rem;cursor:pointer}
+.node:hover{border-color:var(--line-strong)}
+.node[aria-current="true"]{border-color:var(--accent);background:var(--accent-tint)}
+.ni{display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;border:2px solid var(--line-strong);font-weight:700;font-size:var(--t-s);font-variant-numeric:tabular-nums}
+.node[aria-current="true"] .ni{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.node.done .ni{background:var(--ok);border-color:var(--ok);color:var(--on-ok)}
+.nt,.ns{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.nshort{font-size:var(--t-xs);color:var(--muted);font-variant-numeric:tabular-nums}
+.node.done .nshort{color:var(--ok);font-weight:700}
+@media (min-width:900px){
+  .map{grid-template-columns:minmax(0,1fr)}
+  .node{grid-template-columns:auto minmax(0,1fr);justify-items:start;align-items:center;text-align:left;gap:0 var(--s-3);padding:var(--s-3)}
+  .ni{grid-row:span 2}
+  .nt,.ns{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal}
+  .nt{display:block;font-weight:700;line-height:1.25}
+  .ns{display:block;font-size:var(--t-xs);color:var(--muted)}
+  .node.done .ns{color:var(--ok);font-weight:600}
+  .nshort{display:none}
+}
+
+/* ---------- mission header ---------- */
+.mission{min-width:0}
+.mhead{display:grid;gap:var(--s-3);margin-bottom:var(--s-4)}
+.mhead>*{margin:0;min-width:0}
+.mmeta{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2) var(--s-3);font-size:var(--t-s);color:var(--muted)}
+.mmeta .mnum{font-weight:700;color:var(--ink)}
+.mstate{display:inline-flex;align-items:center;gap:var(--s-1);font-weight:600}
+.mstate.is-done{color:var(--ok)}
+.mission h2{font-family:var(--f-display);font-weight:700;font-size:clamp(1.75rem,4.6vw,2.25rem);line-height:1.1;letter-spacing:-.015em;text-wrap:balance}
+.hook{max-width:60ch;color:var(--muted);font-size:var(--t-m)}
+.objective{display:grid;gap:var(--s-1);max-width:60ch;padding:var(--s-3) var(--s-4);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m)}
+.objective>span{font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.objective>b{font-weight:600;font-size:var(--t-m);line-height:1.45}
+.mprog{display:flex;align-items:center;gap:var(--s-3)}
+.bar-track{flex:1;height:.625rem;border-radius:999px;background:var(--raised-2);overflow:hidden;min-width:0}
+.bar-track i{display:block;height:100%;width:0;background:var(--accent);border-radius:999px;transition:width .4s ease}
+.mprog.is-done .bar-track i{background:var(--ok)}
+.mprogtxt{font-size:var(--t-s);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* ---------- step tabs ---------- */
+.mtabs{margin:0 0 var(--s-5)}
+.mtabs ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s-2)}
+.stepbtn{display:flex;align-items:center;gap:var(--s-2);width:100%;min-height:2.75rem;padding:.4rem var(--s-3);text-align:left;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);cursor:pointer;font-weight:500;font-size:var(--t-s);line-height:1.25}
+.stepbtn:hover{border-color:var(--line-strong)}
+.stepbtn .sn{display:grid;place-items:center;flex:none;width:1.5rem;height:1.5rem;border-radius:50%;border:2px solid var(--line-strong);font-size:var(--t-xs);font-weight:700}
+.stepbtn[aria-current="step"]{background:var(--accent-tint);border-color:var(--accent);font-weight:700}
+.stepbtn[aria-current="step"] .sn{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.stepbtn.seen:not([aria-current="step"]) .sn{border-color:var(--muted);color:var(--muted)}
+.stepbtn small{display:block;font-weight:400;color:var(--muted);font-size:var(--t-xs)}
+@media (max-width:640px){.mtabs ol{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---------- step sections ---------- */
+.mstep{min-width:0}
+.mstep+.mstep{margin-top:var(--s-6);padding-top:var(--s-5);border-top:1px solid var(--line)}
+html[data-steps="one"] .mstep{margin-top:0;padding-top:0;border-top:0}
+h3.label{font-family:var(--f-display);font-weight:700;font-size:var(--t-xl);line-height:1.15;margin:0 0 var(--s-4);letter-spacing:-.01em}
+h3.label:focus{outline:none}
+h3.label:focus-visible{outline:3px solid var(--focus);outline-offset:4px}
+.mission p{max-width:62ch}
+.stepnav{display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center;justify-content:space-between;margin-top:var(--s-6);padding-top:var(--s-4);border-top:1px solid var(--line)}
+.stepnav .nextline{flex:1 1 12rem;margin:0;font-size:var(--t-s);color:var(--muted)}
+.stepnav .acts{display:flex;flex-wrap:wrap;gap:var(--s-3);margin-left:auto}
+html[data-steps="all"] .stepnav{display:none}
+html[data-steps="one"] .pager{display:none}
+.pager{display:flex;flex-wrap:wrap;gap:var(--s-3);justify-content:space-between;margin-top:var(--s-6)}
+.pager .btn:only-child{margin-left:auto}
+
+/* ---------- task panel ---------- */
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s-5);display:grid;gap:var(--s-4)}
+.lab>*{margin:0;min-width:0}
+.note{font-size:var(--t-s);color:var(--muted)}
+.ask{font-weight:600;line-height:1.45}
+.lab>.ask:first-of-type::before{content:"Your move";display:block;font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:var(--s-1)}
+.msg{min-height:1.5em;font-size:var(--t-s)}
+.stem{font-family:var(--f-display);font-weight:600;font-size:clamp(1.3rem,4.4vw,1.75rem);line-height:1.3;max-width:none}
+.blank{display:inline-block;min-width:3.5em;border-bottom:3px solid var(--accent);padding-inline:6px;text-align:center}
+.ctxline{font-size:var(--t-s);color:var(--muted)}
+.ctxline b{color:var(--ink)}
+.eyebrow{display:inline-block;font-size:var(--t-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+
+.chips{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.chip{display:inline-flex;align-items:center;gap:var(--s-2);color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r-m);padding:.5rem .95rem;min-height:2.75rem;cursor:pointer;font-weight:500}
+.chip:hover:not(:disabled){background:var(--raised)}
+.chip:disabled{cursor:default;opacity:.8}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-tint);box-shadow:inset 0 0 0 1px var(--accent);opacity:1;font-weight:700}
+.chip[aria-pressed="true"]::before{content:"\2713";font-weight:800}
+.chip.seen::after{content:"\2713";color:var(--ok);font-weight:700}
+
+.bars{display:grid;gap:var(--s-1)}
+.row{display:grid;grid-template-columns:7.5rem minmax(0,1fr) 3rem;gap:var(--s-3);align-items:center;padding:var(--s-1) 0}
+.row .w{overflow-wrap:anywhere}
+.row.mine .w{font-weight:700;text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:3px;text-underline-offset:4px}
+.track{height:1.125rem;background:var(--raised-2);border-radius:var(--r-s);overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--accent);transition:width .45s ease}
+.pc{font-family:var(--f-mono);font-size:var(--t-xs);text-align:right;font-variant-numeric:tabular-nums}
+.verdict{font-weight:600}
+.tracker{font-family:var(--f-mono);font-size:var(--t-xs);color:var(--muted)}
+
+.split{display:grid;gap:var(--s-4);grid-template-columns:minmax(0,1fr)}
+@media (min-width:760px){.split{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.mini{font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 var(--s-2)}
+.prompt{font-family:var(--f-mono);font-size:.875rem;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-4);margin:0;color:var(--ink)}
+.ln{padding:2px 6px;margin:0 -6px;border-radius:var(--r-s)}
+.ln.new{background:var(--accent-tint);box-shadow:inset 0 0 0 1px var(--accent)}
+.ln+.ln{margin-top:var(--s-2)}
+.out{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-2)}
+.out li{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s-3);background:var(--bg);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-3)}
+.out .t{min-width:0;overflow-wrap:anywhere}
+.out .n{font-family:var(--f-mono);font-size:var(--t-xs);color:var(--muted);white-space:nowrap}
+.out .n.fit{color:var(--ok)}
+.meter{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-top:var(--s-1)}
+.meter i{height:.5rem;background:var(--raised-2);border-radius:3px;transition:background .3s}
+.meter i.on{background:var(--accent)}
+.mlabel{font-size:var(--t-s);font-weight:600;margin:var(--s-2) 0 0}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-3)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);font-weight:700;color:var(--on-accent);background:var(--accent);border:1px solid var(--accent);border-radius:var(--r-m);padding:.6rem 1.15rem;min-height:2.75rem;cursor:pointer;text-decoration:none;line-height:1.25}
+.btn:hover:not(:disabled){background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line-strong);font-weight:600}
+.btn.ghost:hover:not(:disabled){background:var(--raised);border-color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.quiet{background:transparent;border-color:transparent;color:var(--muted);font-weight:600;text-decoration:underline;text-underline-offset:3px;padding-inline:var(--s-2)}
+.btn.quiet:hover:not(:disabled){background:var(--raised);color:var(--ink)}
+.btn.warnbtn{background:var(--warn-tint);color:var(--ink);border-color:var(--warn)}
+
+/* ---------- answers, quiz, rounds ---------- */
+.choice{display:block;width:100%;text-align:left;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r-m);padding:var(--s-3) var(--s-4);min-height:2.75rem;cursor:pointer;transition:border-color .15s,background .15s}
+.choice:hover:not(:disabled){background:var(--raised)}
+.choice:disabled{color:var(--ink);cursor:default}
+.choice.ok{border-color:var(--ok);background:var(--ok-tint)}
+.choice.ok::before{content:"\2713\00a0Correct:\00a0";font-weight:700;color:var(--ok)}
+.choice.no{border-color:var(--warn);background:var(--warn-tint)}
+.choice.no::before{content:"Not this one:\00a0";font-weight:700;color:var(--warn)}
+.choice.dim{opacity:.7}
+fieldset.q{border:0;padding:0;margin:0 0 var(--s-5);min-width:0}
+.q legend{font-weight:700;font-size:var(--t-m);padding:0;margin-bottom:var(--s-3);line-height:1.4}
+.qopts,.sent{display:grid;gap:var(--s-2);list-style:none;margin:0;padding:0}
+.why{margin:var(--s-3) 0 0;font-size:var(--t-s);min-height:1.5em}
+.why.good{color:var(--ok);font-weight:600}
+.why.bad{color:var(--warn);font-weight:600}
+.hintbtn{margin-top:var(--s-2)}
+.roundline{font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.brief{background:var(--raised);border-radius:var(--r-m);padding:var(--s-3) var(--s-4);font-size:var(--t-s)}
+.brief b{font-weight:700}
+.reveal{display:grid;gap:var(--s-3);background:var(--bg);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-4)}
+.reveal>*{margin:0}
+.tagchip{justify-self:start;font-size:var(--t-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--warn-tint);color:var(--ink);border:1px solid var(--warn);border-radius:var(--r-s);padding:.2rem .55rem}
+.tells{display:grid;gap:var(--s-2);grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));margin:var(--s-4) 0 0;padding:0;list-style:none}
+.tells li{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s-3) var(--s-4)}
+.tells b{display:block;font-family:var(--f-display);font-size:var(--t-m)}
+.tells span{font-size:var(--t-s);color:var(--muted)}
+
+/* ---------- forms ---------- */
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-3)}
+.fld{display:grid;gap:var(--s-1);min-width:0}
+.fld.wide{grid-column:1/-1}
+.fld span{font-size:var(--t-s);font-weight:700}
+.fld input,.fld select,.fld textarea{width:100%;min-height:2.75rem;font-size:1rem;padding:.55rem .75rem;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r-m)}
+@media (max-width:560px){.form{grid-template-columns:minmax(0,1fr)}}
+.checklist{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.checklist label{display:flex;gap:var(--s-3);align-items:flex-start;padding:var(--s-3) 0;cursor:pointer;min-height:2.75rem}
+.checklist input{width:1.375rem;height:1.375rem;flex:none;margin-top:.15rem;accent-color:var(--accent)}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--accent)}
+
+/* ---------- details ---------- */
+details.deeper{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m)}
+details.deeper summary{cursor:pointer;padding:var(--s-3) var(--s-4);font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:var(--s-3);min-height:2.75rem}
+details.deeper summary::-webkit-details-marker{display:none}
+details.deeper summary::after{content:"+";font-family:var(--f-mono);font-size:1.25rem;transition:transform .2s}
+details.deeper[open] summary::after{transform:rotate(45deg)}
+details.deeper .body{padding:0 var(--s-4) var(--s-4)}
+details.deeper .body p{margin:0 0 var(--s-3)}
+
+/* ---------- completion ---------- */
+.level{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s-5);display:grid;gap:var(--s-4);margin-top:var(--s-6)}
+.level>*{margin:0;min-width:0}
+.stamp{justify-self:start;display:inline-flex;align-items:center;gap:var(--s-2);font-family:var(--f-display);font-weight:700;font-size:var(--t-l);color:var(--ok);border:2px solid var(--ok);border-radius:var(--r-m);padding:.3rem .9rem;animation:pop .35s ease-out both}
+.stamp.pending{color:var(--muted);border-color:var(--line-strong)}
+@keyframes pop{from{transform:scale(.94)}to{transform:scale(1)}}
+.recap{margin:0;padding-left:1.2em;display:grid;gap:var(--s-2)}
+.next{font-weight:700}
+.mdone{display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center;justify-content:space-between;background:var(--ok-tint);border:1px solid var(--ok);border-radius:var(--r-m);padding:var(--s-3) var(--s-4);margin-top:var(--s-5)}
+.mdone[hidden]{display:none}
+.mdone p{margin:0;font-weight:600}
+.mdone p::before{content:"\2713\00a0";color:var(--ok);font-weight:800}
+
+/* ---------- footer, toast ---------- */
+.foot{display:grid;gap:var(--s-3);padding-block:var(--s-5) var(--s-7);border-top:1px solid var(--line)}
+.foot h2{margin:0;font-size:var(--t-s);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.foot .row2{display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center}
+.foot p{margin:0;font-size:var(--t-s);color:var(--muted);max-width:60ch}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);visibility:hidden;background:var(--ink);color:var(--bg);font-weight:700;font-size:var(--t-s);padding:.5rem 1rem;border-radius:var(--r-m);pointer-events:none;z-index:60}
+.toast.show{visibility:visible}
+
+/* ---------- modes ---------- */
+/* Focus mode: only the current step. Navigation, intro, level links, and footer are hidden. */
+html[data-focus="on"] .intro>:not(h1),
+html[data-focus="on"] .map,
+html[data-focus="on"] .foot,
+html[data-focus="on"] .hook,
+html[data-focus="on"] .ctxbar{display:none}
+html[data-focus="on"] .intro{padding:0;gap:0}
+html[data-focus="on"] .intro h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+html[data-focus="on"] .layout{grid-template-columns:minmax(0,46rem);justify-content:center;padding-top:var(--s-5)}
+html[data-focus="on"] .wrap.layout{max-width:50rem}
+/* Calm mode: no popups, no celebration animation, fewer extras. */
+html[data-calm="on"] .toast{display:none}
+html[data-calm="on"] .stamp{animation:none}
+html[data-calm="on"] .objective{background:transparent}
+/* Motion */
+html[data-motion="reduce"] *,html[data-motion="reduce"] *::before,html[data-motion="reduce"] *::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+@media (prefers-reduced-motion:reduce){
+  html:not([data-motion="allow"]) *,html:not([data-motion="allow"]) *::before,html:not([data-motion="allow"]) *::after{transition:none!important;animation:none!important}
+}
+@media (max-width:460px){
+  .row{grid-template-columns:5.5rem minmax(0,1fr) 2.75rem}
+  .lab{padding:var(--s-4)}
+  .brand .bname{font-size:1rem}
+}
+
+/* v3: course-wide progress, view-all toggle, transfer */
+.lvp{font-size:var(--t-xs);font-weight:600;color:var(--muted)}
+.lv.cur .lvp{color:var(--ink)}
+.coursebar{margin:var(--s-2) 0 0;font-size:var(--t-s);color:var(--muted)}
+.resume .other{flex-basis:100%;font-size:var(--t-s);color:var(--muted)}
+.resume .other a{color:var(--accent);font-weight:600}
+.viewall{margin-top:var(--s-3)}
+html[data-steps="all"] .viewall,html[data-focus="on"] .viewall{display:none}
+.viewing-all .stepnav{display:none}
+.xfer{margin:var(--s-4) 0 0;display:grid;gap:var(--s-2);font-size:var(--t-s)}
+.xfer summary{cursor:pointer;color:var(--ink);font-weight:600;min-height:2.75rem;display:flex;align-items:center}
+.xfer input{width:100%;font:inherit;padding:.6rem .75rem;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r-m)}
+.foot .row2 .btn{flex:0 1 auto}
+
+/* small phones: one compact header row */
+@media (max-width:480px){
+  .bname{display:none}
+  .ctxbar .cn{display:none}
+  .ctxbar{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+
+/* level 2 */
+.quote{margin:6px 0 0;font-family:var(--f-display);font-weight:600}
+.chain{margin:0;padding-left:1.4em;display:grid;gap:6px;min-height:1.6em}
+.chain li{background:var(--m-tint);border-radius:6px;padding:8px 12px;min-width:0;overflow-wrap:anywhere}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.tbl{border-collapse:collapse;width:100%;font-size:0.875rem}
+.tbl th,.tbl td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{font-family:var(--f-mono);font-size:0.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tbl tr:last-child td{border-bottom:0}
+.pair{display:grid;gap:2px;min-width:0}
+.pair .k{font-family:var(--f-mono);font-size:0.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.out .stack{display:grid;gap:4px;min-width:0;flex:1}
+.out li.block{display:block}
+.seg{border:0;margin:0;padding:0;min-width:0;display:flex;flex-wrap:wrap;gap:8px}
+.seg legend{padding:0;margin-bottom:6px;width:100%}
+.seg label{position:relative;display:inline-flex;min-width:0}
+.seg input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.seg span{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 14px;border:1px solid var(--line);border-radius:6px;background:var(--surface);font-weight:500}
+.seg input:checked+span{border-color:var(--m);background:var(--m-tint);box-shadow:inset 0 0 0 1px var(--m)}
+.seg input:focus-visible+span{outline:3px solid var(--m);outline-offset:2px}
+.seg span.built::after{content:"\2713";color:var(--ok);font-weight:700}
+.mk{display:flex;gap:10px;align-items:center;font-size:0.875rem;min-height:44px;cursor:pointer}
+.mk input{width:20px;height:20px;flex:none;accent-color:var(--ink)}
+.fld textarea{width:100%;font-size:1rem;line-height:1.4;padding:9px 12px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;font-family:inherit;resize:vertical}
+
+</style>
+
+<a class="skiplink" href="#stage" id="skip">Skip to the mission</a>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand">
+        <svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><path d="M12 2v20M2 12h20"/></svg>
+        <span class="bname">AI for Marketers</span>
+      </div>
+      <div class="hud">
+        <span class="xp" id="xp" aria-label="Level progress"><b>0</b> / 200 XP</span>
+        <button type="button" class="exitfocus" id="exitFocus">Exit focus</button>
+        <button type="button" class="pbtn" id="prefsBtn" aria-expanded="false" aria-controls="prefs" aria-label="Preferences">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+          <span class="ptxt">Preferences</span>
+        </button>
+      </div>
+    </div>
+    <p class="ctxbar" id="ctxbar"></p>
+  </div>
+  <section class="prefs" id="prefs" aria-labelledby="prefsTitle" hidden>
+    <h2 id="prefsTitle">Preferences</h2>
+    <p class="sub">Change how this course looks and behaves. Saved in this browser.</p>
+    <fieldset>
+      <legend>Theme</legend>
+      <div class="pseg">
+        <label><input type="radio" name="pf-theme" value="system"><span>System</span></label>
+        <label><input type="radio" name="pf-theme" value="light"><span>Light</span></label>
+        <label><input type="radio" name="pf-theme" value="dark"><span>Dark</span></label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Text size</legend>
+      <div class="pseg">
+        <label><input type="radio" name="pf-text" value="normal"><span>Standard</span></label>
+        <label><input type="radio" name="pf-text" value="large"><span>Larger</span></label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Focus</legend>
+      <label class="sw-row" for="pf-focus"><input type="checkbox" id="pf-focus"><span><b>Focus mode</b><small>One step at a time. Hides menus and extras.</small></span></label>
+      <label class="sw-row" for="pf-steps"><input type="checkbox" id="pf-steps"><span><b>One step at a time</b><small>Turn off to see a whole mission on one page.</small></span></label>
+      <label class="sw-row" for="pf-hints"><input type="checkbox" id="pf-hints"><span><b>Show hints after a wrong answer</b><small>Off keeps hints behind a button.</small></span></label>
+    </fieldset>
+    <fieldset>
+      <legend>Comfort</legend>
+      <label class="sw-row" for="pf-motion"><input type="checkbox" id="pf-motion"><span><b>Reduce motion</b><small>Follows your device setting until you change it.</small></span></label>
+      <label class="sw-row" for="pf-calm"><input type="checkbox" id="pf-calm"><span><b>Calmer screen</b><small>No pop-up messages or celebration effects.</small></span></label>
+      <label class="sw-row" for="pf-sound"><input type="checkbox" id="pf-sound"><span><b>Sound effects</b><small>Soft tones for progress. Off by default.</small></span></label>
+    </fieldset>
+    <details class="xfer">
+      <summary>Bring over progress from an older link</summary>
+      <label for="xferIn">Transfer code</label>
+      <input type="text" id="xferIn" autocomplete="off" spellcheck="false">
+      <button type="button" class="btn ghost" id="xferBtn">Import</button>
+      <p class="persist" id="xferMsg" aria-live="polite"></p>
+    </details>
+    <button type="button" class="btn done" id="prefsClose">Done</button>
+    <p class="persist" id="persistNote"></p>
+  </section>
+</header>
+
+<main id="main">
+<section class="wrap intro" id="intro">
+  <p class="kicker">AI for Marketers · Level 2 of 5</p>
+  <h1>Prompt Craft</h1>
+  <p class="lede">Four missions, about ten minutes each. Level 1 got you a good first answer. This level gets you control: your voice, your format, your fixes, and a kit you can reuse.</p>
+  <div class="resume" id="resume">
+    <p id="resumeText"></p>
+    <button type="button" class="btn" id="resumeBtn">Continue</button>
+    <p class="other" id="resumeOther" hidden></p>
+  </div>
+  <nav class="levelnav" aria-label="Course levels"><a class="lv" href="level1.html"><b>1</b> Boot Camp<span class="lvp" data-n="1"></span></a><span class="lv cur" aria-current="page"><b>2</b> Prompt Craft<span class="lvp" data-n="2"></span></span><a class="lv" href="level3.html"><b>3</b> Marketing Machine<span class="lvp" data-n="3"></span></a><a class="lv" href="level4.html"><b>4</b> Build Mode<span class="lvp" data-n="4"></span></a><a class="lv" href="level5.html"><b>5</b> Boss Level<span class="lvp" data-n="5"></span></a></nav>
+  <p class="coursebar" id="coursebar"></p>
+</section>
+
+<div class="wrap layout">
+  <nav class="map" id="map" aria-label="Missions in this level">
+    <button type="button" class="node" data-m="1"><span class="ni" aria-hidden="true">1</span><span class="nt"><span class="sr">Mission 1: </span>Write Like You</span><span class="ns">Not started</span><span class="nshort" aria-hidden="true">0/50</span></button>
+    <button type="button" class="node" data-m="2"><span class="ni" aria-hidden="true">2</span><span class="nt"><span class="sr">Mission 2: </span>Show, Don’t Tell</span><span class="ns">Not started</span><span class="nshort" aria-hidden="true">0/50</span></button>
+    <button type="button" class="node" data-m="3"><span class="ni" aria-hidden="true">3</span><span class="nt"><span class="sr">Mission 3: </span>Fix the Miss</span><span class="ns">Not started</span><span class="nshort" aria-hidden="true">0/50</span></button>
+    <button type="button" class="node" data-m="4"><span class="ni" aria-hidden="true">4</span><span class="nt"><span class="sr">Mission 4: </span>Build Your Kit</span><span class="ns">Not started</span><span class="nshort" aria-hidden="true">0/50</span></button>
+  </nav>
+
+  <div class="stage" id="stage">
+<article class="mission" data-m="1" id="mission1">
+<header class="mhead">
+<p class="mmeta"><span class="mnum">Mission 1 of 4</span><span>About 10 min</span><span class="mstate">Not started</span></p>
+<h2 tabindex="-1">Write Like You</h2>
+<p class="hook">“Friendly and professional” describes ten thousand brands. Find the traits that make one voice recognizable, then hand them to the AI on a card.</p>
+<p class="objective"><span>Objective</span><b>Pull the traits out of a real brand voice and turn them into a voice card the AI can follow.</b></p>
+<div class="mprog"><div class="bar-track" role="progressbar" aria-label="Mission 1 progress" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><i></i></div><span class="mprogtxt">0 / 50 XP</span></div>
+</header>
+<div class="mdone" hidden><p>Mission complete. 50 of 50 XP.</p></div>
+<nav class="mtabs" aria-label="Steps in this mission"></nav>
+<section class="mstep" id="m1s0" data-step="0" aria-labelledby="m1s0h">
+<h3 class="label" id="m1s0h" tabindex="-1">Try it</h3>
+<div class="lab">
+        <p class="roundline">Step 1 of 3: Hear the voice</p>
+        <div class="brief"><b>Two real posts from Juniper Row Bakery</b> (an example shop, made up for this course):
+          <p class="quote">“Sourdough is out. The first loaf is always ours. The second one is yours.”</p>
+          <p class="quote">“Closed Monday. Even bread needs a day off.”</p>
+        </div>
+        <p class="ask">Cinnamon rolls are coming Saturday. Which draft sounds like Juniper Row?</p>
+        <div class="sent" id="l2m1-drafts"></div>
+        <div class="reveal" id="l2m1-r1" hidden aria-live="polite"></div>
+      </div>
+
+      <div class="lab" style="margin-top:14px">
+        <p class="roundline">Step 2 of 3: Name the traits</p>
+        <p class="ask">Tap every trait you can hear in those two posts, then check.</p>
+        <div class="chips" id="l2m1-traits"></div>
+        <div class="actions">
+          <button type="button" class="btn" id="l2m1-check">Check my traits</button>
+        </div>
+        <p class="msg" id="l2m1-tmsg" aria-live="polite"></p>
+      </div>
+
+      <div class="lab" style="margin-top:14px">
+        <p class="roundline">Step 3 of 3: Build the voice card</p>
+        <p class="ask">Same request every time: <b>one Instagram caption, cinnamon rolls, Saturday only, 7 a.m. until gone, $4.50 each.</b> Set the card and watch the caption change. Try three different cards.</p>
+        <div class="chips" id="l2m1-tone" role="group" aria-label="Tone"></div>
+        <div class="chips" id="l2m1-len" role="group" aria-label="Sentence length"></div>
+        <div class="chips" id="l2m1-bang" role="group" aria-label="Punctuation"></div>
+        <div class="split">
+          <div>
+            <p class="mini">Your voice card (pasted above the request)</p>
+            <div class="prompt" id="l2m1-card"></div>
+          </div>
+          <div>
+            <p class="mini">Without the card</p>
+            <ul class="out"><li><span class="t" id="l2m1-plain"></span></li></ul>
+            <p class="mini" style="margin-top:12px">With the card</p>
+            <ul class="out"><li><span class="t" id="l2m1-with" aria-live="polite"></span></li></ul>
+          </div>
+        </div>
+        <p class="tracker" id="l2m1-trk"></p>
+      </div>
+</section>
+
+<section class="mstep" id="m1s1" data-step="1" aria-labelledby="m1s1h">
+<h3 class="label" id="m1s1h" tabindex="-1">Why it works</h3>
+<p>A voice is made of habits you can see: how long the sentences run, how much it jokes, which words it never uses. “Warm and professional” is a mood. “Short sentences, dry, no exclamation marks” is an instruction.</p>
+      <p>A voice card is those habits in four or five lines, plus one real sentence you wrote. Paste it above any request and the odds shift toward your voice, the same way you saw in Level 1.</p>
+</section>
+
+<section class="mstep" id="m1s2" data-step="2" aria-labelledby="m1s2h">
+<h3 class="label" id="m1s2h" tabindex="-1">Check</h3>
+<div id="l2m1-quiz"></div>
+</section>
+
+<section class="mstep" id="m1s3" data-step="3" aria-labelledby="m1s3h">
+<h3 class="label" id="m1s3h" tabindex="-1">Go deeper</h3>
+<details class="deeper">
+        <summary>Where to find your own traits</summary>
+        <div class="body">
+          <p>Paste three or four of your best past emails or posts into your AI tool and ask: “List the habits that make these sound like one writer. Sentence length, humor, words used, words avoided. Be specific.” Then edit the list until it sounds right to you.</p>
+          <p>Keep the card short. Five lines the AI follows beat fifteen it half follows. Add a “never” line for anything you have had to delete from drafts more than twice.</p>
+        </div>
+      </details>
+</section>
+
+<div class="pager"></div>
+</article>
+
+<article class="mission" data-m="2" id="mission2" hidden>
+<header class="mhead">
+<p class="mmeta"><span class="mnum">Mission 2 of 4</span><span>About 10 min</span><span class="mstate">Not started</span></p>
+<h2 tabindex="-1">Show, Don’t Tell</h2>
+<p class="hook">One good example beats a paragraph of adjectives. Add examples, change the format, and watch the same request come back different.</p>
+<p class="objective"><span>Objective</span><b>Use examples and a clear output format to get the result you want on the first try.</b></p>
+<div class="mprog"><div class="bar-track" role="progressbar" aria-label="Mission 2 progress" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><i></i></div><span class="mprogtxt">0 / 50 XP</span></div>
+</header>
+<div class="mdone" hidden><p>Mission complete. 50 of 50 XP.</p></div>
+<nav class="mtabs" aria-label="Steps in this mission"></nav>
+<section class="mstep" id="m2s0" data-step="0" aria-labelledby="m2s0h">
+<h3 class="label" id="m2s0h" tabindex="-1">Try it</h3>
+<div class="lab">
+        <p class="note">Example task for Tidewater Yoga, a made-up studio. Change the two dials and read what comes back.</p>
+        <p class="mini">Dial 1: How many examples?</p>
+        <div class="chips" id="l2m2-ex" role="group" aria-label="Number of examples"></div>
+        <p class="mini">Dial 2: What shape should it take?</p>
+        <div class="chips" id="l2m2-fmt" role="group" aria-label="Output format"></div>
+        <div class="split">
+          <div>
+            <p class="mini">What you typed</p>
+            <div class="prompt" id="l2m2-prompt"></div>
+          </div>
+          <div>
+            <p class="mini">What came back</p>
+            <div id="l2m2-out" aria-live="polite"></div>
+            <p class="msg" id="l2m2-note"></p>
+          </div>
+        </div>
+        <p class="tracker" id="l2m2-trk"></p>
+      </div>
+
+      <div class="lab" style="margin-top:14px">
+        <p class="roundline" id="l2m2-rl"></p>
+        <div id="l2m2-match"></div>
+      </div>
+</section>
+
+<section class="mstep" id="m2s1" data-step="1" aria-labelledby="m2s1h">
+<h3 class="label" id="m2s1h" tabindex="-1">Why it works</h3>
+<p>Examples control style. With none, the AI writes the average subject line. With one, it copies that line’s shape, even its first word. With three, it can see what stays the same and what changes, so it copies the pattern and not the sentence.</p>
+      <p>A format line controls shape. It tells the AI how to lay the answer out so you can use it without retyping: a table for a spreadsheet, labeled pairs for an email tool, counts to catch long lines.</p>
+</section>
+
+<section class="mstep" id="m2s2" data-step="2" aria-labelledby="m2s2h">
+<h3 class="label" id="m2s2h" tabindex="-1">Check</h3>
+<div id="l2m2-quiz"></div>
+</section>
+
+<section class="mstep" id="m2s3" data-step="3" aria-labelledby="m2s3h">
+<h3 class="label" id="m2s3h" tabindex="-1">Go deeper</h3>
+<details class="deeper">
+        <summary>Good examples, bad examples</summary>
+        <div class="body">
+          <p>Use examples that really worked, not ones you merely like. Make them differ from each other on purpose: different openings, different lengths. If all three start with “Your,” so will the output.</p>
+          <p>You can also show a bad example. “Do not write like this:” followed by a line you hate is a fast way to rule out a whole style.</p>
+        </div>
+      </details>
+</section>
+
+<div class="pager"></div>
+</article>
+
+<article class="mission" data-m="3" id="mission3" hidden>
+<header class="mhead">
+<p class="mmeta"><span class="mnum">Mission 3 of 4</span><span>About 10 min</span><span class="mstate">Not started</span></p>
+<h2 tabindex="-1">Fix the Miss</h2>
+<p class="hook">The first draft is rarely the one you send. Three weak drafts, three follow-ups to choose from. Pick the one that actually moves things.</p>
+<p class="objective"><span>Objective</span><b>Choose the follow-up that fixes a weak draft, and split a big task into three steps.</b></p>
+<div class="mprog"><div class="bar-track" role="progressbar" aria-label="Mission 3 progress" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><i></i></div><span class="mprogtxt">0 / 50 XP</span></div>
+</header>
+<div class="mdone" hidden><p>Mission complete. 50 of 50 XP.</p></div>
+<nav class="mtabs" aria-label="Steps in this mission"></nav>
+<section class="mstep" id="m3s0" data-step="0" aria-labelledby="m3s0h">
+<h3 class="label" id="m3s0h" tabindex="-1">Try it</h3>
+<div class="lab" id="l2m3-rounds"></div>
+
+      <div class="lab" style="margin-top:14px">
+        <p class="roundline">Part 2: Break a big job into a chain</p>
+        <div class="brief"><b>Big job:</b> a three-email welcome series for new subscribers of Lantern Hill Garden Center (a made-up shop). One giant prompt tends to give you three generic emails.</div>
+        <p class="ask">Tap the cards in the order you would run them. One card does not belong in the chain.</p>
+        <div class="sent" id="l2m3-cards"></div>
+        <p class="mini">Your chain</p>
+        <ol class="chain" id="l2m3-chain" aria-live="polite"></ol>
+        <p class="msg" id="l2m3-msg" aria-live="polite"></p>
+      </div>
+</section>
+
+<section class="mstep" id="m3s1" data-step="1" aria-labelledby="m3s1h">
+<h3 class="label" id="m3s1h" tabindex="-1">Why it works</h3>
+<p>A vague follow-up gives the AI nothing new to rank, so it shuffles the same words. A specific one names what to keep, what to change, and by how much. Keeping the good parts is as important as fixing the bad ones.</p>
+      <p>Big jobs go wrong in the middle where you cannot see. A chain puts a checkpoint after each step, so you catch a wrong direction while it is cheap to fix, and each step feeds the next.</p>
+</section>
+
+<section class="mstep" id="m3s2" data-step="2" aria-labelledby="m3s2h">
+<h3 class="label" id="m3s2h" tabindex="-1">Check</h3>
+<div id="l2m3-quiz"></div>
+</section>
+
+<section class="mstep" id="m3s3" data-step="3" aria-labelledby="m3s3h">
+<h3 class="label" id="m3s3h" tabindex="-1">Go deeper</h3>
+<details class="deeper">
+        <summary>A follow-up formula you can reuse</summary>
+        <div class="body">
+          <p>Keep: what was right. Change: what was wrong, with a number or an example. Don’t touch: anything else. “Keep headlines 1 and 4. Shorten 3 to 30 characters. Leave the rest.”</p>
+          <p>Start a fresh chat when the thread is long and tangled, or when the direction itself has changed. Carry over your voice card and facts, and leave the rest behind.</p>
+        </div>
+      </details>
+</section>
+
+<div class="pager"></div>
+</article>
+
+<article class="mission" data-m="4" id="mission4" hidden>
+<header class="mhead">
+<p class="mmeta"><span class="mnum">Mission 4 of 4</span><span>About 10 min</span><span class="mstate">Not started</span></p>
+<h2 tabindex="-1">Build Your Kit</h2>
+<p class="hook">Time to keep something. Pick a type, fill a few boxes, and get a template you can copy, reuse, and change one placeholder at a time.</p>
+<p class="objective"><span>Objective</span><b>Leave with reusable prompt templates for an ad, an email, and a landing page section.</b></p>
+<div class="mprog"><div class="bar-track" role="progressbar" aria-label="Mission 4 progress" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><i></i></div><span class="mprogtxt">0 / 50 XP</span></div>
+</header>
+<div class="mdone" hidden><p>Mission complete. 50 of 50 XP.</p></div>
+<nav class="mtabs" aria-label="Steps in this mission"></nav>
+<section class="mstep" id="m4s0" data-step="0" aria-labelledby="m4s0h">
+<h3 class="label" id="m4s0h" tabindex="-1">Try it</h3>
+<div class="lab">
+        <p class="note">Prefilled with examples from a made-up shop. Swap in your own, then copy. Build at least two of the three types.</p>
+        <fieldset class="seg" id="l2m4-types">
+          <legend class="mini">Template type</legend>
+        </fieldset>
+        <div class="form">
+          <label class="fld wide" for="l2m4-role"><span>Role for the AI</span>
+            <input id="l2m4-role" type="text" autocomplete="off"></label>
+          <label class="fld wide" for="l2m4-voice"><span>Voice card (from Mission 1)</span>
+            <textarea id="l2m4-voice" rows="5"></textarea></label>
+          <div class="fld">
+            <label for="l2m4-aud"><span>Audience</span></label>
+            <input id="l2m4-aud" type="text" autocomplete="off">
+            <label class="mk"><input type="checkbox" id="l2m4-audph"> Make it a {audience} placeholder</label>
+          </div>
+          <div class="fld">
+            <label for="l2m4-goal"><span>Goal</span></label>
+            <input id="l2m4-goal" type="text" autocomplete="off">
+            <label class="mk"><input type="checkbox" id="l2m4-goalph"> Make it a {goal} placeholder</label>
+          </div>
+          <label class="fld wide" for="l2m4-cons"><span>Constraints</span>
+            <textarea id="l2m4-cons" rows="3"></textarea></label>
+          <label class="fld wide" for="l2m4-ex"><span>One example of the style you want</span>
+            <input id="l2m4-ex" type="text" autocomplete="off"></label>
+          <label class="fld wide" for="l2m4-fmt"><span>Format</span>
+            <input id="l2m4-fmt" type="text" autocomplete="off"></label>
+        </div>
+        <div>
+          <p class="mini">Your template</p>
+          <pre class="prompt" id="l2m4-pre" tabindex="0"></pre>
+        </div>
+        <p class="note" id="l2m4-ph"></p>
+        <div class="actions">
+          <button type="button" class="btn" id="l2m4-copy">Copy template</button>
+          <button type="button" class="btn ghost" id="l2m4-next" data-smoke="">Build another type</button>
+          <span class="note" id="l2m4-cn" aria-live="polite"></span>
+        </div>
+        <p class="tracker" id="l2m4-trk"></p>
+      </div>
+</section>
+
+<section class="mstep" id="m4s1" data-step="1" aria-labelledby="m4s1h">
+<h3 class="label" id="m4s1h" tabindex="-1">Why it works</h3>
+<p>The template splits your prompt into two kinds of lines. Fixed lines (role, voice, constraints, example, format, the no-invented-facts rule) stay the same every time. Placeholders in curly braces are the only parts you change.</p>
+      <p>That is the whole kit. Next time you need a campaign email, you paste the template, swap {offer} and {facts}, and run it. Ten seconds, same quality, same voice.</p>
+</section>
+
+<section class="mstep" id="m4s2" data-step="2" aria-labelledby="m4s2h">
+<h3 class="label" id="m4s2h" tabindex="-1">Check</h3>
+<div class="lab">
+        <p class="ask">Paste one template into your AI tool, replace the placeholders with real details, run it, then tick whatever is true.</p>
+        <ul class="checklist" id="l2m4-checklist">
+          <li><label><input type="checkbox"> I replaced every {placeholder} with real details before running it.</label></li>
+          <li><label><input type="checkbox"> The output followed my format and my limits.</label></li>
+          <li><label><input type="checkbox"> It sounded like us, or I know which voice-card line to tighten.</label></li>
+          <li><label><input type="checkbox"> I saved the template where I will find it next week.</label></li>
+        </ul>
+        <p class="msg" id="l2m4-ckmsg" aria-live="polite"></p>
+      </div>
+</section>
+
+<section class="mstep" id="m4s3" data-step="3" aria-labelledby="m4s3h">
+<h3 class="label" id="m4s3h" tabindex="-1">Go deeper</h3>
+<details class="deeper">
+        <summary>Keeping the kit alive</summary>
+        <div class="body">
+          <p>Save the three templates in one note, one heading each. When a result disappoints, fix the template, not just the output. A new line in the template helps every future run.</p>
+          <p>Add a version date to each. When a template stops working, you will know which edit broke it.</p>
+        </div>
+      </details>
+</section>
+<div class="level" id="levelcard" hidden>
+<div class="stamp" id="stamp">Level complete</div>
+<p id="levelsub" style="font-weight:600"></p>
+<ul class="recap"><li>A voice card is a few followable traits plus one real sample line.</li><li>Examples set the style. A format line sets the shape.</li><li>Follow up with a specific change, or break big jobs into a chain.</li><li>You built reusable templates with placeholders for ads, emails, and pages.</li></ul>
+<p class="next">Next up: Level 3, Marketing Machine. Put AI to work on research, content, ad tests, and reports.</p>
+<a class="btn nextlevel" href="level3.html" style="justify-self:start">Open Level 3</a>
+</div>
+<div class="pager"></div>
+</article>
+  </div>
+</div>
+</main>
+
+<footer class="wrap foot" id="foot">
+  <h2>Progress</h2>
+  <p>Your answers and XP save automatically in this browser. Each reset below says exactly what it erases and asks you to confirm.</p>
+  <div class="row2">
+    <button type="button" class="btn ghost" id="restartM">Restart this mission</button>
+    <button type="button" class="btn ghost" id="reset">Reset this level</button>
+    <button type="button" class="btn ghost" id="resetAll">Reset the whole course</button>
+    <span class="note" id="confirmNote" aria-live="polite"></span>
+  </div>
+</footer>
+<div class="toast" id="toast" aria-hidden="true"></div>
+<div class="sr" id="live" aria-live="polite"></div>
+
+<script>window.LEVEL={"level": 2, "name": "Prompt Craft", "missions": [{"name": "Write Like You", "min": 10}, {"name": "Show, Don’t Tell", "min": 10}, {"name": "Fix the Miss", "min": 10}, {"name": "Build Your Kit", "min": 10}]};</script>
+<script>
+(function(){
+'use strict';
+var L=window.LEVEL;
+var NEED=50,COUNT=4,TOTAL=NEED*COUNT;
+var PKEY='aimbc-prefs-v1';
+var NAMES=L.missions.map(function(m){return m.name});
+var viewAll={};
+var root=document.documentElement;
+var CHECK='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
+function lsGet(k){try{return window.localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{window.localStorage.setItem(k,v)}catch(e){}}
+function lsDel(k){try{window.localStorage.removeItem(k)}catch(e){}}
+
+/* ---------- progress store: one record for the whole course, shared by all five level pages ----------
+   Key aimbc-course-v3 = {v:3, last:{level,t}, levels:{ "1":{got,cur,step,seen,ex,t}, ... }}
+   Older per-level keys (aimbc-levelN-v2 / -v1) are imported once and left in place as a backup. */
+var STORE='aimbc-course-v3',LEVELS=5,CORRUPT='aimbc-course-v3-corrupt';
+var storageOK=true;
+var state={got:{},cur:0,step:{},seen:{},ex:{}};
+var hadSaved=false,frozen=false;
+function cleanLevel(p){
+  var o={got:{},cur:0,step:{},seen:{},ex:{},t:0};
+  if(!p||typeof p!=='object')return o;
+  if(p.got&&typeof p.got==='object'){for(var k in p.got){var v=p.got[k];if(/^m[1-4]:/.test(k)&&typeof v==='number'&&v>0&&v<=NEED)o.got[k]=v}}
+  o.cur=clamp(p.cur|0,0,COUNT-1);
+  if(p.step&&typeof p.step==='object'){for(var i=0;i<COUNT;i++){if(typeof p.step[i]==='number')o.step[i]=clamp(p.step[i]|0,0,3)}}
+  if(p.seen&&typeof p.seen==='object'){for(var s in p.seen){if(/^[0-3]:[0-3]$/.test(s))o.seen[s]=1}}
+  if(p.ex&&typeof p.ex==='object'){for(var e in p.ex){if(/^[A-Za-z0-9_.:\-]{1,80}$/.test(e)&&p.ex[e]!==undefined)o.ex[e]=p.ex[e]}}
+  o.t=typeof p.t==='number'?p.t:0;
+  return o;
+}
+function hasProgress(o){return Object.keys(o.got).length>0||o.cur>0||Object.keys(o.step).some(function(k){return o.step[k]>0})||Object.keys(o.seen).length>1||Object.keys(o.ex).length>0}
+function readStore(){
+  var raw=lsGet(STORE),st={v:3,last:null,levels:{}};
+  if(raw){
+    try{
+      var p=JSON.parse(raw);
+      if(p&&typeof p==='object'){
+        if(p.levels&&typeof p.levels==='object'){for(var n=1;n<=LEVELS;n++){if(p.levels[n])st.levels[n]=cleanLevel(p.levels[n])}}
+        if(p.last&&typeof p.last.level==='number')st.last={level:clamp(p.last.level|0,1,LEVELS),t:p.last.t||0};
+      }
+    }catch(e){lsSet(CORRUPT,raw)}
+  }
+  for(var m=1;m<=LEVELS;m++){
+    if(!st.levels[m]){
+      var old=lsGet('aimbc-level'+m+'-v2')||lsGet('aimbc-level'+m+'-v1');
+      if(old){try{var q=cleanLevel(JSON.parse(old));if(hasProgress(q))st.levels[m]=q}catch(e){}}
+    }
+  }
+  return st;
+}
+function writeStore(st){
+  try{window.localStorage.setItem(STORE,JSON.stringify(st));return true}catch(e){storageOK=false;return false}
+}
+(function(){
+  try{window.localStorage.setItem('aimbc-probe','1');window.localStorage.removeItem('aimbc-probe')}catch(e){storageOK=false}
+  var st=readStore(),mine=st.levels[L.level];
+  if(mine&&hasProgress(mine)){
+    hadSaved=true;
+    state.got=mine.got;state.cur=mine.cur;state.step=mine.step;state.seen=mine.seen;state.ex=mine.ex;
+  }
+  /* write the migrated record right away so every level page sees the same data */
+  if(storageOK&&Object.keys(st.levels).length)writeStore(st);
+})();
+/* save merges with whatever is stored now, so a stale tab or a default value can never wipe saved progress */
+function save(quiet){
+  if(frozen)return;
+  var st=readStore(),prev=st.levels[L.level]||cleanLevel(null),g={},k;
+  for(k in prev.got)g[k]=prev.got[k];
+  for(k in state.got)g[k]=Math.max(g[k]||0,state.got[k]);
+  var seen={};for(k in prev.seen)seen[k]=1;for(k in state.seen)seen[k]=1;
+  var ex={};for(k in prev.ex)ex[k]=prev.ex[k];for(k in state.ex)ex[k]=state.ex[k];
+  st.levels[L.level]={got:g,cur:state.cur,step:state.step,seen:seen,ex:ex,t:Date.now()};
+  if(!quiet||!st.last)st.last={level:L.level,t:Date.now()};
+  writeStore(st);
+}
+function courseSummary(){
+  var st=readStore(),out=[];
+  for(var n=1;n<=LEVELS;n++){
+    var lv=n===L.level?{got:state.got}:(st.levels[n]||{got:{}}),xp=0,done=0,per={};
+    for(var k in lv.got){xp+=lv.got[k];var m=k.charAt(1);per[m]=(per[m]||0)+lv.got[k]}
+    for(var m2 in per){if(per[m2]>=NEED)done++}
+    out.push({n:n,xp:xp,done:done});
+  }
+  return {levels:out,last:st.last};
+}
+function totalXp(){var t=0;for(var k in state.got)t+=state.got[k];return t}
+function mxp(i){var t=0;for(var k in state.got){if(k.indexOf('m'+i+':')===0)t+=state.got[k]}return t}
+function has(k){return !!state.got[k]}
+
+/* ---------- exercise state: levels register what to save; the engine saves it ----------
+   persist(id, {get:function(){return jsonValue}, set:function(value){...apply it...}})
+   get/set must be pure state, no awards. The engine restores once on registration and saves after
+   every click, input, change, and when the page is hidden. Ids start with "mN." for mission N. */
+var reg={},flushT=null,restoring=false;
+function persist(id,h){
+  if(!/^m[1-4]\.[A-Za-z0-9_.\-]{1,60}$/.test(id)||!h||typeof h.get!=='function'||typeof h.set!=='function')return;
+  var e={get:h.get,set:h.set,broken:false,last:null};reg[id]=e;
+  if(Object.prototype.hasOwnProperty.call(state.ex,id)){
+    restoring=true;
+    try{h.set(JSON.parse(JSON.stringify(state.ex[id])))}catch(err){e.broken=true}
+    restoring=false;
+  }
+  try{var j=JSON.stringify(h.get());e.last=j===undefined?null:j}catch(err2){e.broken=true}
+}
+function flush(){
+  clearTimeout(flushT);flushT=null;
+  var changed=false;
+  for(var id in reg){
+    var e=reg[id];if(e.broken)continue;
+    var j;try{j=JSON.stringify(e.get())}catch(x){continue}
+    if(j===undefined||j===e.last)continue;
+    e.last=j;state.ex[id]=JSON.parse(j);changed=true;
+  }
+  if(changed)save();
+}
+function schedule(){if(frozen)return;clearTimeout(flushT);flushT=setTimeout(flush,150)}
+function clearEx(prefix){
+  Object.keys(state.ex).forEach(function(k){if(k.indexOf(prefix)===0)delete state.ex[k]});
+}
+/* every plain form field in a mission is saved automatically; levels only register custom state */
+function autoFields(){
+  articles.forEach(function(a,i){
+    var n=i+1,idx=0;
+    $$('input,textarea,select',a).forEach(function(f){
+      var t=(f.type||'').toLowerCase();
+      if(t==='button'||t==='submit'||t==='reset'||t==='hidden'||t==='file')return;
+      var base=f.id?f.id.replace(/[^A-Za-z0-9_\-]/g,'_'):('i'+idx);idx++;
+      var id='m'+n+'.f_'+base.slice(0,50),box=(t==='checkbox'||t==='radio');
+      persist(id,{
+        get:function(){return box?!!f.checked:f.value},
+        set:function(v){
+          if(box){f.checked=!!v}else if(typeof v==='string'){f.value=v}
+          f.dispatchEvent(new Event('input',{bubbles:true}));f.dispatchEvent(new Event('change',{bubbles:true}));
+        }
+      });
+    });
+  });
+}
+
+/* ---------- preferences (one record shared by every level page of this course) ---------- */
+var DEF={theme:'system',text:'normal',motion:null,calm:false,focus:false,steps:true,hints:true,sound:false};
+var prefs={};for(var dk in DEF)prefs[dk]=DEF[dk];
+(function(){
+  var raw=lsGet(PKEY);
+  if(raw){
+    try{
+      var p=JSON.parse(raw);
+      if(p&&typeof p==='object'){
+        if(/^(system|light|dark)$/.test(p.theme))prefs.theme=p.theme;
+        if(/^(normal|large)$/.test(p.text))prefs.text=p.text;
+        if(p.motion==='reduce'||p.motion==='allow')prefs.motion=p.motion;
+        ['calm','focus','steps','hints','sound'].forEach(function(k){if(typeof p[k]==='boolean')prefs[k]=p[k]});
+      }
+    }catch(e){}
+  }
+})();
+function savePrefs(){lsSet(PKEY,JSON.stringify(prefs))}
+var osReduce=false;
+try{osReduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(e){}
+function motionReduced(){return prefs.motion===null?osReduce:prefs.motion==='reduce'}
+function oneStep(){return prefs.focus||prefs.steps}
+var origTheme=root.getAttribute('data-theme'),themeForced=false;
+function applyPrefs(){
+  if(prefs.theme==='system'){
+    if(themeForced){if(origTheme===null)root.removeAttribute('data-theme');else root.setAttribute('data-theme',origTheme);themeForced=false}
+  }else{root.setAttribute('data-theme',prefs.theme);themeForced=true}
+  root.setAttribute('data-text',prefs.text);
+  root.setAttribute('data-motion',motionReduced()?'reduce':'allow');
+  root.setAttribute('data-calm',prefs.calm?'on':'off');
+  root.setAttribute('data-focus',prefs.focus?'on':'off');
+  root.setAttribute('data-steps',oneStep()?'one':'all');
+  $$('input[name="pf-theme"]').forEach(function(r){r.checked=(r.value===prefs.theme)});
+  $$('input[name="pf-text"]').forEach(function(r){r.checked=(r.value===prefs.text)});
+  var set=function(id,v,dis){var c=$('#'+id);if(c){c.checked=v;c.disabled=!!dis}};
+  set('pf-focus',prefs.focus);
+  set('pf-steps',oneStep(),prefs.focus);
+  set('pf-hints',prefs.hints);
+  set('pf-motion',motionReduced());
+  set('pf-calm',prefs.calm);
+  set('pf-sound',prefs.sound);
+}
+
+/* ---------- announcements, toast, sound ---------- */
+var liveEl=$('#live'),toastEl=$('#toast'),toastT,flip=false;
+function announce(msg){flip=!flip;liveEl.textContent=msg+(flip?' ':'')}
+function toast(msg){
+  announce(msg);
+  if(prefs.calm)return;
+  toastEl.textContent=msg;toastEl.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show')},1600);
+}
+var actx=null;
+function tone(f,t0,d,v){
+  var o=actx.createOscillator(),g=actx.createGain(),n=actx.currentTime;
+  o.type='sine';o.frequency.value=f;
+  g.gain.setValueAtTime(0.0001,n+t0);g.gain.exponentialRampToValueAtTime(v,n+t0+0.02);g.gain.exponentialRampToValueAtTime(0.0001,n+t0+d);
+  o.connect(g);g.connect(actx.destination);o.start(n+t0);o.stop(n+t0+d+0.05);
+}
+function chime(kind){
+  if(!prefs.sound)return;
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    actx=actx||new AC();if(actx.state==='suspended')actx.resume();
+    if(kind==='done'){tone(523,0,.16,.05);tone(784,.14,.24,.05)}else{tone(660,0,.14,.04)}
+  }catch(e){}
+}
+
+/* ---------- elements ---------- */
+var articles=$$('.mission'),nodes=$$('.node');
+var xpEl=$('#xp'),ctxEl=$('#ctxbar'),resumeEl=$('#resume'),resumeText=$('#resumeText'),resumeBtn=$('#resumeBtn');
+var card=$('#levelcard'),stampEl=$('#stamp'),levelSub=$('#levelsub');
+function stepsOf(a){return $$('.mstep',a)}
+function stepName(s){var h=$('h3.label',s);return h?h.textContent:'Step'}
+
+/* ---------- views ---------- */
+function headerH(){var t=$('#top');return t?t.offsetHeight:0}
+function scrollToEl(e){
+  if(!e)return;
+  var y=e.getBoundingClientRect().top+window.pageYOffset-headerH()-12;
+  try{window.scrollTo({top:Math.max(0,y),behavior:motionReduced()?'auto':'smooth'})}catch(x){window.scrollTo(0,Math.max(0,y))}
+}
+function renderCtx(){
+  var i=state.cur,k=state.step[i]||0,secs=stepsOf(articles[i]);
+  ctxEl.textContent='';
+  var b=el('b',null,'Mission '+(i+1)+' of '+COUNT);
+  ctxEl.appendChild(b);
+  var cn=el('span','cn',' · '+NAMES[i]);
+  ctxEl.appendChild(cn);
+  ctxEl.appendChild(document.createTextNode(' · '+(secs[k]?stepName(secs[k]):'')));
+}
+function show(i,k,o){
+  o=o||{};
+  i=clamp(i,0,COUNT-1);
+  var secs=stepsOf(articles[i]);k=clamp(k,0,secs.length-1);
+  state.cur=i;state.step[i]=k;state.seen[i+':'+k]=1;save(!!o.init);
+  articles.forEach(function(a,x){a.hidden=(x!==i)});
+  nodes.forEach(function(n,x){n.setAttribute('aria-current',x===i?'true':'false')});
+  var one=oneStep()&&!viewAll[i];
+  articles[i].classList.toggle('viewing-all',oneStep()&&!!viewAll[i]);
+  var va=$('.viewall',articles[i]);
+  if(va){va.setAttribute('aria-pressed',viewAll[i]?'true':'false');va.textContent=viewAll[i]?'Back to one step at a time':'Show the whole mission'}
+  secs.forEach(function(s,x){s.hidden=(one&&x!==k)});
+  $$('.stepbtn',articles[i]).forEach(function(b,x){
+    if(x===k)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');
+    b.classList.toggle('seen',!!state.seen[i+':'+x]);
+  });
+  renderCtx();
+  if(window.__resetLabels)window.__resetLabels();
+  if(o.focus){
+    var t=(o.focus==='mission')?$('h2',articles[i]):$('h3.label',secs[k]);
+    if(t)t.focus({preventScroll:true});
+  }
+  if(o.scroll==='layout')scrollToEl($('.layout'));
+  else if(o.scroll==='steps')scrollToEl($('.mtabs',articles[i]));
+  else if(o.scroll==='section')scrollToEl($('h3.label',secs[k]));
+  if(o.say)announce('Mission '+(i+1)+', step '+(k+1)+' of '+secs.length+': '+stepName(secs[k]));
+}
+function hideResume(){if(resumeEl)resumeEl.hidden=true}
+
+/* ---------- render progress ---------- */
+function renderHud(){
+  var t=totalXp();
+  xpEl.textContent='';
+  xpEl.appendChild(el('b',null,String(t)));
+  xpEl.appendChild(document.createTextNode(' / '+TOTAL+' XP'));
+  xpEl.setAttribute('aria-label','Level progress: '+t+' of '+TOTAL+' XP');
+  for(var i=1;i<=COUNT;i++){
+    var x=mxp(i),done=x>=NEED,started=x>0,n=nodes[i-1],a=articles[i-1];
+    n.classList.toggle('done',done);
+    var ni=$('.ni',n);if(done)ni.innerHTML=CHECK;else ni.textContent=String(i);
+    var status=done?'Done':(started?'In progress, '+x+' of '+NEED+' XP':'Not started');
+    $('.ns',n).textContent=status;
+    $('.nshort',n).textContent=done?'Done':x+'/'+NEED;
+    var ms=$('.mstate',a);
+    ms.className='mstate'+(done?' is-done':'');
+    ms.innerHTML='';
+    if(done){ms.insertAdjacentHTML('beforeend',CHECK);ms.appendChild(document.createTextNode('Complete'))}
+    else ms.textContent=started?'In progress':'Not started';
+    var pg=$('.mprog',a),bar=$('.bar-track',a);
+    pg.classList.toggle('is-done',done);
+    $('i',bar).style.width=Math.min(100,(x/NEED)*100)+'%';
+    bar.setAttribute('aria-valuenow',String(Math.min(x,NEED)));
+    $('.mprogtxt',a).textContent=Math.min(x,NEED)+' / '+NEED+' XP';
+    $('.mdone',a).hidden=!done;
+  }
+  var show4=mxp(COUNT)>=NEED,wasHidden=card.hidden;
+  card.hidden=!show4;
+  if(show4){
+    var full=t>=TOTAL;
+    stampEl.innerHTML='';
+    if(full)stampEl.insertAdjacentHTML('beforeend',CHECK);
+    stampEl.appendChild(document.createTextNode(full?'Level complete':'Almost there'));
+    stampEl.classList.toggle('pending',!full);
+    levelSub.textContent=full?t+' of '+TOTAL+' XP. '+L.name+' cleared.':t+' of '+TOTAL+' XP. A mission in the list is not marked Done yet. Open it to finish the level.';
+    if(wasHidden){stampEl.style.animation='none';void stampEl.offsetWidth;stampEl.style.animation=''}
+  }
+}
+function award(key,pts){
+  if(state.got[key]||restoring)return;
+  var m=parseInt(key.charAt(1),10),before=mxp(m);
+  state.got[key]=pts;save();hideResume();renderHud();renderCourse();
+  if(before<NEED&&mxp(m)>=NEED){toast('Mission '+m+' complete');chime('done')}
+  else{toast('+'+pts+' XP');chime('xp')}
+}
+
+/* ---------- quiz helper ----------
+   items: [{q, o:[...], c:correctIndex, xp, why, hint}]  XP keys: mk+':q'+index */
+function makeQuiz(host,mk,items){
+  items.forEach(function(it,qi){
+    var key=mk+':q'+qi;
+    var fs=el('fieldset','q');fs.appendChild(el('legend',null,it.q));
+    var list=el('div','qopts');var msg=el('p','why');msg.setAttribute('aria-live','polite');
+    var hb=el('button','btn quiet hintbtn','Show a hint');hb.type='button';hb.hidden=true;
+    hb.addEventListener('click',function(){msg.textContent='Hint: '+it.hint;hb.hidden=true});
+    var btns=it.o.map(function(t,oi){
+      var b=el('button','choice',t);b.type='button';
+      b.addEventListener('click',function(){pick(oi)});
+      list.appendChild(b);return b;
+    });
+    function solve(fresh){
+      btns.forEach(function(b,k){b.disabled=true;if(k===it.c)b.classList.add('ok');else b.classList.add('dim')});
+      msg.className='why good';msg.textContent='Right. '+it.why;hb.hidden=true;
+      if(fresh)award(key,it.xp);
+    }
+    function pick(oi){
+      if(oi===it.c){solve(true);return}
+      btns[oi].classList.add('no');btns[oi].disabled=true;msg.className='why bad';
+      if(prefs.hints){msg.textContent='Not quite. '+it.hint;hb.hidden=true}
+      else{msg.textContent='Not quite. Try another answer.';hb.hidden=false}
+    }
+    if(state.got[key])solve(false);
+    fs.appendChild(list);fs.appendChild(msg);fs.appendChild(hb);host.appendChild(fs);
+  });
+}
+
+/* ---------- copy helper ----------
+   cb(true) when the text reached the clipboard, cb(false) when it could only be selected. */
+function copyText(text,selEl,cb){
+  function fallback(){
+    var sel=false,ok=false;
+    try{var r=document.createRange();r.selectNodeContents(selEl);var s=window.getSelection();s.removeAllRanges();s.addRange(r);sel=true}catch(e){}
+    try{ok=document.execCommand('copy')}catch(e){}
+    cb(!!(ok&&sel));
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){cb(true)},fallback);
+  }else{fallback()}
+}
+
+/* ---------- build the step tabs and step navigation ---------- */
+function buildSteps(){
+  articles.forEach(function(a,i){
+    var secs=stepsOf(a),nav=$('.mtabs',a),ol=el('ol');
+    secs.forEach(function(s,k){
+      var li=el('li'),b=el('button','stepbtn');b.type='button';
+      var sn=el('span','sn',String(k+1));sn.setAttribute('aria-hidden','true');
+      var tx=el('span',null,stepName(s));
+      if(k===secs.length-1){tx.appendChild(el('small',null,'Optional'))}
+      b.appendChild(sn);b.appendChild(tx);
+      b.addEventListener('click',function(){hideResume();show(i,k,{focus:'step',scroll:(oneStep()&&!viewAll[i])?'steps':'section',say:true})});
+      li.appendChild(b);ol.appendChild(li);
+    });
+    nav.appendChild(ol);
+    var vb=el('button','btn quiet viewall','Show the whole mission');vb.type='button';vb.setAttribute('aria-pressed','false');
+    vb.addEventListener('click',function(){viewAll[i]=!viewAll[i];show(i,state.step[i]||0,{});announce(viewAll[i]?'Showing every step of this mission':'Showing one step at a time')});
+    nav.appendChild(vb);
+    var lines=['Finished the exercise? Next, see why it worked.','Next, check what stuck.','Next, go deeper if you like, or move on.',i<COUNT-1?'Next, start the next mission.':'That is the last mission in this level.'];
+    secs.forEach(function(s,k){
+      var sn=el('div','stepnav'),info=el('p','nextline',lines[k]||''),acts=el('div','acts');
+      if(k>0){
+        var bk=el('button','btn ghost','Back: '+stepName(secs[k-1]));bk.type='button';
+        bk.addEventListener('click',function(){show(i,k-1,{focus:'step',scroll:'steps',say:true})});acts.appendChild(bk);
+      }
+      if(k<secs.length-1){
+        var nx=el('button','btn','Next: '+stepName(secs[k+1]));nx.type='button';
+        nx.addEventListener('click',function(){show(i,k+1,{focus:'step',scroll:'steps',say:true})});acts.appendChild(nx);
+        if(k===secs.length-2&&i<COUNT-1){
+          var sk=el('button','btn ghost','Skip to Mission '+(i+2));sk.type='button';
+          sk.addEventListener('click',function(){show(i+1,0,{focus:'mission',scroll:'layout',say:true})});acts.appendChild(sk);
+        }
+      }else if(i<COUNT-1){
+        var nm=el('button','btn','Next mission: '+NAMES[i+1]);nm.type='button';
+        nm.addEventListener('click',function(){show(i+1,0,{focus:'mission',scroll:'layout',say:true})});acts.appendChild(nm);
+      }
+      sn.appendChild(info);sn.appendChild(acts);s.appendChild(sn);
+    });
+    var pg=$('.pager',a);
+    if(i>0){var b1=el('button','btn ghost','Back: '+NAMES[i-1]);b1.type='button';b1.addEventListener('click',function(){show(i-1,0,{focus:'mission',scroll:'layout'})});pg.appendChild(b1)}
+    if(i<COUNT-1){var b2=el('button','btn','Next: '+NAMES[i+1]);b2.type='button';b2.addEventListener('click',function(){show(i+1,0,{focus:'mission',scroll:'layout'})});pg.appendChild(b2)}
+  });
+}
+
+/* ---------- resume card ---------- */
+function renderResume(returning){
+  var t=totalXp(),i=state.cur,k=state.step[i]||0,secs=stepsOf(articles[i]);
+  resumeText.textContent='';
+  if(t>=TOTAL){
+    resumeText.appendChild(el('b',null,'Level complete.'));
+    resumeText.appendChild(el('span','sub','All four missions are done. Open any mission to review it.'));
+    resumeBtn.hidden=true;return;
+  }
+  resumeBtn.hidden=false;
+  if(returning){
+    resumeText.appendChild(el('b',null,'Welcome back.'));
+    resumeText.appendChild(el('span','sub','You were in Mission '+(i+1)+', '+NAMES[i]+', at step '+(k+1)+': '+stepName(secs[k])+'. '+Math.min(mxp(i+1),NEED)+' of '+NEED+' XP in this mission.'+(Object.keys(state.ex).some(function(k){return k.indexOf('m'+(i+1)+'.')===0})?' Your answers are saved.':'')));
+    resumeBtn.textContent='Continue where you left off';
+    resumeBtn.onclick=function(){hideResume();show(i,k,{focus:'step',scroll:'steps',say:true})};
+  }else{
+    resumeText.appendChild(el('b',null,'Start here.'));
+    resumeText.appendChild(el('span','sub','Mission 1, '+NAMES[0]+', takes about '+(L.missions[0].min||10)+' minutes.'));
+    resumeBtn.textContent='Start Mission 1';
+    resumeBtn.onclick=function(){hideResume();show(0,0,{focus:'step',scroll:'steps',say:true})};
+  }
+}
+
+/* ---------- preferences panel ---------- */
+function wirePrefs(){
+  var btn=$('#prefsBtn'),panel=$('#prefs');
+  function open(){panel.hidden=false;btn.setAttribute('aria-expanded','true');var f=$('input:checked',panel)||$('input',panel);if(f)f.focus()}
+  function close(back){panel.hidden=true;btn.setAttribute('aria-expanded','false');if(back)btn.focus()}
+  btn.addEventListener('click',function(){if(panel.hidden)open();else close(false)});
+  $('#prefsClose').addEventListener('click',function(){close(true)});
+  panel.addEventListener('keydown',function(e){if(e.key==='Escape'){e.stopPropagation();close(true)}});
+  $$('input[name="pf-theme"]').forEach(function(r){r.addEventListener('change',function(){if(r.checked){prefs.theme=r.value;savePrefs();applyPrefs();announce('Theme: '+r.value)}})});
+  $$('input[name="pf-text"]').forEach(function(r){r.addEventListener('change',function(){if(r.checked){prefs.text=r.value;savePrefs();applyPrefs();announce(r.value==='large'?'Larger text on':'Standard text size')}})});
+  function bool(id,fn,label){
+    $('#'+id).addEventListener('change',function(e){fn(e.target.checked);savePrefs();applyPrefs();announce(label+(e.target.checked?' on':' off'))});
+  }
+  bool('pf-focus',function(v){prefs.focus=v;refresh();if(v){close(false);var t=$('h3.label',stepsOf(articles[state.cur])[state.step[state.cur]||0]);if(t)t.focus({preventScroll:true})}},'Focus mode');
+  bool('pf-steps',function(v){prefs.steps=v;refresh()},'One step at a time');
+  bool('pf-hints',function(v){prefs.hints=v},'Hints after a wrong answer');
+  bool('pf-motion',function(v){prefs.motion=v?'reduce':'allow'},'Reduce motion');
+  bool('pf-calm',function(v){prefs.calm=v},'Calmer screen');
+  bool('pf-sound',function(v){prefs.sound=v;if(v)chime('xp')},'Sound effects');
+  function refresh(){
+    root.setAttribute('data-steps',oneStep()?'one':'all');
+    show(state.cur,state.step[state.cur]||0,{});
+    window.scrollTo(0,0);
+  }
+  $('#exitFocus').addEventListener('click',function(){prefs.focus=false;savePrefs();applyPrefs();refresh();announce('Focus mode off');btn.focus()});
+  $('#persistNote').textContent=storageOK?'Preferences, progress and your answers are saved in this browser and shared by all five levels.':'This browser is blocking saved data. The course still works, but progress and answers will be lost when you close the page.';
+  var xb=$('#xferBtn');
+  if(xb)xb.addEventListener('click',function(){
+    var msg=importCode($('#xferIn').value);$('#xferMsg').textContent=msg;
+    if(msg.indexOf('Imported')===0)setTimeout(reloadPage,400);
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!panel.hidden){close(true)}});
+}
+
+/* ---------- restart and reset (two-step confirm) ---------- */
+function reloadPage(){try{window.location.reload()}catch(e){}}
+function missionCounts(m){
+  var xp=0,ans=0,k;
+  for(k in state.got){if(k.indexOf('m'+m+':')===0)xp+=state.got[k]}
+  for(k in state.ex){if(k.indexOf('m'+m+'.')===0)ans++}
+  return {xp:xp,ans:ans};
+}
+function wipe(scope){
+  frozen=true;clearTimeout(flushT);
+  var st=readStore(),n;
+  if(scope==='course'){for(n=1;n<=LEVELS;n++)st.levels[n]=cleanLevel(null);st.last=null}
+  else if(scope==='level'){st.levels[L.level]=cleanLevel(null)}
+  else{
+    var e=st.levels[L.level]||cleanLevel(null),m=state.cur+1,k;
+    for(k in e.got){if(k.indexOf('m'+m+':')===0)delete e.got[k]}
+    for(k in e.ex){if(k.indexOf('m'+m+'.')===0)delete e.ex[k]}
+    for(k in e.seen){if(k.charAt(0)===String(state.cur))delete e.seen[k]}
+    e.step[state.cur]=0;e.cur=state.cur;st.levels[L.level]=e;
+  }
+  if(!writeStore(st)){frozen=false;return false}
+  for(n=1;n<=LEVELS;n++){if(scope==='course'||n===L.level){lsDel('aimbc-level'+n+'-v2');lsDel('aimbc-level'+n+'-v1')}}
+  reloadPage();return true;
+}
+function arm(btn,label,confirmLabel,note,run){
+  var armed=false,t,note$=$('#confirmNote');
+  function disarm(){armed=false;btn.textContent=label();clearTimeout(t)}
+  btn.addEventListener('click',function(){
+    if(!armed){armed=true;btn.textContent=confirmLabel();note$.textContent=note();t=setTimeout(function(){disarm();note$.textContent=''},8000);return}
+    disarm();note$.textContent='';run();
+  });
+  btn.addEventListener('blur',function(){setTimeout(function(){if(document.activeElement!==btn){disarm()}},150)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&armed){disarm();note$.textContent='Cancelled. Nothing was erased.'}});
+  btn.refreshLabel=function(){if(!armed)btn.textContent=label()};
+  btn.refreshLabel();
+}
+function wireReset(){
+  var rm=$('#restartM'),rl=$('#reset'),rc=$('#resetAll');
+  arm(rm,function(){return 'Restart Mission '+(state.cur+1)},function(){return 'Confirm: erase Mission '+(state.cur+1)},function(){
+    var c=missionCounts(state.cur+1);
+    return 'This erases '+c.xp+' XP and your saved answers in Mission '+(state.cur+1)+' of Level '+L.level+'. Other missions and levels are not touched. Press Escape to cancel.';
+  },function(){wipe('mission')});
+  arm(rl,function(){return 'Reset Level '+L.level},function(){return 'Confirm: erase Level '+L.level},function(){
+    return 'This erases '+totalXp()+' XP and all saved answers in all four missions of Level '+L.level+'. Other levels are not touched. Press Escape to cancel.';
+  },function(){wipe('level')});
+  arm(rc,function(){return 'Reset the whole course'},function(){return 'Confirm: erase all five levels'},function(){
+    var s=courseSummary(),x=0;s.levels.forEach(function(l){x+=l.xp});
+    return 'This erases '+x+' XP and all saved answers in all five levels, and cannot be undone. Your display preferences are kept. Press Escape to cancel.';
+  },function(){wipe('course')});
+  window.__resetLabels=function(){rm.refreshLabel&&rm.refreshLabel()};
+}
+
+/* ---------- course-wide summary, level chips, last-visited level ---------- */
+function renderCourse(){
+  var s=courseSummary(),xp=0,done=0;
+  s.levels.forEach(function(l){
+    xp+=l.xp;done+=l.done;
+    var c=$('.lvp[data-n="'+l.n+'"]');
+    if(c){
+      c.textContent='';
+      var v=el('span',null,l.done+'/'+COUNT);v.setAttribute('aria-hidden','true');
+      var r=el('span','sr',' '+l.done+' of '+COUNT+' missions done');
+      c.appendChild(v);c.appendChild(r);
+    }
+  });
+  var cb=$('#coursebar');
+  if(cb)cb.textContent='Whole course: '+xp+' of '+(TOTAL*LEVELS)+' XP, '+done+' of '+(COUNT*LEVELS)+' missions done.';
+  var ro=$('#resumeOther');
+  if(ro){
+    ro.textContent='';ro.hidden=true;
+    var last=s.last;
+    if(last&&last.level!==L.level){
+      var lv=s.levels[last.level-1];
+      if(lv&&(lv.xp>0)&&lv.done<COUNT){
+        var a=el('a',null,'Open Level '+last.level);a.href='level'+last.level+'.html';
+        ro.appendChild(document.createTextNode('You were last in Level '+last.level+' ('+lv.done+' of '+COUNT+' missions done). '));
+        ro.appendChild(a);ro.hidden=false;
+      }
+    }
+  }
+}
+
+/* ---------- carry progress from an older link (transfer code) ---------- */
+function importCode(str){
+  try{
+    str=String(str||'').replace(/\s+/g,'');
+    if(str.indexOf('AIMBC1.')!==0)return 'That is not a transfer code from this course.';
+    var data=JSON.parse(decodeURIComponent(escape(atob(str.slice(7)))));
+    if(!data||typeof data!=='object'||!data.levels)return 'That code is empty.';
+    var st=readStore(),n,added=0;
+    for(n=1;n<=LEVELS;n++){
+      if(!data.levels[n])continue;
+      var inc=cleanLevel(data.levels[n]);if(!hasProgress(inc))continue;
+      var cur=(n===L.level)?{got:state.got,cur:state.cur,step:state.step,seen:state.seen,ex:state.ex}:(st.levels[n]||cleanLevel(null));
+      var had=hasProgress(cur),k;
+      for(k in inc.got){if((cur.got[k]||0)<inc.got[k]){cur.got[k]=inc.got[k];added++}}
+      if(!had){cur.cur=inc.cur;cur.step=inc.step}
+      for(k in inc.seen)cur.seen[k]=1;
+      for(k in inc.ex){if(!(k in cur.ex))cur.ex[k]=inc.ex[k]}
+      cur.t=Date.now();
+      st.levels[n]=cleanLevel(cur);
+    }
+    if(!writeStore(st))return 'This browser is blocking saved progress, so nothing could be imported.';
+    return 'Imported. Reloading.';
+  }catch(e){return 'That code could not be read. Check that you copied all of it.'}
+}
+
+/* ---------- scrollable tables must be reachable by keyboard ---------- */
+function enhanceScrollers(r){
+  $$('.tblwrap,.tablewrap',r).forEach(function(w){
+    if(w.getAttribute('tabindex')===null){w.setAttribute('tabindex','0');w.setAttribute('role','region');w.setAttribute('aria-label','Table. Scroll sideways if it does not fit.')}
+  });
+}
+
+/* ---------- start ---------- */
+function start(){
+  if(!root.getAttribute('lang'))root.setAttribute('lang','en');
+  enhanceScrollers(document);
+  try{new MutationObserver(function(){enhanceScrollers(document)}).observe($('#stage'),{childList:true,subtree:true})}catch(e){}
+  var returning=hadSaved&&(totalXp()>0||state.cur>0||(state.step[state.cur]||0)>0||Object.keys(state.seen).length>1||Object.keys(state.ex).length>0);
+  buildSteps();
+  autoFields();
+  ['click','input','change','keyup'].forEach(function(t){document.addEventListener(t,schedule,true)});
+  window.addEventListener('pagehide',flush);
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')flush()});
+  window.addEventListener('storage',function(e){
+    if(e.key!==STORE||frozen)return;
+    var m=readStore().levels[L.level];if(!m)return;
+    var grew=false;for(var k in m.got){if((state.got[k]||0)<m.got[k]){state.got[k]=m.got[k];grew=true}}
+    if(grew)renderHud();
+    renderCourse();
+  });
+  nodes.forEach(function(n,i){n.addEventListener('click',function(){hideResume();show(i,state.step[i]||0,{focus:'mission',scroll:'layout',say:true})})});
+  $('#skip').addEventListener('click',function(e){e.preventDefault();var h=$('h2',articles[state.cur]);if(h){h.focus({preventScroll:true});scrollToEl(h)}});
+  applyPrefs();
+  wirePrefs();wireReset();
+  show(state.cur,state.step[state.cur]||0,{init:true});
+  renderHud();
+  renderCourse();
+  renderResume(returning);
+  if(!storageOK){
+    var w=el('span','sub','This browser is blocking saved data, so progress will not be kept after you close the page.');
+    resumeText.appendChild(w);
+  }
+}
+
+window.Course={$:$,$$:$$,el:el,award:award,has:has,persist:persist,toast:toast,makeQuiz:makeQuiz,copy:copyText,start:start,level:L.level,prefs:function(){return prefs}};
+})();
+
+</script>
+<script>
+(function(C){
+'use strict';
+var $=C.$,$$=C.$$,el=C.el,award=C.award,makeQuiz=C.makeQuiz;
+
+/* ---------- Mission 1: Write Like You ---------- */
+(function(){
+  /* step 1: pick the draft that matches */
+  var DR=[
+    {t:'Juniper Row Bakery is pleased to offer freshly prepared cinnamon rolls on Saturday morning, beginning at seven o’clock, while supplies last.',
+     no:'Too formal. Both real posts use short sentences and plain words, nothing like “is pleased to offer.”'},
+    {t:'Cinnamon rolls. Saturday, 7 a.m., until they’re gone. We have no notes.',ok:true},
+    {t:'We’re thrilled to announce our amazing cinnamon rolls are back this Saturday! Treat yourself to a delicious morning!',
+     no:'Too loud. The real posts have no exclamation marks and no hype words.'}
+  ];
+  var host=$('#l2m1-drafts'),rev=$('#l2m1-r1'),dbtns=[],done1=false,tries1=0,wrong1=[],okIdx1=-1;
+  function pick1(i,quiet){
+    var d=DR[i],b=dbtns[i];
+    if(done1)return;
+    if(d.ok){
+      done1=true;okIdx1=i;
+      dbtns.forEach(function(x,k){x.disabled=true;x.classList.add(k===i?'ok':'dim')});
+      rev.textContent='';
+      rev.appendChild(el('span','tagchip','What gave it away'));
+      rev.appendChild(el('p',null,'Short sentences. Dry humor (“We have no notes”). Plain words. No exclamation marks. You did not need a rulebook, you just heard it. Next, put names on those habits.'));
+      rev.hidden=false;
+      if(!quiet)award('m1:pick',10);
+    }else{
+      tries1++;wrong1.push(i);b.disabled=true;b.classList.add('no');
+      rev.hidden=false;rev.textContent='';
+      rev.appendChild(el('p',null,d.no+(tries1>=2?' The last one is the match.':'')));
+    }
+  }
+  DR.forEach(function(d,i){
+    var b=el('button','choice',d.t);b.type='button';
+    b.addEventListener('click',function(){pick1(i)});
+    host.appendChild(b);dbtns.push(b);
+  });
+  C.persist('m1.pick',{
+    get:function(){return {wrong:wrong1.slice(),ok:okIdx1}},
+    set:function(v){
+      if(!v||typeof v!=='object'||done1||wrong1.length)return;
+      var w=Array.isArray(v.wrong)?v.wrong:[];
+      w.forEach(function(i){if(typeof i==='number'&&i>=0&&i<DR.length&&i%1===0&&!DR[i].ok&&wrong1.indexOf(i)<0)pick1(i,true)});
+      if(typeof v.ok==='number'&&v.ok>=0&&v.ok<DR.length&&DR[v.ok].ok)pick1(v.ok,true);
+    }
+  });
+
+  /* step 2: name the traits */
+  var TR=[
+    {n:'Short sentences',y:true},{n:'Dry humor',y:true},{n:'Plain words',y:true},
+    {n:'Exclamation marks',y:false},{n:'Emoji',y:false},{n:'Long, formal sentences',y:false}
+  ];
+  var tw=$('#l2m1-traits'),tmsg=$('#l2m1-tmsg'),tb=[],checks=0,tmsgState='';
+  TR.forEach(function(t){
+    var b=el('button','chip',t.n);b.type='button';b.setAttribute('aria-pressed','false');
+    b.addEventListener('click',function(){b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')==='true'?'false':'true')});
+    tw.appendChild(b);tb.push(b);
+  });
+  $('#l2m1-check').addEventListener('click',function(){
+    var missed=[],extra=[],any=false;
+    tb.forEach(function(b,i){
+      var on=b.getAttribute('aria-pressed')==='true';if(on)any=true;
+      if(TR[i].y&&!on)missed.push(TR[i].n);
+      if(!TR[i].y&&on)extra.push(TR[i].n);
+    });
+    if(!any){tmsg.textContent='Tap at least one trait first.';tmsgState='';return}
+    checks++;
+    if(!missed.length&&!extra.length){
+      tmsg.textContent='Exactly right: short sentences, dry humor, plain words. Those three are your card’s core.';
+      tmsgState='ok';award('m1:traits',10);return;
+    }
+    if(checks>=2){
+      tb.forEach(function(b,i){b.setAttribute('aria-pressed',TR[i].y?'true':'false')});
+      tmsg.textContent='I set the answer for you: short sentences, dry humor, plain words. The posts have no exclamation marks, no emoji, and nothing formal.';
+      tmsgState='set';award('m1:traits',10);return;
+    }
+    tmsg.textContent=(extra.length?'Not in the posts: '+extra.join(', ')+'. ':'')+(missed.length?'Still missing '+missed.length+' trait'+(missed.length>1?'s':'')+'. Reread the two posts.':'Take those out and check again.');
+    tmsgState=tmsg.textContent;
+  });
+  C.persist('m1.traits',{
+    get:function(){return {on:tb.map(function(b){return b.getAttribute('aria-pressed')==='true'}),checks:checks,msg:tmsgState}},
+    set:function(v){
+      if(!v||typeof v!=='object')return;
+      if(Array.isArray(v.on))tb.forEach(function(b,i){b.setAttribute('aria-pressed',v.on[i]===true?'true':'false')});
+      if(typeof v.checks==='number'&&isFinite(v.checks))checks=Math.max(0,Math.min(99,Math.floor(v.checks)));
+      if(v.msg==='ok'){tmsg.textContent='Exactly right: short sentences, dry humor, plain words. Those three are your card’s core.';tmsgState='ok'}
+      else if(v.msg==='set'){tmsg.textContent='I set the answer for you: short sentences, dry humor, plain words. The posts have no exclamation marks, no emoji, and nothing formal.';tmsgState='set'}
+      else if(typeof v.msg==='string'&&v.msg&&v.msg.length<300){tmsg.textContent=v.msg;tmsgState=v.msg}
+    }
+  });
+
+  /* step 3: voice card builder */
+  var TONE=[
+    {n:'Dry',card:'Dry. Understated, a little deadpan, never gushing.'},
+    {n:'Warm',card:'Warm. A friendly neighbor, welcoming, plain words.'},
+    {n:'Bold',card:'Bold. Confident and direct, urgent without shouting.'}
+  ];
+  var LEN=[{n:'Short sentences',card:'short, up to 8 words each.'},{n:'Flowing sentences',card:'flowing, up to 25 words each.'}];
+  var BANG=[{n:'No exclamation marks',card:'no exclamation marks.'},{n:'Exclamation marks fine',card:'exclamation marks are fine.'}];
+  var OUT={
+    '0,0':'Cinnamon rolls are back Saturday. 7 a.m., $4.50, until they’re gone.',
+    '0,1':'Saturday morning, the cinnamon rolls come out at 7 and stay until the tray is empty, which is usually sooner than we would like. They are $4.50 each.',
+    '1,0':'Saturday means cinnamon rolls. They come out warm at 7 a.m. Come say hi. $4.50 each, until they’re gone.',
+    '1,1':'Saturday mornings at Juniper Row smell like cinnamon, and the first rolls come out at 7. Pop in, grab a warm one for $4.50, and stay a minute if you can.',
+    '2,0':'Saturday, 7 a.m. Cinnamon rolls. Be early. $4.50 each, until they’re gone.',
+    '2,1':'Set an alarm. Saturday’s cinnamon rolls hit the counter at 7 a.m. and they do not last, so plan to get here early. They are $4.50 each.'
+  };
+  $('#l2m1-plain').textContent='We’re thrilled to announce that our amazing cinnamon rolls are back this Saturday! Treat yourself to a delicious, freshly baked delight starting at 7 a.m. Only $4.50!';
+  var sel={t:0,l:0,b:0},tried={},groups={};
+  function trkText(n){return n>=3?'Three cards tried. Same request, different voices.':'Cards tried: '+n+' of 3'}
+  var card=$('#l2m1-card'),withEl=$('#l2m1-with'),trk=$('#l2m1-trk');
+  function mk(hostId,list,key){
+    var h=$(hostId),bs=[];
+    list.forEach(function(o,i){
+      var b=el('button','chip',o.n);b.type='button';b.setAttribute('aria-pressed',i===sel[key]?'true':'false');
+      b.addEventListener('click',function(){
+        sel[key]=i;bs.forEach(function(x,k){x.setAttribute('aria-pressed',k===i?'true':'false')});paint(true);
+      });
+      h.appendChild(b);bs.push(b);
+    });
+    groups[key]=bs;
+  }
+  function paint(user){
+    card.textContent='';
+    [['Voice card: Juniper Row Bakery',0],['Tone: '+TONE[sel.t].card,1],['Sentences: '+LEN[sel.l].card,1],['Punctuation: '+BANG[sel.b].card,1],
+     ['Avoid: hype words like amazing, thrilled, treat yourself.',1],['Sounds like: “Closed Monday. Even bread needs a day off.”',1]].forEach(function(r,i){
+      card.appendChild(el('div','ln',r[0]));
+    });
+    var txt=OUT[sel.t+','+sel.l];
+    if(sel.b===1)txt=txt.replace(/\.$/,'!');
+    withEl.textContent=txt;
+    if(user){
+      tried[sel.t+','+sel.l+','+sel.b]=true;
+      var n=Object.keys(tried).length;
+      trk.textContent=trkText(n);
+      if(n>=3)award('m1:card',10);
+    }else{trk.textContent='Cards tried: 0 of 3. Tap a setting.'}
+  }
+  mk('#l2m1-tone',TONE,'t');mk('#l2m1-len',LEN,'l');mk('#l2m1-bang',BANG,'b');
+  paint(false);
+  if(C.has('m1:card'))trk.textContent='Three cards tried. Same request, different voices.';
+  C.persist('m1.card',{
+    get:function(){return {t:sel.t,l:sel.l,b:sel.b,tried:Object.keys(tried)}},
+    set:function(v){
+      if(!v||typeof v!=='object')return;
+      function pickIdx(x,max){return (typeof x==='number'&&x>=0&&x<max&&x%1===0)?x:0}
+      sel.t=pickIdx(v.t,TONE.length);sel.l=pickIdx(v.l,LEN.length);sel.b=pickIdx(v.b,BANG.length);
+      ['t','l','b'].forEach(function(k){groups[k].forEach(function(x,i){x.setAttribute('aria-pressed',i===sel[k]?'true':'false')})});
+      tried={};
+      if(Array.isArray(v.tried))v.tried.forEach(function(k){if(typeof k==='string'&&/^[0-2],[01],[01]$/.test(k)&&+k.charAt(0)<TONE.length)tried[k]=true});
+      paint(false);
+      var n=Object.keys(tried).length;
+      if(n>0||C.has('m1:card'))trk.textContent=trkText(Math.max(n,C.has('m1:card')?3:0));
+    }
+  });
+
+  makeQuiz($('#l2m1-quiz'),'m1',[
+    {q:'Which line belongs on a voice card?',
+     o:['Sound authentic and professional','Short sentences. Dry. No exclamation marks.','Be the best bakery voice ever'],c:1,xp:10,
+     why:'The AI can follow habits it can count or spot. Moods like “authentic” give it nothing to check.',
+     hint:'Pick the one you could verify by reading a draft.'},
+    {q:'Why add one real sample line to the card?',
+     o:['It makes the card longer, so the AI pays more attention','It shows the traits working together in a single sentence','It stops the AI from ever writing anything else'],c:1,xp:10,
+     why:'Traits describe. A sample demonstrates. Together they pin the voice down.',
+     hint:'Think about “Closed Monday. Even bread needs a day off.” What does it show that a list cannot?'}
+  ]);
+})();
+
+/* ---------- Mission 2: Show, Don't Tell ---------- */
+(function(){
+  var EXS=[
+    {s:'Your mat misses you',p:'Beginner series, Tuesdays at 6 p.m.'},
+    {s:'Slow down. It’s Tuesday.',p:'Six weeks of beginner yoga. $60.'},
+    {s:'Stiff? Perfect. Come anyway.',p:'No experience needed. Starts next Tuesday.'}
+  ];
+  var SETS=[
+    [['Join Our Beginner Yoga Series!','Sign up today for six weeks of beginner yoga at Tidewater.'],
+     ['Begin Your Wellness Adventure','Beginner classes for all levels, starting next Tuesday.'],
+     ['Don’t Miss Out on Yoga Class','Register now: six Tuesdays at 6 p.m. for $60.']],
+    [['Your first class is waiting','Six Tuesdays at 6 p.m. Beginners only. $60.'],
+     ['Your knees will be fine','No experience needed. Starts next Tuesday.'],
+     ['Your Tuesday just got better','Beginner yoga, six weeks, $60 total.']],
+    [['Your hamstrings called. Be nice.','Beginner series, Tuesdays at 6 p.m. $60 for six weeks.'],
+     ['Stiff knees welcome','Six Tuesdays of beginner yoga. No experience needed.'],
+     ['Tuesday, but slower','Beginner yoga at 6 p.m. Six weeks, $60.']]
+  ];
+  var EXN=[{n:'No examples',k:0,i:0},{n:'One example',k:1,i:1},{n:'Three examples',k:3,i:2}];
+  var FMT=[
+    {n:'Free text',line:null},
+    {n:'Table',line:'Format: a table with columns #, Subject, Preview.'},
+    {n:'Subject + preview pairs',line:'Format: for each option, two labeled lines, Subject: and Preview:.'},
+    {n:'Bullets with limits',line:'Format: a bulleted list. Subject 40 characters or fewer, preview 70 or fewer. Show the character count for each.'}
+  ];
+  var NOTES=[
+    'Generic and eager. With no example it writes the average subject line.',
+    'Closer to a voice, but all three copy the shape of your one example, starting with “Your.”',
+    'Now it sees what stays constant (short, dry, specific) and what varies. The openings differ.'
+  ];
+  var ex=0,fm=0,seenE={0:true},seenF={0:true};
+  var exW=$('#l2m2-ex'),fmW=$('#l2m2-fmt'),pr=$('#l2m2-prompt'),out=$('#l2m2-out'),note=$('#l2m2-note'),trk=$('#l2m2-trk');
+  var exB=[],fmB=[];
+  function mkChips(wrap,list,arr,fn){
+    list.forEach(function(o,i){
+      var b=el('button','chip',o.n);b.type='button';b.addEventListener('click',function(){fn(i)});
+      wrap.appendChild(b);arr.push(b);
+    });
+  }
+  function render(){
+    var set=SETS[EXN[ex].i];
+    pr.textContent='';
+    pr.appendChild(el('div','ln','Write 3 subject lines with preview text for our beginner yoga series at Tidewater Yoga. Facts: six Tuesdays at 6 p.m., starts next Tuesday, $60 total, no experience needed.'));
+    if(EXN[ex].k>0){
+      pr.appendChild(el('div','ln new','Past ones I liked:\n'+EXS.slice(0,EXN[ex].k).map(function(e){return 'Subject: '+e.s+'\nPreview: '+e.p}).join('\n\n')));
+    }
+    if(FMT[fm].line)pr.appendChild(el('div','ln new',FMT[fm].line));
+    out.textContent='';
+    if(fm===0){
+      var ul=el('ul','out'),li=el('li');
+      li.appendChild(el('span','t','You could try “'+set[0][0]+'” with a preview like “'+set[0][1]+'”. Or “'+set[1][0]+'”, previewed by “'+set[1][1]+'”. A third option is “'+set[2][0]+'” followed by “'+set[2][1]+'”.'));
+      ul.appendChild(li);out.appendChild(ul);
+    }else if(fm===1){
+      var w=el('div','tblwrap'),t=el('table','tbl'),th=el('tr');
+      ['#','Subject','Preview'].forEach(function(h){th.appendChild(el('th',null,h))});
+      t.appendChild(th);
+      set.forEach(function(r,i){var tr=el('tr');[String(i+1),r[0],r[1]].forEach(function(c){tr.appendChild(el('td',null,c))});t.appendChild(tr)});
+      w.appendChild(t);out.appendChild(w);
+    }else if(fm===2){
+      var ul2=el('ul','out');
+      set.forEach(function(r){
+        var li2=el('li','block'),p=el('div','pair');
+        p.appendChild(el('span','k','Subject'));p.appendChild(el('span',null,r[0]));
+        p.appendChild(el('span','k','Preview'));p.appendChild(el('span',null,r[1]));
+        li2.appendChild(p);ul2.appendChild(li2);
+      });
+      out.appendChild(ul2);
+    }else{
+      var ul3=el('ul','out');
+      set.forEach(function(r){
+        var li3=el('li','block'),p3=el('div','pair');
+        var sOk=r[0].length<=40,pOk=r[1].length<=70;
+        p3.appendChild(el('span',null,'• '+r[0]));
+        p3.appendChild(el('span','n'+(sOk?' fit':''),'subject '+r[0].length+' of 40'+(sOk?' ✓':' over')));
+        p3.appendChild(el('span',null,'• '+r[1]));
+        p3.appendChild(el('span','n'+(pOk?' fit':''),'preview '+r[1].length+' of 70'+(pOk?' ✓':' over')));
+        li3.appendChild(p3);ul3.appendChild(li3);
+      });
+      out.appendChild(ul3);
+    }
+    exB.forEach(function(b,i){b.setAttribute('aria-pressed',i===ex?'true':'false');b.classList.toggle('seen',!!seenE[i])});
+    fmB.forEach(function(b,i){b.setAttribute('aria-pressed',i===fm?'true':'false');b.classList.toggle('seen',!!seenF[i])});
+    note.textContent=NOTES[EXN[ex].i]+(fm===0?' Free text is hard to paste anywhere.':'');
+    var ne=Object.keys(seenE).length,nf=Object.keys(seenF).length;
+    trk.textContent='Example levels seen: '+ne+' of 3. Formats seen: '+nf+' of 4.';
+    if(ne>=3)award('m2:examples',10);
+    if(nf>=4)award('m2:formats',10);
+  }
+  mkChips(exW,EXN,exB,function(i){ex=i;seenE[i]=true;render()});
+  mkChips(fmW,FMT,fmB,function(i){fm=i;seenF[i]=true;render()});
+  render();
+  C.persist('m2.explore',{
+    get:function(){return {ex:ex,fm:fm,seenE:Object.keys(seenE).map(Number),seenF:Object.keys(seenF).map(Number)}},
+    set:function(v){
+      if(!v||typeof v!=='object')return;
+      function idx(x,max){return (typeof x==='number'&&x>=0&&x<max&&x%1===0)?x:0}
+      function mapOf(a,max){var o={0:true};if(Array.isArray(a))a.forEach(function(x){if(typeof x==='number'&&x>=0&&x<max&&x%1===0)o[x]=true});return o}
+      ex=idx(v.ex,EXN.length);fm=idx(v.fm,FMT.length);
+      seenE=mapOf(v.seenE,EXN.length);seenF=mapOf(v.seenF,FMT.length);
+      seenE[ex]=true;seenF[fm]=true;
+      render();
+    }
+  });
+
+  /* match the format to the need */
+  var NEED=[
+    {q:'Your teammate wants to sort and filter the options in a spreadsheet.',a:1,
+     why:'A table pastes into rows and columns with no cleanup.',hint:'Which layout already has columns?'},
+    {q:'You will paste each subject into one field and each preview into another in your email tool.',a:2,
+     why:'Labeled pairs tell you exactly what goes in which box.',hint:'You need to tell subject from preview at a glance, one option at a time.'},
+    {q:'You need to see at a glance which lines run past the character limits.',a:3,
+     why:'A limit in the prompt plus a count on every line makes overruns obvious.',hint:'Which format asks the AI to show a number for each line?'}
+  ];
+  var mh=$('#l2m2-match'),rl=$('#l2m2-rl'),mi=0,rWrong=[],rSolved=false;
+  function round(st){
+    var r=NEED[mi],tries=0;
+    rWrong=[];rSolved=false;
+    mh.textContent='';
+    rl.textContent='Match the format: '+(mi+1)+' of '+NEED.length;
+    mh.appendChild(el('p','ask',r.q));
+    var list=el('div','sent'),btns=[],msg=el('p','msg');msg.setAttribute('aria-live','polite');
+    FMT.forEach(function(f,i){
+      var b=el('button','choice',f.n);b.type='button';
+      b.addEventListener('click',function(){press(i,false)});
+      list.appendChild(b);btns.push(b);
+    });
+    function press(i,quiet){
+      var b=btns[i];
+      if(rSolved)return;
+      if(i===r.a){
+        rSolved=true;
+        btns.forEach(function(x,k){x.disabled=true;x.classList.add(k===i?'ok':'dim')});
+        msg.textContent='Right. '+r.why;
+        if(mi<NEED.length-1){
+          var nb=el('button','btn','Next one');nb.type='button';nb.style.justifySelf='start';
+          nb.addEventListener('click',function(){mi++;round()});mh.appendChild(nb);
+        }else{
+          msg.textContent+=' That is all three.';if(!quiet)award('m2:match',10);
+        }
+      }else{tries++;rWrong.push(i);b.disabled=true;b.classList.add('no');msg.textContent=tries<2?'Not that one. Think about what you will do with the result.':'Hint: '+r.hint}
+    }
+    mh.appendChild(list);mh.appendChild(msg);
+    if(st){
+      st.w.forEach(function(i){press(i,true)});
+      if(st.s)press(r.a,true);
+    }
+  }
+  round();
+  if(C.has('m2:match')){rl.textContent='Match the format: done'}
+  C.persist('m2.match',{
+    get:function(){return {mi:mi,w:rWrong.slice(),s:rSolved}},
+    set:function(v){
+      if(!v||typeof v!=='object')return;
+      var n=(typeof v.mi==='number'&&v.mi>=0&&v.mi<NEED.length&&v.mi%1===0)?v.mi:0;
+      var w=[];
+      if(Array.isArray(v.w))v.w.forEach(function(i){if(typeof i==='number'&&i>=0&&i<FMT.length&&i%1===0&&i!==NEED[n].a&&w.indexOf(i)<0)w.push(i)});
+      mi=n;round({w:w,s:v.s===true});
+      if(C.has('m2:match'))rl.textContent='Match the format: done';
+    }
+  });
+
+  makeQuiz($('#l2m2-quiz'),'m2',[
+    {q:'Why do three varied examples usually beat one?',
+     o:['More text always makes the AI try harder','They show what stays the same and what can change, so it copies the pattern','The AI needs exactly three to switch on'],c:1,xp:10,
+     why:'One example gets copied nearly line for line. Several let the AI separate the pattern from the particulars.',
+     hint:'Remember the “Your…” subject lines from the one-example run.'},
+    {q:'All your outputs start the same way, and your single example does too. Best fix?',
+     o:['Add two more examples that open differently','Ask it to be more creative','Delete the example and start over'],c:0,xp:10,
+     why:'Varied examples tell the AI which part is a habit and which part is a coincidence.',
+     hint:'Which option gives the AI new information about what can vary?'}
+  ]);
+})();
+
+/* ---------- Mission 3: Fix the Miss ---------- */
+(function(){
+  function words(s){return s.trim().split(/\s+/).length}
+  var R=[
+    {title:'Round 1: The email that says nothing',
+     brief:'Lantern Hill Garden Center (made up). Facts you gave: bulb-planting workshop, Saturday at 10 a.m., free.',
+     bad:'Dear Valued Customer, We are excited to share that Lantern Hill Garden Center is hosting a bulb-planting workshop this Saturday at 10 a.m. Whether you are a seasoned gardener or just getting started, this event has something for everyone. Our knowledgeable team will walk you through selecting, preparing, and planting bulbs for a beautiful spring display. The workshop is free, and all are welcome. Thank you for being a part of the Lantern Hill family.',
+     ask:'The draft is long and generic. What do you type next?',
+     opts:[
+      {t:'Make it better.',r:'Dear Valued Customer, We are thrilled to invite you to a truly wonderful bulb-planting workshop this Saturday at 10 a.m. Everyone is welcome, and it is free.',v:'Barely moved, and it got more adjectives. “Better” gives the AI nothing to aim at.',g:'Weak'},
+      {t:'Cut it to under 40 words. Keep the day, the time, and that it is free. Open with the workshop, not a greeting.',r:'Bulb-planting workshop, this Saturday at 10 a.m. It’s free. Come learn how to choose, prep, and plant bulbs now so spring shows up on time. See you at Lantern Hill.',v:'This one works. It names a length, what to keep, and how to open.',g:'Strong',ok:true},
+      {t:'Start a new chat and try again.',r:'Hello! Join us this Saturday at 10 a.m. for a fun and informative bulb-planting workshop at Lantern Hill. All skill levels welcome. Free!',v:'A fresh draw of the same dice. Everything you had already pinned down is gone.',g:'Reset'}
+     ],xp:7},
+    {title:'Round 2: Four headlines, two problems',
+     brief:'Search ad for Lantern Hill. Rule you gave: headlines 30 characters or fewer. You never gave it any prices.',
+     list:['Fall Bulbs, Planted Right','Best Bulb Prices in Town','Free Planting Workshop Saturday','Spring Color Starts Now'],
+     ask:'Headline 2 invents a claim and headline 3 is over the limit. Headlines 1 and 4 are fine. What do you type next?',
+     opts:[
+      {t:'Rewrite all four.',list:['Bulbs for Every Garden','Plant Now, Bloom Later','Garden Center Fall Event','Top-Rated Bulb Selection'],v:'You threw away two good headlines, and a new unsupported claim (“Top-Rated”) crept in.',g:'Weak'},
+      {t:'Keep 1 and 4 as they are. Replace 2: I have not given you prices, so no price claims. Shorten 3 to 30 characters or fewer.',list:['Fall Bulbs, Planted Right','Bulbs for Every Garden Bed','Free Bulb Workshop Saturday','Spring Color Starts Now'],v:'Keep, change, don’t touch. Two lines fixed, two left alone.',g:'Strong',ok:true},
+      {t:'Why did you write “Best Bulb Prices in Town”?',expl:'I wanted the headline to sound persuasive and competitive, so I added a price claim. I apologize for the confusion.',v:'Interesting, but you still have the same four headlines. An explanation is not an edit.',g:'No fix'}
+     ],xp:7},
+    {title:'Round 3: Right facts, wrong voice',
+     brief:'Instagram caption for the workshop. You want a dry, plain voice. Facts: Saturday, 10 a.m., free.',
+     bad:'Don’t miss out! Our incredible bulb workshop is the PERFECT way to get your garden ready for spring. Sign up now and thank us later!',
+     ask:'The facts are right but it sounds like a billboard. What do you type next?',
+     opts:[
+      {t:'Make it sound more like us.',r:'Don’t miss out! Our wonderful bulb workshop is a great way to get your garden ready for spring. Sign up now!',v:'Almost nothing changed. The AI does not know what “us” sounds like.',g:'Weak'},
+      {t:'Be less salesy.',r:'Join us Saturday at 10 a.m. for a bulb-planting workshop. It’s free and open to everyone.',v:'Calmer, and a fair second choice. But it only says what to remove, not what to be.',g:'Partial'},
+      {t:'Match this voice: dry, short sentences, no exclamation marks, no hype words. Sample: “Tulips don’t plant themselves.”',r:'Tulips do not plant themselves. Saturday, 10 a.m., we show you how. It’s free.',v:'Traits plus a sample line. This is the voice card from Mission 1 doing its job.',g:'Strong',ok:true}
+     ],xp:6}
+  ];
+  var host=$('#l2m3-rounds'),idx=0,clicks=[];
+  function render(replay){
+    var r=R[idx],won=false,picks=[];
+    clicks=[];
+    host.textContent='';
+    host.appendChild(el('p','roundline',r.title));
+    var br=el('div','brief');br.appendChild(el('b',null,'Your brief: '));br.appendChild(document.createTextNode(r.brief));host.appendChild(br);
+    host.appendChild(el('p','mini','The AI’s draft'));
+    var d=el('ul','out'),dl=el('li','block');
+    if(r.list){r.list.forEach(function(h){var row=el('div','pair');row.appendChild(el('span',null,h+'  ('+h.length+' characters)'));dl.appendChild(row)})}
+    else dl.appendChild(el('span','t',r.bad+'  ('+words(r.bad)+' words)'));
+    d.appendChild(dl);host.appendChild(d);
+    host.appendChild(el('p','ask',r.ask+' Tap an option to see what comes back. You can try them all.'));
+    var list=el('div','sent'),btns=[];
+    var res=el('div','reveal');res.hidden=true;res.setAttribute('aria-live','polite');
+    r.opts.forEach(function(o,i){
+      var b=el('button','choice','“'+o.t+'”');b.type='button';
+      function pick(quiet){
+        var at=clicks.indexOf(i);if(at>=0)clicks.splice(at,1);clicks.push(i);
+        btns.forEach(function(x,k){x.setAttribute('aria-pressed',k===i?'true':'false')});
+        res.textContent='';
+        res.appendChild(el('span','tagchip',o.g));
+        res.appendChild(el('p','mini','What came back'));
+        var u=el('ul','out'),li=el('li','block');
+        if(o.list){o.list.forEach(function(h){var row=el('div','pair');row.appendChild(el('span',null,h+'  ('+h.length+' characters)'));li.appendChild(row)})}
+        else if(o.expl)li.appendChild(el('span','t',o.expl));
+        else li.appendChild(el('span','t',o.r+(o.ok&&o.r.length<300?'  ('+words(o.r)+' words)':'')));
+        u.appendChild(li);res.appendChild(u);
+        res.appendChild(el('p',null,o.v));
+        res.hidden=false;
+        if(o.ok){
+          b.classList.add('ok');
+          if(!won){won=true;if(!quiet)award('m3:r'+idx,r.xp)}
+        }else b.classList.add('no');
+        if(won){
+          if(idx<R.length-1){
+            var nb=el('button','btn','Next round');nb.type='button';nb.style.justifySelf='start';
+            nb.addEventListener('click',function(){idx++;render()});res.appendChild(nb);
+          }else res.appendChild(el('p','note','That is all three rounds. Now the bigger problem.'));
+        }
+      }
+      b.addEventListener('click',function(){pick(false)});
+      picks.push(pick);
+      list.appendChild(b);btns.push(b);
+    });
+    host.appendChild(list);host.appendChild(res);
+    if(replay)replay.forEach(function(i){picks[i](true)});
+  }
+  render();
+  C.persist('m3.round',{
+    get:function(){return {idx:idx,clicks:clicks.slice()}},
+    set:function(v){
+      if(!v||typeof v!=='object')return;
+      var n=(typeof v.idx==='number'&&v.idx>=0&&v.idx<R.length&&v.idx%1===0)?v.idx:0,c=[];
+      if(Array.isArray(v.clicks))v.clicks.forEach(function(i){if(typeof i==='number'&&i>=0&&i<R[n].opts.length&&i%1===0&&c.indexOf(i)<0)c.push(i)});
+      idx=n;render(c);
+    }
+  });
+
+  /* chain */
+  var CARDS=[
+    {id:'d',t:'Ask for all three emails fully written and ready to send, in one go.',hint:'That is the giant prompt you are trying to avoid.'},
+    {id:'b',t:'Approve the outline, then ask for email 1 only.',after:'a',hint:'Not yet. You need an outline to approve first.'},
+    {id:'a',t:'Ask for an outline: the goal of each of the three emails, one line each.',after:null,hint:'Not yet. What do you need before you can write anything?'},
+    {id:'c',t:'Check email 1, then ask for emails 2 and 3 using email 1 as the model.',after:'b',hint:'Not yet. You need email 1 on the table first.'}
+  ];
+  var ORDER=['a','b','c'];
+  var cw=$('#l2m3-cards'),chain=$('#l2m3-chain'),cmsg=$('#l2m3-msg'),step=0,cbtn={};
+  function accept(c,quiet){
+    var b=cbtn[c.id];
+    step++;b.disabled=true;b.classList.add('ok');
+    chain.appendChild(el('li',null,c.t));
+    if(step>=ORDER.length){
+      cbtn.d.disabled=true;cbtn.d.classList.add('dim');
+      cmsg.textContent='That is a chain. Each step is small, checked, and feeds the next. The card left over is the one-shot prompt it replaces.';
+      if(!quiet)award('m3:chain',10);
+    }else cmsg.textContent='Good. Step '+step+' of 3 is in.';
+  }
+  CARDS.forEach(function(c){
+    var b=el('button','choice',c.t);b.type='button';
+    b.addEventListener('click',function(){
+      if(step>=ORDER.length)return;
+      if(c.id===ORDER[step]){
+        accept(c,false);
+      }else{
+        b.classList.add('no');cmsg.textContent=c.hint;
+        setTimeout(function(){b.classList.remove('no')},900);
+      }
+    });
+    cw.appendChild(b);cbtn[c.id]=b;
+  });
+  C.persist('m3.chain',{
+    get:function(){return {step:step}},
+    set:function(v){
+      if(!v||typeof v!=='object'||step>0)return;
+      var n=(typeof v.step==='number'&&isFinite(v.step))?Math.max(0,Math.min(ORDER.length,Math.floor(v.step))):0;
+      while(step<n){
+        var want=ORDER[step];
+        accept(CARDS.filter(function(c){return c.id===want})[0],true);
+      }
+    }
+  });
+
+  makeQuiz($('#l2m3-quiz'),'m3',[
+    {q:'When is a fresh chat better than another follow-up?',
+     o:['Whenever the first answer is not perfect','When the thread is long and tangled, or the direction itself has changed','Never, follow-ups always work better'],c:1,xp:10,
+     why:'A fresh chat clears the clutter. Carry over your voice card and facts so you do not lose them.',
+     hint:'Round 1 showed what a reset costs. When is that cost worth paying?'},
+    {q:'Why put a checkpoint after step 1 of a chain?',
+     o:['You catch a wrong direction while it is cheap to fix','It makes the AI work harder on later steps','Chains only work with exactly three steps'],c:0,xp:10,
+     why:'Mistakes in step 1 get copied into steps 2 and 3. A quick check early saves a rewrite later.',
+     hint:'Think about what happens if the outline is wrong and you only notice at email 3.'}
+  ]);
+})();
+
+/* ---------- Mission 4: Build Your Kit ---------- */
+(function(){
+  var VOICE='Voice card: Juniper Row Bakery (example)\nTone: dry, understated, never gushing.\nSentences: short, up to 8 words each.\nPunctuation: no exclamation marks.\nAvoid: hype words like amazing, thrilled, treat yourself.\nSounds like: “Closed Monday. Even bread needs a day off.”';
+  var T={
+    ad:{n:'Search ad',what:'a search ad (5 headlines and 2 descriptions)',
+      role:'senior search ad copywriter for small local businesses',
+      aud:'neighbors within ten minutes of the shop who have not visited yet',goal:'get a click to the booking page',
+      cons:'Headlines: 30 characters or fewer. Descriptions: 90 characters or fewer. No exclamation marks. No superlatives like “best” or “number one”.',
+      ex:'Headline: Fresh bread, baked at 4 a.m.',fmt:'A table with columns: Type, Text, Character count.',audph:true,goalph:false},
+    email:{n:'Email',what:'a promotional email (subject, preview text, body)',
+      role:'email marketer who writes for small shops',
+      aud:'past customers who bought once in the last year',goal:'get a reply or a booking',
+      cons:'Subject under 45 characters. Preview text under 80 characters. Body under 120 words. One call to action and one link. No exclamation marks.',
+      ex:'Subject: Closed Monday. Even bread needs a day off.',fmt:'Three labeled parts: Subject, Preview, Body.',audph:true,goalph:true},
+    page:{n:'Landing page section',what:'the hero section of a landing page',
+      role:'conversion copywriter for small business websites',
+      aud:'first-time visitors who arrive from a search ad',goal:'get a form sign-up',
+      cons:'Headline: 10 words or fewer. Subhead: 25 words or fewer. Three benefit bullets, 12 words or fewer each. Button label: 4 words or fewer.',
+      ex:'Headline: Pottery for people who say they can’t.',fmt:'Use these labels: Headline, Subhead, Bullets, Button.',audph:false,goalph:false}
+  };
+  var KEYS=['ad','email','page'];
+  var V={};KEYS.forEach(function(k){var t=T[k];V[k]={role:t.role,aud:t.aud,goal:t.goal,cons:t.cons,ex:t.ex,fmt:t.fmt,audph:t.audph,goalph:t.goalph}});
+  var cur='ad',built={};
+  var f={role:$('#l2m4-role'),voice:$('#l2m4-voice'),aud:$('#l2m4-aud'),goal:$('#l2m4-goal'),cons:$('#l2m4-cons'),ex:$('#l2m4-ex'),fmt:$('#l2m4-fmt'),audph:$('#l2m4-audph'),goalph:$('#l2m4-goalph')};
+  var pre=$('#l2m4-pre'),phn=$('#l2m4-ph'),cn=$('#l2m4-cn'),trk=$('#l2m4-trk'),nextBtn=$('#l2m4-next'),copyBtn=$('#l2m4-copy');
+  var seg=$('#l2m4-types'),radios={},spans={};
+  f.voice.value=VOICE;
+
+  function val(x,ph){var t=x.value.replace(/[ \t]+/g,' ').trim();return t||ph}
+  function store(){
+    var v=V[cur];
+    v.role=f.role.value;v.aud=f.aud.value;v.goal=f.goal.value;v.cons=f.cons.value;v.ex=f.ex.value;v.fmt=f.fmt.value;v.audph=f.audph.checked;v.goalph=f.goalph.checked;
+  }
+  function load(){
+    var v=V[cur];
+    f.role.value=v.role;f.aud.value=v.aud;f.goal.value=v.goal;f.cons.value=v.cons;f.ex.value=v.ex;f.fmt.value=v.fmt;f.audph.checked=v.audph;f.goalph.checked=v.goalph;
+    sync();
+  }
+  function sync(){
+    f.aud.disabled=f.audph.checked;f.goal.disabled=f.goalph.checked;
+  }
+  function build(){
+    var t=T[cur];
+    var aud=f.audph.checked?'{audience}':val(f.aud,'{audience}');
+    var goal=f.goalph.checked?'{goal}':val(f.goal,'{goal}');
+    return 'You are a '+val(f.role,'[role]')+'.\n\n'
+      +'Write '+t.what+' for {offer}.\n\n'
+      +'Audience: '+aud+'\n'
+      +'Goal: '+goal+'\n'
+      +'Constraints: '+val(f.cons,'[constraints]')+'\n\n'
+      +val(f.voice,'[voice card]')+'\n\n'
+      +'An example of the style I want:\n'+val(f.ex,'[example]')+'\n\n'
+      +'Format: '+val(f.fmt,'[format]')+'\n\n'
+      +'Facts you may use:\n{facts}\n\n'
+      +'Use only the facts above. Do not invent statistics, quotes, prices, dates, or claims. If you need a fact I did not give you, ask me before writing.';
+  }
+  function refresh(){
+    pre.textContent=build();
+    var seen={},list=[];
+    (pre.textContent.match(/\{[a-z_]+\}/g)||[]).forEach(function(p){if(!seen[p]){seen[p]=1;list.push(p)}});
+    phn.textContent='Fill in each time you use it: '+list.join('  ')+'. Everything else stays fixed.';
+  }
+  function shelf(){
+    var n=Object.keys(built).length;
+    KEYS.forEach(function(k){spans[k].classList.toggle('built',!!built[k])});
+    trk.textContent=n>=2?'Kit started: '+n+' of 3 types copied.':'Types copied: '+n+' of 2 needed. Pick another type after you copy.';
+    var nx=KEYS[(KEYS.indexOf(cur)+1)%KEYS.length];
+    nextBtn.textContent='Switch to: '+T[nx].n;
+  }
+  function select(k){
+    if(k===cur)return;
+    store();cur=k;radios[k].checked=true;load();refresh();shelf();cn.textContent='';
+  }
+  KEYS.forEach(function(k){
+    var lab=el('label'),inp=document.createElement('input');
+    inp.type='radio';inp.name='l2m4-type';inp.value=k;if(k===cur)inp.checked=true;
+    var sp=el('span',null,T[k].n);
+    inp.addEventListener('change',function(){if(inp.checked)select(k)});
+    lab.appendChild(inp);lab.appendChild(sp);seg.appendChild(lab);radios[k]=inp;spans[k]=sp;
+  });
+  ['role','voice','aud','goal','cons','ex','fmt'].forEach(function(k){f[k].addEventListener('input',refresh);f[k].addEventListener('change',refresh)});
+  ['audph','goalph'].forEach(function(k){f[k].addEventListener('change',function(){sync();refresh()})});
+  nextBtn.addEventListener('click',function(){select(KEYS[(KEYS.indexOf(cur)+1)%KEYS.length])});
+  load();refresh();shelf();
+  C.persist('m4.kit',{
+    get:function(){
+      store();
+      var o={cur:cur,built:Object.keys(built),v:{}};
+      KEYS.forEach(function(k){var x=V[k];o.v[k]={role:x.role,aud:x.aud,goal:x.goal,cons:x.cons,ex:x.ex,fmt:x.fmt,audph:!!x.audph,goalph:!!x.goalph}});
+      return o;
+    },
+    set:function(d){
+      if(!d||typeof d!=='object')return;
+      if(d.v&&typeof d.v==='object'){
+        KEYS.forEach(function(k){
+          var x=d.v[k];if(!x||typeof x!=='object')return;
+          ['role','aud','goal','cons','ex','fmt'].forEach(function(p){if(typeof x[p]==='string'&&x[p].length<4000)V[k][p]=x[p]});
+          ['audph','goalph'].forEach(function(p){if(typeof x[p]==='boolean')V[k][p]=x[p]});
+        });
+      }
+      built={};
+      if(Array.isArray(d.built))d.built.forEach(function(k){if(KEYS.indexOf(k)>=0)built[k]=true});
+      if(typeof d.cur==='string'&&KEYS.indexOf(d.cur)>=0)cur=d.cur;
+      radios[cur].checked=true;load();refresh();shelf();
+    }
+  });
+
+  function done(ok){
+    built[cur]=true;
+    var n=Object.keys(built).length;
+    cn.textContent=ok?'Copied. Paste it into your AI tool and replace the {placeholders}.':'Text selected. Press copy on your keyboard, then paste it into your AI tool.';
+    award('m4:first',15);
+    if(n>=2)award('m4:second',20);
+    shelf();
+  }
+  copyBtn.addEventListener('click',function(){
+    store();
+    C.copy(build(),pre,done);
+  });
+
+  var boxes=$$('#l2m4-checklist input'),ckmsg=$('#l2m4-ckmsg');
+  function checkAll(){
+    var all=boxes.every(function(b){return b.checked});
+    if(all){ckmsg.textContent='All four ticked. Your kit works.';award('m4:check',15)}
+    else if(!C.has('m4:check')){ckmsg.textContent=''}
+  }
+  boxes.forEach(function(b){b.addEventListener('change',checkAll)});
+  if(C.has('m4:check')){boxes.forEach(function(b){b.checked=true});ckmsg.textContent='All four ticked. Your kit works.'}
+})();
+})(window.Course);
+
+</script>
+<script>Course.start();</script>
+
+</html>

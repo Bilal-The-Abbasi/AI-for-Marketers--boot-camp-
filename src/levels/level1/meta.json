@@ -1,0 +1,40 @@
+{
+ "level": 1,
+ "pageTitle": "AI Marketing Boot Camp",
+ "name": "Boot Camp",
+ "lede": "Four missions, about ten minutes each. You try something first, then find out why it worked. Jump to any mission in any order.",
+ "description": "Level 1 of an interactive AI course for marketers: four short missions with games, quizzes, XP, and a real prompt to run.",
+ "missions": [
+  {
+   "name": "Guess the Next Word",
+   "min": 10,
+   "hook": "Every AI writing tool is, at heart, a very good guesser. You are about to guess alongside it.",
+   "objective": "See how an AI picks its next word, and how your context changes the odds."
+  },
+  {
+   "name": "Brief the Machine",
+   "min": 10,
+   "hook": "Same AI, same task, five different answers. The only thing that changes is what you tell it. Add one ingredient at a time and watch.",
+   "objective": "Add four prompt ingredients one at a time and see how each one improves the result."
+  },
+  {
+   "name": "Spot the Fake",
+   "min": 10,
+   "hook": "AI writes confident sentences whether or not they are true. Your job is catching the bad one before it ships. Three rounds, one problem sentence in each.",
+   "objective": "Catch the invented number, quote, or rule in an AI draft before it ships."
+  },
+  {
+   "name": "Your First Win",
+   "min": 10,
+   "hook": "Time for the real thing. Fill in a few boxes, copy the prompt, paste it into any AI tool you already use, then grade what comes back.",
+   "objective": "Write a complete prompt for your own offer, run it, and grade what comes back."
+  }
+ ],
+ "recap": [
+  "AI ranks likely next words. Context moves the odds.",
+  "Audience, goal, rules, and voice turn a generic answer into yours.",
+  "Check numbers, quotes, dates, and “always.” The AI cannot vouch for itself.",
+  "You ran a real prompt and graded the result."
+ ],
+ "next": "Next up: Level 2, Prompt Craft. Build a reusable prompt kit for ads, emails, and landing pages."
+}
